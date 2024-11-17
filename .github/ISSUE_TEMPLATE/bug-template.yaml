@@ -1,0 +1,79 @@
+name: "Bug Report"
+description: Report an issue or possible bug
+title: "[BUG]:"
+labels: ["bug"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for taking the time to file a bug report! Please provide as much information as possible.
+        Add as much information as possible from --debug flag (drizzle-lab cli) or output panel (vscode-drizzle-orm extension).
+
+  - type: checkboxes
+    id: verified
+    attributes:
+      label: Report hasn't been filed before.
+      options:
+        - label: I have verified that the bug I'm about to report hasn't been filed before.
+          required: true
+
+  - type: input
+    attributes:
+      label: What version of `vscode-drizzle-orm` are you using?
+      description: You can check the version by opening extension's output panel.
+      placeholder: 0.0.0
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: vscode
+    attributes:
+      label: Are you using Cursor or any other VSCode fork?
+      options:
+        - label: "yes"
+          required: false
+
+  - type: checkboxes
+    id: drizzle-run
+    attributes:
+      label: Is it related to `drizzle.run`?
+      options:
+        - label: "yes"
+          required: false
+
+  - type: input
+    attributes:
+      label: What version of `drizzle-lab` are you using?
+      description: You can check the version by opening the `package.json` file in your project.
+      placeholder: 0.0.0
+    validations:
+      required: true
+
+  - type: input
+    attributes:
+      label: What version of `@drizzle-lab/api` are you using?
+      description: You can check the version by opening the `package.json` file in your project.
+      placeholder: 0.0.0
+    validations:
+      required: false
+
+  - type: textarea
+    attributes:
+      label: Describe the Bug
+      description: |
+        To fill this field, please answer the following:
+          - What is the undesired behavior?
+          - What are the steps to reproduce it?
+          - What is the desired result?
+
+        Add as much information as possible from `--debug` flag (drizzle-lab cli) or output panel (vscode-drizzle-orm extension).
+
+        If the issue is more specific, consider answering the following questions if you think they may be relevant:
+          - What database engine are you using? Are you using a specific?
+          - Do you think this bug pertains to a specific database driver? or configuration? Which one?
+          - Are you working in a monorepo?
+          - If this is a bug related to types: What Typescript version are you using? What's the content of your tsconfig.json file?
+          - If you're using a runtime that isn't Node.js: Which one? What version? Have you verified that this isn't an issue with the runtime itself?
+    validations:
+      required: true

@@ -1,0 +1,37 @@
+{
+  "name": "drizzle-lab-monorepo",
+  "private": true,
+  "scripts": {
+    "dev": "TZ=UTC turbo dev --log-prefix=none",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "clean-node-modules": "rm -rf {node_modules,package-lock.json} **/*/{node_modules,package-lock.json}",
+    "clean-turbo-cache": "rm -rf ./**/.turbo",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "drizzle-lab:release:publish": "npm run -w drizzle-lab release:publish",
+    "drizzle-run:docker:build": "docker build -f apps/drizzle-run/Dockerfile -t drizzle-run .",
+    "drizzle-run:docker:run": "docker run --rm --name drizzle-run -p 3000:3000 --env-file apps/drizzle-run/.env --env-file apps/drizzle-run/.env.supabase drizzle-run",
+    "drizzle-run:start:docker": "run-s drizzle-run:docker:*",
+    "drizzle-run:start:local:prod": "npm run -w drizzle-run start:local:prod",
+    "drizzle-run:start:local": "npm run -w drizzle-run start:local",
+    "drizzle-run:start": "npm run -w drizzle-run start",
+    "prod:drizzle-run:deploy": "fly deploy -c apps/drizzle-run/fly.toml --dockerfile apps/drizzle-run/Dockerfile --ignorefile .dockerignore --remote-only",
+    "postinstall": "patch-package"
+  },
+  "devDependencies": {
+    "patch-package": "^8.0.0",
+    "prettier": "^3.1.1",
+    "turbo": "^2.2.3",
+    "typescript": "^5.5.4"
+  },
+  "packageManager": "npm@10.1.0",
+  "workspaces": [
+    "apps/*",
+    "shared/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "prettier": {}
+}

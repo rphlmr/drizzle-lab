@@ -1,0 +1,11 @@
+{
+  "$schema": "https://sly-cli.fly.dev/registry/config.json",
+  "libraries": [
+    {
+      "name": "lucide-icons",
+      "directory": "./other/svg-icons",
+      "postinstall": ["npm", "run", "build"],
+      "transformers": []
+    }
+  ]
+}

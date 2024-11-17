@@ -1,0 +1,14 @@
+node_modules
+.turbo
+**/.cache
+build/
+dist
+*.env*
+!*.env.example
+
+templates/*/drizzle
+container
+*.wasm
+.drizzle/
+*.vsix
+*.tgz

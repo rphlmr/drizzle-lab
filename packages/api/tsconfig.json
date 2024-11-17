@@ -1,0 +1,9 @@
+{
+  "extends": "@repo/typescript-config/node-library.json",
+  "compilerOptions": {
+    "noImplicitAny": false,
+    "allowImportingTsExtensions": true
+  },
+  "include": ["src/**/*.ts", "../../shared/typescript-config/reset.d.ts"],
+  "exclude": ["node_modules", "dist"]
+}

@@ -1,0 +1,23 @@
+{
+  "extends": "@repo/typescript-config/remix.json",
+  "include": [
+    "**/*.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "**/.server/**/*.ts",
+    "**/.server/**/*.tsx",
+    "**/.client/**/*.ts",
+    "**/.client/**/*.tsx"
+  ],
+  "exclude": ["node_modules"],
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "~/*": ["./app/*"],
+      "registry/*": ["./registry/*"],
+      "@drizzle-lab/api/*/node": ["../../packages/api/src/*/index.node"],
+      "@drizzle-lab/api/*": ["../../packages/api/src/*"],
+      "@drizzle-lab/visualizer/*": ["../../packages/visualizer/src/*"]
+    }
+  }
+}

@@ -1,15 +1,18 @@
-# 👋 Welcome to Drizzle Run!
-> Drizzle in your browser
+# 👋 Welcome to Drizzle Lab!
 
-![drizzle-run-app](https://github.com/rphlmr/drizzle-run/assets/20722140/03c97e54-d15a-4ca9-8ae1-53bf97337dbd)
+![drizzle_lab](https://github.com/user-attachments/assets/b2d92e19-ec7c-4b48-93fe-bd5ca30f1838)
 
-**The code will be open-sourced later**
 
-Relies on:
-- [Drizzle ORM](https://orm.drizzle.team)
-- [Stackblitz Webcontainers](https://webcontainers.io)
-- [Xstate](https://stately.ai/docs)
-- [Electric SQL](https://electric-sql.com)
-- [Remix Run](https://remix.run)
-- [Supabase](https://supabase.com)
-- [Fly](https://fly.io)
+> [!NOTE]
+> Documentation is WIP
+
+## As promised, here's a list of projects I am open-sourcing:
+
+- [Drizzle Run](./apps/drizzle-run)
+- [Drizzle Lab (CLI + Visualizer)](./apps/cli)
+- [Drizzle VSCode extension](./vscode-extension)
+- [Drizzle Lab API (Kit fork)](./packages/api)
+- [Drizzle Lab Visualizer](./packages/visualizer)
+
+
+I will try to add more documentation to each project.

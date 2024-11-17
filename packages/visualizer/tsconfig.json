@@ -1,0 +1,17 @@
+{
+  "extends": "@repo/typescript-config/react-library.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "jsx": "react-jsx",
+    "noEmit": true,
+    "paths": {
+      "@drizzle-lab/api/*": ["../api/src/*"]
+    }
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    "../../shared/typescript-config/reset.d.ts"
+  ],
+  "exclude": ["node_modules", "dist"]
+}

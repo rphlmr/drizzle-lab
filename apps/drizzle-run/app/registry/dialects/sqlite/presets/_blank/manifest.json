@@ -1,0 +1,5 @@
+{
+  "$schema": "../../../manifest.schema.json",
+  "name": "Blank",
+  "description": "Start from scratch"
+}

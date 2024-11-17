@@ -1,0 +1,7 @@
+{
+  "name": "@repo/eslint-plugin-node-imports",
+  "version": "0.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "description": "Prevent importing .node.ts files from non-.node.ts files except for type imports"
+}

@@ -1,0 +1,1 @@
+export { relationsToTypeScript } from "./typescript";

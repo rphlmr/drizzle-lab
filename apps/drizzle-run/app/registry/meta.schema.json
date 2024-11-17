@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "id": "meta.schema.json",
+  "description": "A schema for the meta.json file in a preset",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The name of the preset"
+    },
+    "description": {
+      "type": "string",
+      "description": "A description of the preset"
+    }
+  },
+  "required": ["name", "description"]
+}

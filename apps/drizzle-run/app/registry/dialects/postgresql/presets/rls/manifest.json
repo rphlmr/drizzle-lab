@@ -1,0 +1,5 @@
+{
+  "$schema": "../../../manifest.schema.json",
+  "name": "Starter 01",
+  "description": "A starter demo"
+}

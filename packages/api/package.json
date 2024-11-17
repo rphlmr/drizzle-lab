@@ -1,0 +1,223 @@
+{
+  "name": "@drizzle-lab/api",
+  "version": "0.27.4",
+  "description": "Drizzle Lab API - Fork of Drizzle Kit API",
+  "type": "module",
+  "license": "MIT",
+  "author": "@rphlmr",
+  "homepage": "https://github.com/rphlmr/drizzle-lab#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rphlmr/drizzle-lab.git"
+  },
+  "bugs": {
+    "url": "https://github.com/rphlmr/drizzle-lab/issues"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup --config tsup.config.ts",
+    "postbuild": "npm run check:exports",
+    "check:exports": "attw --pack .",
+    "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
+    "typecheck": "tsc --noEmit",
+    "prerelease:publish": "npm version prerelease && npm publish --access=public --tag next",
+    "patch:publish": "npm version patch && npm publish --access=public",
+    "minor:publish": "npm version minor && npm publish --access=public"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "exports": {
+    "./package.json": "./package.json",
+    "./config/node": {
+      "import": {
+        "types": "./dist/config/index.node.d.ts",
+        "import": "./dist/config/index.node.js",
+        "default": "./dist/config/index.node.js"
+      },
+      "require": {
+        "types": "./dist/config/index.node.d.cts",
+        "import": "./dist/config/index.node.cjs",
+        "require": "./dist/config/index.node.cjs"
+      }
+    },
+    "./extensions": {
+      "import": {
+        "types": "./dist/extensions/index.d.ts",
+        "import": "./dist/extensions/index.js",
+        "default": "./dist/extensions/index.js"
+      },
+      "require": {
+        "types": "./dist/extensions/index.d.cts",
+        "import": "./dist/extensions/index.cjs",
+        "require": "./dist/extensions/index.cjs"
+      }
+    },
+    "./pg": {
+      "import": {
+        "types": "./dist/pg/index.d.ts",
+        "import": "./dist/pg/index.js",
+        "default": "./dist/pg/index.js"
+      },
+      "require": {
+        "types": "./dist/pg/index.d.cts",
+        "import": "./dist/pg/index.cjs",
+        "require": "./dist/pg/index.cjs"
+      }
+    },
+    "./pg/node": {
+      "import": {
+        "types": "./dist/pg/index.node.d.ts",
+        "import": "./dist/pg/index.node.js",
+        "default": "./dist/pg/index.node.js"
+      },
+      "require": {
+        "types": "./dist/pg/index.node.d.cts",
+        "import": "./dist/pg/index.node.cjs",
+        "require": "./dist/pg/index.node.cjs"
+      }
+    },
+    "./sqlite": {
+      "import": {
+        "types": "./dist/sqlite/index.d.ts",
+        "import": "./dist/sqlite/index.js",
+        "default": "./dist/sqlite/index.js"
+      },
+      "require": {
+        "types": "./dist/sqlite/index.d.cts",
+        "import": "./dist/sqlite/index.cjs",
+        "require": "./dist/sqlite/index.cjs"
+      }
+    },
+    "./sqlite/node": {
+      "import": {
+        "types": "./dist/sqlite/index.node.d.ts",
+        "import": "./dist/sqlite/index.node.js",
+        "default": "./dist/sqlite/index.node.js"
+      },
+      "require": {
+        "types": "./dist/sqlite/index.node.d.cts",
+        "import": "./dist/sqlite/index.node.cjs",
+        "require": "./dist/sqlite/index.node.cjs"
+      }
+    },
+    "./mysql": {
+      "import": {
+        "types": "./dist/mysql/index.d.ts",
+        "import": "./dist/mysql/index.js",
+        "default": "./dist/mysql/index.js"
+      },
+      "require": {
+        "types": "./dist/mysql/index.d.cts",
+        "import": "./dist/mysql/index.cjs",
+        "require": "./dist/mysql/index.cjs"
+      }
+    },
+    "./mysql/node": {
+      "import": {
+        "types": "./dist/mysql/index.node.d.ts",
+        "import": "./dist/mysql/index.node.js",
+        "default": "./dist/mysql/index.node.js"
+      },
+      "require": {
+        "types": "./dist/mysql/index.node.d.cts",
+        "import": "./dist/mysql/index.node.cjs",
+        "require": "./dist/mysql/index.node.cjs"
+      }
+    },
+    "./relations": {
+      "import": {
+        "types": "./dist/relations/index.d.ts",
+        "import": "./dist/relations/index.js",
+        "default": "./dist/relations/index.js"
+      },
+      "require": {
+        "types": "./dist/relations/index.d.cts",
+        "import": "./dist/relations/index.cjs",
+        "require": "./dist/relations/index.cjs"
+      }
+    },
+    "./sql": {
+      "import": {
+        "types": "./dist/sql/index.d.ts",
+        "import": "./dist/sql/index.js",
+        "default": "./dist/sql/index.js"
+      },
+      "require": {
+        "types": "./dist/sql/index.d.cts",
+        "import": "./dist/sql/index.cjs",
+        "require": "./dist/sql/index.cjs"
+      }
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "config/node": [
+        "./dist/config/index.node.d.ts",
+        "./dist/config/index.node.d.cts"
+      ],
+      "extensions": [
+        "./dist/extensions/index.d.ts",
+        "./dist/extensions/index.d.cts"
+      ],
+      "pg": [
+        "./dist/pg/index.d.ts",
+        "./dist/pg/index.d.cts"
+      ],
+      "pg/node": [
+        "./dist/pg/index.node.d.ts",
+        "./dist/pg/index.node.d.cts"
+      ],
+      "sqlite": [
+        "./dist/sqlite/index.d.ts",
+        "./dist/sqlite/index.d.cts"
+      ],
+      "sqlite/node": [
+        "./dist/sqlite/index.node.d.ts",
+        "./dist/sqlite/index.node.d.cts"
+      ],
+      "mysql": [
+        "./dist/mysql/index.d.ts",
+        "./dist/mysql/index.d.cts"
+      ],
+      "mysql/node": [
+        "./dist/mysql/index.node.d.ts",
+        "./dist/mysql/index.node.d.cts"
+      ],
+      "relations": [
+        "./dist/relations/index.d.ts",
+        "./dist/relations/index.d.cts"
+      ],
+      "sql": [
+        "./dist/sql/index.d.ts",
+        "./dist/sql/index.d.cts"
+      ]
+    }
+  },
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "glob": "^11.0.0",
+    "jiti": "^2.4.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "*",
+    "@repo/typescript-config": "*",
+    "eslint": "^8.56.0",
+    "tsup": "^8.3.5",
+    "typescript": "^5.3.3"
+  },
+  "peerDependencies": {
+    "@electric-sql/pglite": ">=0.2.0",
+    "@libsql/client-wasm": ">=0.9.0",
+    "drizzle-kit": ">=0.26.0",
+    "drizzle-orm": ">=0.36.0",
+    "mysql2": ">=3.0.0"
+  },
+  "optionalDependencies": {
+    "@rollup/rollup-linux-x64-musl": "^4.25.0"
+  },
+  "prettier": {}
+}

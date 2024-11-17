@@ -1,0 +1,24 @@
+export const DRIZZLE_LAB_ENV_KEY = {
+  DEBUG: "DRIZZLE_LAB_DEBUG",
+  CWD: "DRIZZLE_LAB_CWD",
+  CONFIG_PATH: "DRIZZLE_LAB_CONFIG_PATH",
+  SAVE_DIR: "DRIZZLE_LAB_SAVE_DIR",
+  PROJECT_ID: "DRIZZLE_LAB_PROJECT_ID",
+  TS_CONFIG_PATH: "TS_CONFIG_PATH",
+} as const;
+
+export const DRIZZLE_LAB_DEBUG =
+  process.env[DRIZZLE_LAB_ENV_KEY.DEBUG] === "true";
+
+export const DRIZZLE_LAB_CWD = process.env[DRIZZLE_LAB_ENV_KEY.CWD]
+  ? `${process.env[DRIZZLE_LAB_ENV_KEY.CWD]}/`
+  : "";
+
+export const DRIZZLE_LAB_CONFIG_PATH =
+  process.env[DRIZZLE_LAB_ENV_KEY.CONFIG_PATH];
+
+export const DRIZZLE_LAB_PROJECT_ID =
+  process.env[DRIZZLE_LAB_ENV_KEY.PROJECT_ID];
+
+export const DRIZZLE_LAB_TS_CONFIG_PATH =
+  process.env[DRIZZLE_LAB_ENV_KEY.TS_CONFIG_PATH] || "./tsconfig.json";

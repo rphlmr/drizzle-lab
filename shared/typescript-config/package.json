@@ -1,0 +1,13 @@
+{
+  "name": "@repo/typescript-config",
+  "version": "0.0.0",
+  "private": true,
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@total-typescript/ts-reset": "^0.5.1"
+  },
+  "prettier": {}
+}
