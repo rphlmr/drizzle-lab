@@ -1,4 +1,4 @@
-import { getTableConfig } from "drizzle-orm/sqlite-core";
+import { getTableConfig, getViewConfig } from "drizzle-orm/sqlite-core";
 import type { SQLiteView, AnySQLiteTable } from "drizzle-orm/sqlite-core";
 
 import { DrizzleLab } from "../../extensions/symbols.ts";
@@ -13,6 +13,8 @@ import {
   schemaToDrizzleObjects,
   type DrizzleObjects,
 } from "../serializer/drizzle-objects.ts";
+
+// fork: drizzle-kit/src/serializer/sqliteImports.ts
 
 /**
  * Import the Drizzle schema and extract the Drizzle objects.
@@ -50,9 +52,23 @@ export async function importFromFiles(
     }),
   );
 
+  const uniqueTables = Array.from(
+    new Map(
+      tables.map((table) => [getTableConfig(table).name, table]),
+    ).values(),
+  );
+
+  const uniqueViews = Array.from(
+    new Map(views.map((view) => [getViewConfig(view).name, view])).values(),
+  );
+
+  const uniqueRelations = Array.from(
+    new Map(relations.map((rel) => [rel.dbName, rel])).values(),
+  );
+
   return {
-    tables: Array.from(new Set(tables)),
-    views,
-    relations,
+    tables: uniqueTables,
+    views: uniqueViews,
+    relations: uniqueRelations,
   };
 }

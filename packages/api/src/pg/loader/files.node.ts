@@ -1,4 +1,8 @@
-import { getTableConfig } from "drizzle-orm/pg-core";
+import {
+  getMaterializedViewConfig,
+  getTableConfig,
+  getViewConfig,
+} from "drizzle-orm/pg-core";
 import type {
   PgPolicy,
   PgRole,
@@ -22,6 +26,8 @@ import {
   schemaToDrizzleObjects,
   type DrizzleObjects,
 } from "../serializer/drizzle-objects.ts";
+
+// fork: drizzle-kit/src/serializer/pgImports.ts
 
 /**
  * Import the Drizzle schema and extract the Drizzle objects.
@@ -74,19 +80,58 @@ export async function importFromFiles(
     }),
   );
 
+  const uniqueTables = Array.from(
+    new Map(
+      tables.map((table) => [getTableConfig(table).name, table]),
+    ).values(),
+  );
+
+  const uniqueSchemas = Array.from(
+    new Map(schemas.map((schema) => [schema.schemaName, schema])).values(),
+  );
+
+  const uniqueEnums = Array.from(
+    new Map(enums.map((en) => [en.name, en])).values(),
+  );
+
+  const uniqueSequences = Array.from(
+    new Map(sequences.map((seq) => [seq.seqName, seq])).values(),
+  );
+
+  const uniqueViews = Array.from(
+    new Map(views.map((view) => [getViewConfig(view).name, view])).values(),
+  );
+
+  const uniqueMatViews = Array.from(
+    new Map(
+      matViews.map((matView) => [
+        getMaterializedViewConfig(matView).name,
+        matView,
+      ]),
+    ).values(),
+  );
+
+  const uniqueRoles = Array.from(
+    new Map(roles.map((role) => [role.name, role])).values(),
+  );
+
+  const uniquePolicies = Array.from(
+    new Map(policies.map((policy) => [policy.name, policy])).values(),
+  );
+
   const uniqueRelations = Array.from(
     new Map(relations.map((rel) => [rel.dbName, rel])).values(),
   );
 
   return {
-    tables: Array.from(new Set(tables)),
-    enums,
-    schemas,
-    sequences,
-    views,
-    matViews,
-    roles,
-    policies,
+    tables: uniqueTables,
+    enums: uniqueEnums,
+    schemas: uniqueSchemas,
+    sequences: uniqueSequences,
+    views: uniqueViews,
+    matViews: uniqueMatViews,
+    roles: uniqueRoles,
+    policies: uniquePolicies,
     relations: uniqueRelations,
   };
 }
