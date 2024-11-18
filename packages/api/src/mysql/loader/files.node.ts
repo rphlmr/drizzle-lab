@@ -3,8 +3,8 @@ import {
   type AnyMySqlTable,
   type MySqlSchema,
   type MySqlView,
+  getTableConfig,
 } from "drizzle-orm/mysql-core";
-import { getTableConfig } from "drizzle-orm/sqlite-core";
 
 import { DrizzleLab } from "../../extensions/symbols.ts";
 import type { DrizzleSchema } from "../../internal/global.ts";
