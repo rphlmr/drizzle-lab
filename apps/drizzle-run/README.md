@@ -5,35 +5,32 @@
 > [!NOTE]
 > Documentation is WIP
 
-## Development
+## How to run it locally
 
-Run the Vite dev server:
+> [!IMPORTANT]
+> [Install Supabase CLI to self host Supabase](https://supabase.com/docs/guides/local-development/cli/getting-started)
 
-```shellscript
-npm run dev
-```
+___
 
-## Deployment
+> [!IMPORTANT]
+> To use GitHub auth, you need to create an OAuth app on GitHub and add the client ID and secret to the `.env` file at the **root** of the project.
+> 
+> [Follow the docs](https://supabase.com/docs/guides/auth/social-login/auth-github)
+> 
+> ```env
+> SUPABASE_AUTH_GITHUB_CLIENT_ID=
+> SUPABASE_AUTH_GITHUB_SECRET=
+> ```
+> Once done, you can restart the Supabase project with `supabase stop` and `supabase start`.
 
-First, build your app for production:
+___
 
-```sh
-npm run build
-```
+1. Start Supabase locally with `supabase start` and wait until it's done.
+2. Create a `.env` file with the required variables by running `cp .env.example .env`. It already contains all the required environment variables and their values.
+   * NB: `DATABASE_URL_MIGRATE`, on production, it should point to the port `5432` of your db instance.
+3. `npm install`
+4. `cd apps/drizzle-run`
+5. Apply Drizzle migrations `npm run db:server:migration:deploy`
+6. Run `npm run dev` to start the development server
 
-Then run the app in production mode:
-
-```sh
-npm start
-```
-
-Now you'll need to pick a host to deploy it to.
-
-### DIY
-
-If you're familiar with deploying Node applications, the built-in Remix app server is production-ready.
-
-Make sure to deploy the output of `npm run build`
-
-- `build/server`
-- `build/client`
+It's a npm workspace monorepo, everything is linked together so if you make changes to `packages/*`, they will be reflected in the app.
