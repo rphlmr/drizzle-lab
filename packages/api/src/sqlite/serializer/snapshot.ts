@@ -158,11 +158,16 @@ export function drizzleObjectsToSnapshot(
             column.uniqueName,
           )} on the ${chalk.underline.blue(
             name,
-          )} column is confilcting with a unique constraint name already defined for ${chalk.underline.blue(
+          )} column is conflicting with a unique constraint name already defined for ${chalk.underline.blue(
             existingUnique.columns.join(","),
           )} columns\n`)}`,
           );
-          throw new Error();
+          throw new Error(
+            `We've found duplicated unique constraint names in ${tableName} table. 
+          The unique constraint ${column.uniqueName} on the ${column.name} column is conflicting with a unique constraint name already defined for ${existingUnique.columns.join(
+            ",",
+          )} columns`,
+          );
         }
         indexesObject[column.uniqueName!] = {
           name: column.uniqueName!,
@@ -282,7 +287,14 @@ export function drizzleObjectsToSnapshot(
             )} columns\n`,
           )}`,
         );
-        throw new Error();
+        throw new Error(
+          `We've found duplicated unique constraint names in ${tableName} table. 
+          The unique constraint ${name} on the ${columnNames.join(
+            ",",
+          )} columns is conflicting with a unique constraint name already defined for ${existingUnique.columns.join(
+            ",",
+          )} columns`,
+        );
       }
 
       indexesObject[name] = {
@@ -326,7 +338,9 @@ export function drizzleObjectsToSnapshot(
               )} table`,
             )}`,
           );
-          throw new Error();
+          throw new Error(
+            `We've found duplicated check constraint name in ${tableName} table. Please rename your check constraint in the ${tableName} table`,
+          );
         }
         checksInTable[tableName].push(checkName);
       } else {
@@ -382,7 +396,9 @@ export function drizzleObjectsToSnapshot(
           )} schema. Please rename your view`,
         )}`,
       );
-      throw new Error();
+      throw new Error(
+        `We've found duplicated view name across ${schema ?? "public"} schema. Please rename your view`,
+      );
     }
 
     for (const key in selectedFields) {

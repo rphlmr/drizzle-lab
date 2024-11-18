@@ -352,7 +352,9 @@ export function drizzleObjectsToSnapshot(
         )} columns\n`,
           )}`,
         );
-        throw new Error();
+        throw new Error(
+          `We've found duplicated unique constraint names in ${chalk.underline.blue(tableName)} table.`,
+        );
       }
 
       uniqueConstraintObject[name] = {
@@ -420,7 +422,11 @@ export function drizzleObjectsToSnapshot(
                 `Please specify an index name in ${getTableName(value.config.table)} table that has "${dialect.sqlToQuery(it).sql}" expression. We can generate index names for indexes on columns only; for expressions in indexes, you need to specify the name yourself.`,
               )}`,
             );
-            throw new Error();
+            throw new Error(
+              `Please specify an index name in ${getTableName(
+                value.config.table,
+              )} table that has "${dialect.sqlToQuery(it).sql}" expression. We can generate index names for indexes on columns only; for expressions in indexes, you need to specify the name yourself.`,
+            );
           }
         }
         it = it as IndexedColumn;
@@ -447,7 +453,13 @@ export function drizzleObjectsToSnapshot(
               )}\n\nYou can check the "pg_vector" docs for more info: https://github.com/pgvector/pgvector?tab=readme-ov-file#indexing\n`,
             )}`,
           );
-          throw new Error();
+          throw new Error(
+            `You are specifying an index on the ${
+              name
+            } column inside the ${tableName} table with the vector type without specifying an operator class. Vector extension doesn't have a default operator class, so you need to specify one of the available options. Here is a list of available op classes for the vector extension: [${vectorOps
+              .map((it) => `${chalk.underline(`${it}`)}`)
+              .join(", ")}].`,
+          );
         }
         indexColumnNames.push(name);
       });
@@ -494,7 +506,9 @@ export function drizzleObjectsToSnapshot(
               )} table or the table with the duplicated index name`,
             )}`,
           );
-          throw new Error();
+          throw new Error(
+            `We've found duplicated index name across ${schema ?? "public"} schema. Please rename your index in either the ${tableName} table or the table with the duplicated index name`,
+          );
         }
         indexesInSchema[schema ?? "public"].push(name);
       } else {
@@ -545,7 +559,9 @@ export function drizzleObjectsToSnapshot(
             )} name`,
           )}`,
         );
-        throw new Error();
+        throw new Error(
+          `We've found duplicated policy name across ${tableKey} table. Please rename one of the policies with ${policy.name} name`,
+        );
       }
 
       policiesObject[policy.name] = {
@@ -585,7 +601,11 @@ export function drizzleObjectsToSnapshot(
               )} table or the table with the duplicated check contraint name`,
             )}`,
           );
-          throw new Error();
+          throw new Error(
+            `We've found duplicated check constraint name across ${
+              schema ?? "public"
+            } schema in ${tableName} table. Please rename your check constraint in either the ${tableName} table or the table with the duplicated check contraint name`,
+          );
         }
         checksInTable[`"${schema ?? "public"}"."${tableName}"`].push(checkName);
       } else {
@@ -683,7 +703,9 @@ export function drizzleObjectsToSnapshot(
           )} name`,
         )}`,
       );
-      throw new Error();
+      throw new Error(
+        `We've found duplicated policy name across ${tableKey} table. Please rename one of the policies with ${policy.name} name`,
+      );
     }
 
     const mappedPolicy = {
@@ -814,7 +836,9 @@ export function drizzleObjectsToSnapshot(
           )} schema. Please rename your view`,
         )}`,
       );
-      throw new Error();
+      throw new Error(
+        `We've found duplicated view name across ${schema ?? "public"} schema. Please rename your view`,
+      );
     }
 
     for (const key in selectedFields) {
@@ -900,12 +924,17 @@ export function drizzleObjectsToSnapshot(
                 `We\'ve found duplicated unique constraint names in ${chalk.underline.blue(viewName)} table. 
           The unique constraint ${chalk.underline.blue(column.uniqueName)} on the ${chalk.underline.blue(
             column.name,
-          )} column is confilcting with a unique constraint name already defined for ${chalk.underline.blue(
+          )} column is conflicting with a unique constraint name already defined for ${chalk.underline.blue(
             existingUnique.columns.join(","),
           )} columns\n`,
               )}`,
             );
-            throw new Error();
+            throw new Error(
+              `We've found duplicated unique constraint names in ${viewName} table. 
+          The unique constraint ${column.uniqueName} on the ${column.name} column is conflicting with a unique constraint name already defined for ${existingUnique.columns.join(
+            ",",
+          )} columns`,
+            );
           }
           uniqueConstraintObject[column.uniqueName!] = {
             name: column.uniqueName!,

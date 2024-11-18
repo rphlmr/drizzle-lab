@@ -1,9 +1,10 @@
-import type {
-  AnyMySqlTable,
-  MySqlSchema,
-  MySqlView,
+import {
+  getViewConfig,
+  type AnyMySqlTable,
+  type MySqlSchema,
+  type MySqlView,
+  getTableConfig,
 } from "drizzle-orm/mysql-core";
-import { getTableConfig } from "drizzle-orm/sqlite-core";
 
 import { DrizzleLab } from "../../extensions/symbols.ts";
 import type { DrizzleSchema } from "../../internal/global.ts";
@@ -56,10 +57,28 @@ export async function importFromFiles(
     }),
   );
 
+  const uniqueTables = Array.from(
+    new Map(
+      tables.map((table) => [getTableConfig(table).name, table]),
+    ).values(),
+  );
+
+  const uniqueSchemas = Array.from(
+    new Map(schemas.map((schema) => [schema.schemaName, schema])).values(),
+  );
+
+  const uniqueViews = Array.from(
+    new Map(views.map((view) => [getViewConfig(view).name, view])).values(),
+  );
+
+  const uniqueRelations = Array.from(
+    new Map(relations.map((rel) => [rel.dbName, rel])).values(),
+  );
+
   return {
-    tables: Array.from(new Set(tables)),
-    schemas,
-    views,
-    relations,
+    tables: uniqueTables,
+    schemas: uniqueSchemas,
+    views: uniqueViews,
+    relations: uniqueRelations,
   };
 }

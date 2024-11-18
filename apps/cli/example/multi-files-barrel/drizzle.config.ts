@@ -11,7 +11,7 @@ export default defineConfig({
   dbCredentials: {
     url: process.env.ADMIN_DATABASE_URL!,
   },
-  schema: `${base}/index.ts`,
+  schema: `${base}/schemas`,
   out: `${base}/migrations`,
   verbose: false,
   schemaFilter: ["public"],
