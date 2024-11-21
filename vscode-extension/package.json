@@ -40,6 +40,10 @@
       {
         "command": "drizzle.visualizer:stop",
         "title": "🌧️ Stop Drizzle Visualizer server"
+      },
+      {
+        "command": "drizzle.studio:stop",
+        "title": "🌧️ Stop Drizzle Studio server"
       }
     ],
     "codeLens": [
@@ -48,7 +52,17 @@
           "typescript"
         ]
       }
-    ]
+    ],
+    "configuration": {
+      "title": "Drizzle",
+      "properties": {
+        "drizzle.studio.url": {
+          "type": "string",
+          "default": "https://local.drizzle.studio",
+          "description": "Drizzle Studio URL"
+        }
+      }
+    }
   },
   "scripts": {
     "package": "vsce package",

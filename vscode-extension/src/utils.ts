@@ -1,9 +1,13 @@
 import path from "node:path";
 import * as vscode from "vscode";
-import { getExtensionContext } from "./context";
 
 export const outputChannel =
   vscode.window.createOutputChannel("Drizzle Visualizer");
+
+export function toastError(message: string) {
+  outputChannel.appendLine(message);
+  vscode.window.showErrorMessage(message);
+}
 
 export function createPanel({
   id,
@@ -14,8 +18,6 @@ export function createPanel({
   title: string;
   onDispose?: () => void;
 }) {
-  const context = getExtensionContext();
-
   const panel = vscode.window.createWebviewPanel(
     id,
     title,
@@ -27,8 +29,16 @@ export function createPanel({
   );
 
   panel.iconPath = {
-    light: vscode.Uri.joinPath(context.extensionUri, "media", "drizzle.png"),
-    dark: vscode.Uri.joinPath(context.extensionUri, "media", "drizzle.png"),
+    light: vscode.Uri.joinPath(
+      vscode.Uri.file(path.dirname(__dirname)),
+      "media",
+      "drizzle.png",
+    ),
+    dark: vscode.Uri.joinPath(
+      vscode.Uri.file(path.dirname(__dirname)),
+      "media",
+      "drizzle.png",
+    ),
   };
 
   panel.onDidDispose(onDispose);
@@ -67,4 +77,31 @@ export async function findNearestPackageJson(startPath: vscode.Uri) {
   }
 
   throw new Error("No workspace folder found. Unable to find package.json");
+}
+
+export function findDrizzleConfigLines(
+  text: string,
+  options: { requireDb: boolean } = { requireDb: false },
+) {
+  const isConfig =
+    text.includes("drizzle-kit") &&
+    (text.includes("defineConfig") ||
+      text.includes("type Config") ||
+      text.includes("satisfies Config")) &&
+    options.requireDb
+      ? text.includes("dbCredentials")
+      : true;
+
+  if (!isConfig) {
+    return [];
+  }
+
+  return text
+    .split("\n")
+    .map((line, index) => ({ line, index }))
+    .filter(
+      ({ line }) =>
+        (line.includes("defineConfig") || line.includes("default")) &&
+        (line.includes("export") || line.includes("module.exports")),
+    );
 }

@@ -5,14 +5,14 @@ import { createPanel, render } from "../../utils";
 /* Local state */
 let $panel: WebviewPanel | undefined = undefined;
 
-export function createDrizzleVisualizerPanel() {
+export function createDrizzleStudioPanel() {
   if ($panel) {
     return $panel;
   }
 
   $panel = createPanel({
-    id: "DrizzleVisualizer",
-    title: "Drizzle Visualizer",
+    id: "DrizzleStudio",
+    title: "Drizzle Studio",
     onDispose: () => {
       $panel = undefined;
     },
@@ -20,13 +20,13 @@ export function createDrizzleVisualizerPanel() {
 
   $panel.webview.html = render(`
 		<p style="display: flex; justify-content: center; align-items: center; height: 100%; margin: 0; font-size: 1.5rem; font-weight: bold;">
-      Starting Drizzle Visualizer...
+      Starting Drizzle Studio...
     </p>
   `);
 
   return $panel;
 }
 
-export function closeDrizzleVisualizerPanel() {
+export function closeDrizzleStudioPanel() {
   $panel?.dispose();
 }

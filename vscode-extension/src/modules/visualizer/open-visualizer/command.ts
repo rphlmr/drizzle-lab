@@ -1,32 +1,23 @@
-import * as vscode from "vscode";
-
+import { render, toastError } from "../../../utils";
 import { createDrizzleVisualizerPanel } from "../panel";
 import { startVisualizer } from "../server";
-import { outputChannel, render } from "../../../utils";
 
-export const command = "drizzle.visualizer:open";
+export const OpenVisualizerCommand = "drizzle.visualizer:open";
 
-const OutputKey = `[${command}]`;
+export async function OpenVisualizer(...args: any[]) {
+  const OutputKey = `[${OpenVisualizerCommand}]`;
+  const configPath = args[0];
 
-export const OpenVisualizerCommand = vscode.commands.registerCommand(
-  command,
-  async (...args) => {
-    const configPath = args[0];
+  if (!configPath || typeof configPath !== "string") {
+    toastError(`${OutputKey} Expected config path to be a string`);
+    return;
+  }
 
-    if (!configPath || typeof configPath !== "string") {
-      const msg = `${OutputKey} Expected config path to be a string`;
+  try {
+    const { port } = await startVisualizer(configPath);
+    const panel = createDrizzleVisualizerPanel();
 
-      vscode.window.showErrorMessage(msg);
-      outputChannel.appendLine(msg);
-
-      return;
-    }
-
-    try {
-      const panel = createDrizzleVisualizerPanel();
-      const { port } = await startVisualizer(configPath);
-
-      panel.webview.html = render(`
+    panel.webview.html = render(`
 				<iframe 
 					src="http://127.0.0.1:${port}" 
 					width="100%" 
@@ -35,14 +26,13 @@ export const OpenVisualizerCommand = vscode.commands.registerCommand(
 					style="border: none;"
 				/>`);
 
-      panel.reveal();
-    } catch (error) {
-      const msg = `${OutputKey} Failed to start Drizzle Visualizer: ${error instanceof Error ? error.message : String(error)}`;
-
-      vscode.window.showErrorMessage(msg);
-      outputChannel.appendLine(msg);
-
-      return;
-    }
-  },
-);
+    panel.reveal();
+  } catch (error) {
+    toastError(
+      `${OutputKey} Failed to start Drizzle Visualizer: ${
+        error instanceof Error ? error.message : String(error)
+      }`,
+    );
+    return;
+  }
+}

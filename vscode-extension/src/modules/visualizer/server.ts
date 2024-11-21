@@ -1,7 +1,7 @@
 import { ChildProcessWithoutNullStreams, spawn } from "node:child_process";
 import path from "node:path";
 
-import { getProjectWorkingDir } from "../../context";
+import { findProjectWorkingDir } from "../../context";
 import { outputChannel } from "../../utils";
 
 /* Local state */
@@ -11,7 +11,7 @@ let $processIds: number[] = [];
 let $configPath: string | undefined = undefined;
 
 /* Constants */
-const OutputKey = "[App]";
+const OutputKey = "[Visualizer]";
 const extensionCwd = path.dirname(__dirname);
 const appsCwd = path.join(extensionCwd, "apps");
 const binPath = path.join(appsCwd, "visualizer", "server", "index.mjs");
@@ -36,14 +36,12 @@ export async function startVisualizer(configPath: string) {
       stopVisualizer();
     }
 
+    $configPath = configPath;
+
     if (!$port) {
       // random port from 60_000 to 64_000
       $port = String(Math.floor(Math.random() * 4000) + 60000);
     }
-
-    $configPath = configPath;
-
-    const cwd = await getProjectWorkingDir($configPath);
 
     // if app is already running on the same config path, return the existing app
     if ($app) {
@@ -53,6 +51,7 @@ export async function startVisualizer(configPath: string) {
       return resolve({ port: $port });
     }
 
+    const cwd = await findProjectWorkingDir($configPath);
     const drizzleEnvs = {
       DRIZZLE_LAB_CONFIG_PATH: path.relative(cwd, $configPath),
       DRIZZLE_LAB_SAVE_DIR: ".drizzle",
@@ -99,7 +98,7 @@ export async function startVisualizer(configPath: string) {
     });
 
     $app.on("error", (error) => {
-      console.error("app error", error);
+      console.error(`${OutputKey} process error`, error);
     });
   });
 }

@@ -1,34 +1,41 @@
-import * as vscode from "vscode";
-import { outputChannel } from "./utils";
 import path from "node:path";
+import * as vscode from "vscode";
 
-/* Local state */
-let $context: vscode.ExtensionContext | undefined = undefined;
+import pkg from "../package.json";
+import { toastError } from "./utils";
 
 /* Constants */
 const OutputKey = "[Context]";
 
-export function setExtensionContext(context: vscode.ExtensionContext) {
-  $context = context;
+type Configuration = typeof pkg.contributes.configuration.properties;
+type ConfigurationKey = keyof Configuration extends `${string}.${infer Rest}`
+  ? Rest
+  : never;
+
+export function getConfiguration<Type>(key: ConfigurationKey) {
+  return vscode.workspace.getConfiguration("drizzle").get<Type>(key);
 }
 
-export function getExtensionContext() {
-  if (!$context) {
-    const msg = `${OutputKey} Context not set`;
-    outputChannel.appendLine(msg);
+export function getWorkspaceRootFolder(startPath: string) {
+  const workspaceRootPath = vscode.workspace.getWorkspaceFolder(
+    vscode.Uri.file(startPath),
+  )?.uri.fsPath;
+
+  if (!workspaceRootPath) {
+    const msg = `${OutputKey} No workspace root folder found`;
+    toastError(msg);
     throw new Error(msg);
   }
 
-  return $context;
+  return workspaceRootPath;
 }
 
-export async function getProjectWorkingDir(configPath: string) {
+export async function findProjectWorkingDir(configPath: string) {
   const pwd = path.dirname(await findNearestPackageJson(configPath));
 
   if (!pwd) {
     const msg = `${OutputKey} No workspace folder`;
-    vscode.window.showErrorMessage(msg);
-    outputChannel.appendLine(msg);
+    toastError(msg);
     throw new Error(msg);
   }
 
@@ -36,18 +43,7 @@ export async function getProjectWorkingDir(configPath: string) {
 }
 
 async function findNearestPackageJson(startPath: string) {
-  const rootPath = vscode.workspace.getWorkspaceFolder(
-    vscode.Uri.file(startPath),
-  )?.uri.fsPath;
-
-  const msg = `${OutputKey} No root folder found. Unable to find package.json`;
-
-  if (!rootPath) {
-    vscode.window.showErrorMessage(msg);
-    outputChannel.appendLine(msg);
-    throw new Error(msg);
-  }
-
+  const rootPath = getWorkspaceRootFolder(startPath);
   let currentDir = path.dirname(startPath);
 
   while (currentDir.startsWith(rootPath)) {
@@ -60,7 +56,7 @@ async function findNearestPackageJson(startPath: string) {
     }
   }
 
-  vscode.window.showErrorMessage(msg);
-  outputChannel.appendLine(msg);
+  const msg = `${OutputKey} No package.json found in workspace`;
+  toastError(msg);
   throw new Error(msg);
 }

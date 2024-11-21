@@ -1,28 +1,60 @@
 import * as vscode from "vscode";
 
 import visualizerPkg from "../apps/visualizer/package.json";
-import { setExtensionContext } from "./context";
 import { OpenVisualizerCodeLens } from "./modules/visualizer/open-visualizer/codelens";
-import { OpenVisualizerCommand } from "./modules/visualizer/open-visualizer/command";
-import { StopVisualizerCommand } from "./modules/visualizer/stop-visualizer/command";
+import {
+  OpenVisualizer,
+  OpenVisualizerCommand,
+} from "./modules/visualizer/open-visualizer/command";
+import {
+  StopVisualizerCommand,
+  StopVisualizer,
+} from "./modules/visualizer/stop-visualizer/command";
 import { stopVisualizer } from "./modules/visualizer/server";
 import { outputChannel } from "./utils";
+import {
+  OpenStudioCommand,
+  OpenStudio,
+  SelectEnvAndOpenStudio,
+  SelectEnvAndOpenStudioCommand,
+} from "./modules/studio/open-studio/command";
+import {
+  StopStudioCommand,
+  StopStudio,
+} from "./modules/studio/stop-studio/command";
+import { OpenStudioCodeLens } from "./modules/studio/open-studio/codelens";
+import { stopStudio } from "./modules/studio/server";
 
 export function activate(context: vscode.ExtensionContext) {
-  setExtensionContext(context);
   checkNodeVersion();
 
-  // Register CodeLens and commands
   context.subscriptions.push(
-    OpenVisualizerCodeLens,
-    OpenVisualizerCommand,
-    StopVisualizerCommand,
+    /* Studio */
+    vscode.commands.registerCommand(OpenStudioCommand, OpenStudio),
+    vscode.commands.registerCommand(
+      SelectEnvAndOpenStudioCommand,
+      SelectEnvAndOpenStudio,
+    ),
+    vscode.commands.registerCommand(StopStudioCommand, StopStudio),
+    vscode.languages.registerCodeLensProvider(
+      { pattern: "**/*{drizzle,config}.ts", language: "typescript" },
+      new OpenStudioCodeLens(),
+    ),
+
+    /* Visualizer */
+    vscode.commands.registerCommand(OpenVisualizerCommand, OpenVisualizer),
+    vscode.commands.registerCommand(StopVisualizerCommand, StopVisualizer),
+    vscode.languages.registerCodeLensProvider(
+      { pattern: "**/*{drizzle,config}.ts", language: "typescript" },
+      new OpenVisualizerCodeLens(),
+    ),
   );
 }
 
 // This method is called when your extension is deactivated
 export function deactivate() {
   stopVisualizer();
+  stopStudio();
 }
 
 function checkNodeVersion() {
