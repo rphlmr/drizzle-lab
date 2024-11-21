@@ -4,6 +4,11 @@ All notable changes to the "drizzle-orm" extension will be documented in this fi
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [0.6.0]
+
+- Add Drizzle Studio command
+- Add a setting to choose your Drizzle Studio url (default is `https://local.drizzle.studio`)
+
 ## [0.5.0]
 
 - Handle duplicated imports from barrel exports
