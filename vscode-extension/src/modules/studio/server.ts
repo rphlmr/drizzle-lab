@@ -124,7 +124,12 @@ export function stopStudio() {
 export function findDrizzleKitPath(configPath: string) {
   const cwd = getWorkspaceRootFolder(configPath);
 
-  const drizzleKitPath = path.join(cwd, "node_modules", ".bin", "drizzle-kit");
+  const drizzleKitPath = path.join(
+    cwd,
+    "node_modules",
+    "drizzle-kit",
+    "bin.cjs",
+  );
 
   if (!fs.existsSync(drizzleKitPath)) {
     return null;
