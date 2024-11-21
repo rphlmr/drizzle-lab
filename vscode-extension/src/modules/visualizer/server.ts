@@ -1,8 +1,8 @@
 import { ChildProcessWithoutNullStreams, spawn } from "node:child_process";
 import path from "node:path";
 
-import { getProjectWorkingDir } from "./context";
-import { outputChannel } from "./utils";
+import { getProjectWorkingDir } from "../../context";
+import { outputChannel } from "../../utils";
 
 /* Local state */
 let $port: string | undefined = undefined;
@@ -13,14 +13,16 @@ let $configPath: string | undefined = undefined;
 /* Constants */
 const OutputKey = "[App]";
 const extensionCwd = path.dirname(__dirname);
-const binPath = path.join(extensionCwd, "visualizer", "server", "index.mjs");
+const appsCwd = path.join(extensionCwd, "apps");
+const binPath = path.join(appsCwd, "visualizer", "server", "index.mjs");
 
 interface ServerStartResult {
   port: string;
 }
 
-export async function start(configPath: string) {
+export async function startVisualizer(configPath: string) {
   outputChannel.appendLine(`${OutputKey} extension cwd: ${extensionCwd}`);
+  outputChannel.appendLine(`${OutputKey} apps cwd: ${appsCwd}`);
   outputChannel.appendLine(
     `${OutputKey} Using drizzle visualizer from: ${binPath}`,
   );
@@ -31,7 +33,7 @@ export async function start(configPath: string) {
       outputChannel.appendLine(
         `${OutputKey} Config path changed. Killing server and restarting on port ${$port} with new config path: ${configPath}`,
       );
-      stop();
+      stopVisualizer();
     }
 
     if (!$port) {
@@ -66,7 +68,7 @@ export async function start(configPath: string) {
       stdio: "pipe",
       detached: true,
       shell: false,
-      cwd: extensionCwd,
+      cwd: appsCwd,
       env: {
         ...process.env,
         ...drizzleEnvs,
@@ -92,12 +94,17 @@ export async function start(configPath: string) {
 
     // error from the server
     $app.stderr.on("data", (error) => {
-      return reject(error);
+      outputChannel.appendLine(`${OutputKey} [stderr] ${String(error)}`);
+      reject(error);
+    });
+
+    $app.on("error", (error) => {
+      console.error("app error", error);
     });
   });
 }
 
-export function stop() {
+export function stopVisualizer() {
   outputChannel.appendLine(
     `${OutputKey} Stopping Drizzle Visualizer server...`,
   );

@@ -1,11 +1,11 @@
 import * as vscode from "vscode";
 
-import visualizerPkg from "../visualizer/package.json";
+import visualizerPkg from "../apps/visualizer/package.json";
 import { setExtensionContext } from "./context";
-import { OpenVisualizerCodeLens } from "./modules/open-visualizer/codelens";
-import { OpenVisualizerCommand } from "./modules/open-visualizer/command";
-import { StopVisualizerCommand } from "./modules/stop-visualizer/command";
-import { stop } from "./server";
+import { OpenVisualizerCodeLens } from "./modules/visualizer/open-visualizer/codelens";
+import { OpenVisualizerCommand } from "./modules/visualizer/open-visualizer/command";
+import { StopVisualizerCommand } from "./modules/visualizer/stop-visualizer/command";
+import { stopVisualizer } from "./modules/visualizer/server";
 import { outputChannel } from "./utils";
 
 export function activate(context: vscode.ExtensionContext) {
@@ -22,7 +22,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 // This method is called when your extension is deactivated
 export function deactivate() {
-  stop();
+  stopVisualizer();
 }
 
 function checkNodeVersion() {

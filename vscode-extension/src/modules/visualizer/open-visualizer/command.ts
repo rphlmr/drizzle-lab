@@ -1,8 +1,8 @@
 import * as vscode from "vscode";
 
-import { getDrizzleVisualizerPanel } from "../../panel";
-import { start } from "../../server";
-import { outputChannel, render } from "../../utils";
+import { createDrizzleVisualizerPanel } from "../panel";
+import { startVisualizer } from "../server";
+import { outputChannel, render } from "../../../utils";
 
 export const command = "drizzle.visualizer:open";
 
@@ -23,8 +23,8 @@ export const OpenVisualizerCommand = vscode.commands.registerCommand(
     }
 
     try {
-      const panel = getDrizzleVisualizerPanel();
-      const { port } = await start(configPath);
+      const panel = createDrizzleVisualizerPanel();
+      const { port } = await startVisualizer(configPath);
 
       panel.webview.html = render(`
 				<iframe 
@@ -37,9 +37,7 @@ export const OpenVisualizerCommand = vscode.commands.registerCommand(
 
       panel.reveal();
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
-      const msg = `${OutputKey} Failed to start Drizzle Visualizer: ${errorMessage}`;
+      const msg = `${OutputKey} Failed to start Drizzle Visualizer: ${error instanceof Error ? error.message : String(error)}`;
 
       vscode.window.showErrorMessage(msg);
       outputChannel.appendLine(msg);

@@ -1,8 +1,40 @@
 import path from "node:path";
 import * as vscode from "vscode";
+import { getExtensionContext } from "./context";
 
 export const outputChannel =
   vscode.window.createOutputChannel("Drizzle Visualizer");
+
+export function createPanel({
+  id,
+  title,
+  onDispose = () => {},
+}: {
+  id: string;
+  title: string;
+  onDispose?: () => void;
+}) {
+  const context = getExtensionContext();
+
+  const panel = vscode.window.createWebviewPanel(
+    id,
+    title,
+    vscode.ViewColumn.One,
+    {
+      enableScripts: true,
+      retainContextWhenHidden: true,
+    },
+  );
+
+  panel.iconPath = {
+    light: vscode.Uri.joinPath(context.extensionUri, "media", "drizzle.png"),
+    dark: vscode.Uri.joinPath(context.extensionUri, "media", "drizzle.png"),
+  };
+
+  panel.onDidDispose(onDispose);
+
+  return panel;
+}
 
 export function render(children: string) {
   return `
