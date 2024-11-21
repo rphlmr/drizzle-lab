@@ -29,13 +29,17 @@ async function main() {
   console.log("Building drizzle-lab...");
   execSync("npm run -w drizzle-lab build-all", { cwd: "..", stdio: "inherit" });
 
+  const visualizerDir = "apps/visualizer";
   // copy bundled drizzle-lab visualizer to dist
-  if (fs.existsSync("visualizer")) {
-    fs.rmSync("visualizer", { recursive: true, force: true });
+  if (fs.existsSync(visualizerDir)) {
+    fs.rmSync(visualizerDir, { recursive: true, force: true });
   }
-  fs.mkdirSync("visualizer");
-  fs.cpSync("../apps/cli/dist/visualizer", "visualizer", { recursive: true });
-  fs.copyFileSync("../apps/cli/dist/package.json", "visualizer/package.json");
+  fs.mkdirSync(visualizerDir, { recursive: true });
+  fs.cpSync("../apps/cli/dist/visualizer", visualizerDir, { recursive: true });
+  fs.copyFileSync(
+    "../apps/cli/dist/package.json",
+    `${visualizerDir}/package.json`,
+  );
 
   const ctx = await esbuild.context({
     entryPoints: ["src/extension.ts"],
