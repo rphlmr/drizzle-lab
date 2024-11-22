@@ -688,6 +688,7 @@ async function fetchNodeModules(
 
   const imports = new Map<string, Promise<Record<string, unknown>>>([
     ["drizzle-orm", import("drizzle-orm")],
+    ["drizzle-seed", import("drizzle-seed")],
     ["@drizzle-lab/api/pg", import("@drizzle-lab/api/pg")],
     ["@drizzle-lab/api/sqlite", import("@drizzle-lab/api/sqlite")],
   ]);

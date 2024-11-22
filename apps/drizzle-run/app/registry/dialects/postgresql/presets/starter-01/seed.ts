@@ -4,16 +4,12 @@
  * 💡Tip: you can use the `$` global variable to access goodies
  */
 
-import { sql } from "drizzle-orm";
+import { drizzle } from "drizzle-orm/pglite";
+import { seed } from "drizzle-seed";
 
 import { db } from "./db";
+import { posts, users } from "./schema";
 
-await db.execute(sql`
-create or replace function auth.uid() returns uuid as $$
-  select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid;
-$$ language sql stable;
-`);
-
-await db.execute(sql`
-GRANT postgres TO authenticated;
-`);
+// doc: https://orm.drizzle.team/docs/seed-overview
+// @ts-ignore - temporary fix for drizzle-seed
+await seed(db, { posts, users });

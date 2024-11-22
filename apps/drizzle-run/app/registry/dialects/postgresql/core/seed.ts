@@ -4,5 +4,10 @@
  * 💡Tip: you can use the `$` global variable to access goodies
  */
 
+import { seed } from "drizzle-seed";
+
 import { db } from "./db";
-import {} from "./schema";
+import * as schema from "./schema";
+
+// doc: https://orm.drizzle.team/docs/seed-overview
+await seed(db, schema);
