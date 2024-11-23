@@ -4,21 +4,16 @@
  * 💡Tip: you can use the `$` global variable to access goodies
  */
 
+import { sql } from "drizzle-orm";
+
 import { db } from "./db";
-import { posts, users } from "./schema";
 
-/* ------------------------------- Create user ------------------------------ */
+await db.execute(sql`
+create or replace function auth.uid() returns uuid as $$
+  select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid;
+$$ language sql stable;
+`);
 
-const [{ userId }] = await db
-  .insert(users)
-  .values({
-    name: $.random.fullName(),
-  })
-  .returning({ userId: users.id });
-
-/* ------------------------------- Create post ------------------------------ */
-
-await db.insert(posts).values({
-  authorId: userId,
-  content: $.random.lorem(),
-});
+await db.execute(sql`
+GRANT postgres TO authenticated;
+`);

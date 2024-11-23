@@ -4,21 +4,11 @@
  * 💡Tip: you can use the `$` global variable to access goodies
  */
 
+import { seed } from "drizzle-seed";
+
 import { db } from "./db";
 import { posts, users } from "./schema";
 
-/* ------------------------------- Create user ------------------------------ */
-
-const [{ userId }] = await db
-  .insert(users)
-  .values({
-    name: $.random.fullName(),
-  })
-  .returning({ userId: users.id });
-
-/* ------------------------------- Create post ------------------------------ */
-
-await db.insert(posts).values({
-  authorId: userId,
-  content: $.random.lorem(),
-});
+// doc: https://orm.drizzle.team/docs/seed-overview
+// @ts-ignore - temporary fix for drizzle-seed
+await seed(db, { posts, users });

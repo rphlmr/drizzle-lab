@@ -17,6 +17,7 @@ const typesToBundle = [
   "valibot",
   "@electric-sql/pglite",
   "@libsql",
+  "drizzle-seed",
 ] as const;
 
 console.log("Building registry");

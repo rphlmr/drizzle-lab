@@ -5,5 +5,9 @@ module.exports = {
   parserOptions: {
     project: true,
   },
-  ignorePatterns: ["app/registry/*/presets", "**/*/_blank"],
+  ignorePatterns: [
+    "app/registry/dialects/*/presets",
+    "app/registry/dialects/*/core",
+    "**/*/_blank",
+  ],
 };
