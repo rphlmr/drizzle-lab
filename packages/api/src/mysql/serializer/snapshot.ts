@@ -412,7 +412,7 @@ export function drizzleObjectsToSnapshot(
       foreignKeys: foreignKeysObject,
       compositePrimaryKeys: primaryKeysObject,
       uniqueConstraints: uniqueConstraintObject,
-      checkConstraint: checkConstraintObject,
+      checkConstraints: checkConstraintObject,
       /* lab extension */
       description,
       relations: tableRelations,

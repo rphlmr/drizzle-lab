@@ -95,7 +95,7 @@ const table = object({
   foreignKeys: record(string(), fk),
   compositePrimaryKeys: record(string(), compositePK),
   uniqueConstraints: record(string(), uniqueConstraint).default({}),
-  checkConstraint: record(string(), checkConstraint).default({}),
+  checkConstraints: record(string(), checkConstraint).default({}),
   /* lab extension */
   schema: string(),
   relations: array(relation).default([]),
@@ -411,7 +411,7 @@ export const squashSnapshot = (json: Snapshot): SnapshotSquashed => {
       );
 
       const squashedCheckConstraints = mapValues(
-        it[1].checkConstraint,
+        it[1].checkConstraints,
         (check) => {
           return MySqlSquasher.squashCheck(check);
         },

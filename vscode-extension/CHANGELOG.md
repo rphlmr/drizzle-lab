@@ -4,6 +4,10 @@ All notable changes to the "drizzle-orm" extension will be documented in this fi
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [0.7.0]
+
+- Add support for MySQL
+
 ## [0.6.0]
 
 - Add Drizzle Studio command
