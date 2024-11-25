@@ -158,7 +158,9 @@ export function snapshotToTypeScript(snapshot: Snapshot, casing: Casing) {
       const uniqueImports = Object.values(it.uniqueConstraints).map(
         () => "unique",
       );
-      const checkImports = Object.values(it.checkConstraint).map(() => "check");
+      const checkImports = Object.values(it.checkConstraints).map(
+        () => "check",
+      );
 
       res.mysql.push(...idxImports);
       res.mysql.push(...fkImpots);
@@ -267,7 +269,7 @@ export function snapshotToTypeScript(snapshot: Snapshot, casing: Casing) {
       filteredFKs.length > 0 ||
       Object.keys(table.compositePrimaryKeys).length > 0 ||
       Object.keys(table.uniqueConstraints).length > 0 ||
-      Object.keys(table.checkConstraint).length > 0
+      Object.keys(table.checkConstraints).length > 0
     ) {
       statement += ",\n";
       statement += "(table) => {\n";
@@ -287,7 +289,7 @@ export function snapshotToTypeScript(snapshot: Snapshot, casing: Casing) {
         withCasing,
       );
       statement += createTableChecks(
-        Object.values(table.checkConstraint),
+        Object.values(table.checkConstraints),
         withCasing,
       );
       statement += "\t}\n";
