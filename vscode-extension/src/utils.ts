@@ -88,9 +88,7 @@ export function findDrizzleConfigLines(
     (text.includes("defineConfig") ||
       text.includes("type Config") ||
       text.includes("satisfies Config")) &&
-    options.requireDb
-      ? text.includes("dbCredentials")
-      : true;
+    (options.requireDb ? text.includes("dbCredentials") : true);
 
   if (!isConfig) {
     return [];

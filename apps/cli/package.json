@@ -1,6 +1,6 @@
 {
   "name": "drizzle-lab",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "Drizzle Lab CLI",
   "sideEffects": false,
   "type": "module",

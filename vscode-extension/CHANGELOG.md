@@ -7,6 +7,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [0.7.0]
 
 - Add support for MySQL
+- Fix code lens showing up in non-drizzle-kit config files
 
 ## [0.6.0]
 
