@@ -195,7 +195,7 @@ export async function importFromDatabase(
         indexes: {},
         foreignKeys: {},
         uniqueConstraints: {},
-        checkConstraint: {},
+        checkConstraints: {},
         relations: [],
         schema,
       };
@@ -414,7 +414,7 @@ AND
 
     const tableInResult = result[tableName];
     // if (typeof tableInResult === 'undefined') continue;
-    tableInResult.checkConstraint[constraintName] = {
+    tableInResult.checkConstraints[constraintName] = {
       name: constraintName,
       value: constraintValue,
     };

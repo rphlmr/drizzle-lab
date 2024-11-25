@@ -15,20 +15,25 @@ export type Snapshot = PgSnapshot | SQLiteSnapshot | MySqlSnapshot;
 
 type CompositePrimaryKeyDefinition =
   | PgSnapshot["tables"][number]["compositePrimaryKeys"][number]
-  | SQLiteSnapshot["tables"][number]["compositePrimaryKeys"][number];
+  | SQLiteSnapshot["tables"][number]["compositePrimaryKeys"][number]
+  | MySqlSnapshot["tables"][number]["compositePrimaryKeys"][number];
 type RelationDefinition =
   | PgSnapshot["tables"][number]["relations"][number]
-  | SQLiteSnapshot["tables"][number]["relations"][number];
+  | SQLiteSnapshot["tables"][number]["relations"][number]
+  | MySqlSnapshot["tables"][number]["relations"][number];
 type CheckDefinition =
   | PgSnapshot["tables"][number]["checkConstraints"][number]
-  | SQLiteSnapshot["tables"][number]["checkConstraints"][number];
+  | SQLiteSnapshot["tables"][number]["checkConstraints"][number]
+  | MySqlSnapshot["tables"][number]["checkConstraints"][number];
 type PolicyDefinition = PgSnapshot["policies"][number];
 type UniqueConstraintDefinition =
   | PgSnapshot["tables"][number]["uniqueConstraints"][number]
-  | SQLiteSnapshot["tables"][number]["uniqueConstraints"][number];
+  | SQLiteSnapshot["tables"][number]["uniqueConstraints"][number]
+  | MySqlSnapshot["tables"][number]["uniqueConstraints"][number];
 type IndexDefinition =
   | PgSnapshot["tables"][number]["indexes"][number]
-  | SQLiteSnapshot["tables"][number]["indexes"][number];
+  | SQLiteSnapshot["tables"][number]["indexes"][number]
+  | MySqlSnapshot["tables"][number]["indexes"][number];
 type ForeignKeyDefinition = {
   id: string;
   fkName: string;
@@ -450,6 +455,152 @@ export async function compute(snapshot: Snapshot) {
         });
       });
 
+      break;
+    }
+    case "mysql": {
+      /* Tables */
+      Object.values(snapshot.tables).forEach((table) => {
+        /* Foreign Keys */
+        const foreignKeys = Object.values(table.foreignKeys).flatMap((fk) => {
+          const fkName = fk.name;
+          const tableTo = fk.tableTo;
+          const tableFrom = table.name;
+          const onDelete = fk.onDelete;
+          const onUpdate = fk.onUpdate;
+
+          return fk.columnsFrom.map((columnFrom, colIdx) => {
+            const columnTo = fk.columnsTo[colIdx];
+
+            return {
+              id: `${fkName}_${colIdx}`,
+              fkName,
+              tableFrom,
+              columnFrom,
+              columnTo,
+              tableTo,
+              onDelete,
+              onUpdate,
+            };
+          });
+        });
+
+        foreignKeys.forEach((foreignKey) => {
+          edges.push({
+            id: foreignKey.id,
+            source: foreignKey.tableTo,
+            sourceHandle: `${foreignKey.columnTo}-right`,
+            target: foreignKey.tableFrom,
+            targetHandle: `${foreignKey.columnFrom}-left`,
+            style: { strokeWidth: 2 },
+            type: "smoothstep",
+          });
+        });
+
+        /* Composite Primary Keys */
+        const compositePrimaryKeys = Object.values(table.compositePrimaryKeys);
+
+        /* Relations */
+        const relations = table.relations;
+
+        relations.forEach((relation) => {
+          edges.push({
+            id: crypto.randomUUID(),
+            source: relation.referencedTableName,
+            sourceHandle: "relation",
+            target: table.name,
+            targetHandle: relation.fieldName,
+            style: { strokeWidth: 2, strokeDasharray: "5" },
+            type: "smoothstep",
+          });
+        });
+
+        /* Checks */
+        const checks = Object.values(table.checkConstraints);
+
+        /* Unique Constraints */
+        const uniqueConstraints = Object.values(table.uniqueConstraints);
+
+        /* Indexes */
+        const indexes = Object.values(table.indexes);
+
+        /* Nodes */
+        nodes.push({
+          id: table.name,
+          data: {
+            name: table.name,
+            description: table.description,
+            schema: table.schema,
+            columns: Object.values(table.columns).map((column) => {
+              const foreignKey = foreignKeys.find(
+                (fk) => fk.columnFrom === column.name,
+              );
+
+              return {
+                name: column.name,
+                dataType: column.type,
+                description: column.description,
+                isPrimaryKey:
+                  column.primaryKey ||
+                  compositePrimaryKeys.some((cpk) =>
+                    cpk.columns.includes(column.name),
+                  ),
+                isForeignKey: Boolean(foreignKey),
+                isNotNull: column.notNull,
+                isUnique: false,
+                default: column.default,
+                defaultFn: column.defaultFn,
+                enumValues: column.enumValues,
+                jsonShape: column.jsonShape,
+                onDelete: foreignKey?.onDelete,
+                onUpdate: foreignKey?.onUpdate,
+              };
+            }),
+            isRLSEnabled: false,
+            provider: undefined,
+            checks,
+            relations,
+            policies: [],
+            compositePrimaryKeys,
+            foreignKeys,
+            uniqueConstraints,
+            indexes,
+          },
+          position: { x: 0, y: 0 },
+          type: "table",
+        });
+      });
+
+      /* Views */
+      Object.values(snapshot.views).forEach((view) => {
+        nodes.push({
+          id: view.name,
+          data: {
+            name: view.name,
+            schema: view.schema,
+            definition: view.definition,
+            description: view.description,
+            columns: Object.values(view.columns).map((column) => {
+              return {
+                name: column.name,
+                dataType: column.type,
+                isPrimaryKey: column.primaryKey,
+                isNotNull: column.notNull,
+                isUnique: false,
+                default: column.default,
+                defaultFn: column.defaultFn,
+                enumValues: column.enumValues,
+                description: column.description,
+              };
+            }),
+            materialized: false,
+            with: undefined,
+            isExisting: view.isExisting,
+            provider: undefined,
+          },
+          position: { x: 0, y: 0 },
+          type: "view",
+        });
+      });
       break;
     }
   }
