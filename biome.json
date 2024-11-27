@@ -1,5 +1,8 @@
 {
-  "$schema": "../../node_modules/@biomejs/biome/configuration_schema.json",
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "files": {
+    "include": ["apps/cli/**/*"]
+  },
   "vcs": {
     "enabled": true,
     "clientKind": "git",
@@ -17,7 +20,6 @@
     "enabled": true
   },
   "linter": {
-    "ignore": ["test-apps"],
     "enabled": true,
     "rules": {
       "recommended": true,
@@ -28,7 +30,8 @@
       },
       "style": {
         "recommended": true,
-        "noParameterAssign": "info"
+        "noParameterAssign": "info",
+        "noNonNullAssertion": "warn"
       },
       "complexity": {
         "recommended": true
