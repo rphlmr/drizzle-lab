@@ -271,3 +271,29 @@ export const productTags = pgTable("product_tags", {
     .notNull(),
   tag: text("tag").notNull(),
 });
+
+export const tableWithLongColumnName1 = pgTable(
+  "table_with_long_column_name_1",
+  {
+    id: serial("id").primaryKey(),
+    thisIsAReallyLongColumnNameThatIsExactlySixtyFourCharactersLong: text(
+      "this_is_a_really_long_column_name_that_is_exactly_sixty_four_characters_long",
+    ),
+    authorId: integer("author_id")
+      .references(() => users.id)
+      .notNull(),
+  },
+);
+
+export const tableWithLongColumnName2 = pgTable(
+  "table_with_long_column_name_2",
+  {
+    id: serial("id").primaryKey(),
+    anotherExtremelyLongColumnNameThatIsAlsoSixtyFourCharactersLong: integer(
+      "another_extremely_long_column_name_that_is_also_sixty_four_characters_long",
+    ),
+    authorId: integer("author_id")
+      .references(() => users.id)
+      .notNull(),
+  },
+);
