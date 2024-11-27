@@ -4,6 +4,11 @@ All notable changes to the "drizzle-orm" extension will be documented in this fi
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [0.8.0]
+
+- New visualizer UI
+- Auto layout improvements
+
 ## [0.7.0]
 
 - Add support for MySQL

@@ -147,10 +147,12 @@ export default function Index() {
       {/* <div className="absolute left-0 top-0 z-50 flex w-full items-center justify-center">
         <span className="text-sm font-medium">Drizzle Lab - Visualizer</span>
       </div> */}
-      <Alert className="absolute top-0 z-50 flex w-full flex-col items-center border-none bg-transparent">
-        <span className="text-sm font-bold">Drizzle Lab - Visualizer</span>
-        <p className="text-sm font-bold text-orange-500">
-          This is a beta version. It can still have bugs!
+      <Alert className="pointer-events-none absolute top-0 z-10 flex w-full flex-col border-none bg-transparent">
+        <span className="text-sm font-bold text-muted-foreground/50">
+          Drizzle Lab - Visualizer
+        </span>
+        <p className="text-sm text-muted-foreground/30">
+          It can still have bugs!
         </p>
       </Alert>
       <ClientOnly fallback={<p>Loading...</p>}>

@@ -106,8 +106,112 @@ export type ViewNodeDefinition = Node<
 >;
 
 // ReactFlow is scaling everything by the factor of 2
-const NODE_WIDTH = 1000;
-const NODE_ROW_HEIGHT = 150;
+const NODE_WIDTH = 600;
+const NODE_ROW_HEIGHT = 100;
+
+// Calculate the maximum width needed for a node based on its column names
+const getNodeWidth = (node: TableNodeDefinition | ViewNodeDefinition) => {
+  const columnWidths = node.data.columns.map(
+    (col) => (col.name.length + col.dataType.length) * 8,
+  );
+  const headerWidth = node.data.name.length * 8;
+  return Math.max(NODE_WIDTH, Math.max(...columnWidths, headerWidth) + 40); // Add padding just in case
+};
+
+const ITEM_HEIGHT = 100;
+
+// Calculate the height needed for a node based on its content
+const getNodeHeight = (node: TableNodeDefinition | ViewNodeDefinition) => {
+  // Base height for header
+  const baseHeight = NODE_ROW_HEIGHT;
+
+  if (node.type === "view") {
+    // Views, only have columns
+    const columnsHeight = Math.max(
+      node.data.columns.length * ITEM_HEIGHT,
+      NODE_ROW_HEIGHT,
+    );
+    return baseHeight + columnsHeight;
+  }
+
+  const tableNode = node as TableNodeDefinition;
+
+  // Calculate height for each component
+  const columnsHeight = node.data.columns.length * ITEM_HEIGHT;
+  const relationsHeight = tableNode.data.relations.length * ITEM_HEIGHT;
+  const policiesHeight = tableNode.data.policies.length * ITEM_HEIGHT;
+  const checksHeight = tableNode.data.checks.length * ITEM_HEIGHT;
+  const indexesHeight = tableNode.data.indexes.length * ITEM_HEIGHT;
+  const foreignKeysHeight = tableNode.data.foreignKeys.length * ITEM_HEIGHT;
+  const uniqueConstraintsHeight =
+    tableNode.data.uniqueConstraints.length * ITEM_HEIGHT;
+  const compositePrimaryKeysHeight =
+    tableNode.data.compositePrimaryKeys.length * ITEM_HEIGHT;
+
+  // Sum up all components
+  const totalComponentsHeight =
+    columnsHeight +
+    relationsHeight +
+    policiesHeight +
+    checksHeight +
+    indexesHeight +
+    foreignKeysHeight +
+    uniqueConstraintsHeight +
+    compositePrimaryKeysHeight;
+
+  return Math.max(baseHeight + totalComponentsHeight, NODE_ROW_HEIGHT);
+};
+
+// Determine optimal edge positions based on node connections
+const getNodeEdgePositions = (
+  nodeId: string,
+  edges: Edge[],
+  dagreGraph: dagre.graphlib.Graph,
+) => {
+  const currentNode = dagreGraph.node(nodeId);
+  const currentX = currentNode.x;
+
+  // Get connected nodes and their positions
+  const connectedNodes = edges
+    .filter((e) => e.source === nodeId || e.target === nodeId)
+    .map((e) => {
+      const connectedId = e.source === nodeId ? e.target : e.source;
+      const connectedNode = dagreGraph.node(connectedId);
+      // Filter out edges where the connected node doesn't exist in the graph (like auth.users)
+      if (!connectedNode) {
+        return null;
+      }
+
+      return {
+        id: connectedId,
+        isSource: e.source === nodeId,
+        x: connectedNode.x,
+      };
+    })
+    .filter((node): node is NonNullable<typeof node> => node !== null);
+
+  // If there's only one connection, align both positions to that side
+  if (connectedNodes.length === 1) {
+    const position =
+      connectedNodes[0].x > currentX ? Position.Right : Position.Left;
+    return { sourcePos: position, targetPos: position };
+  }
+
+  // Count nodes on each side
+  const leftNodes = connectedNodes.filter((n) => n.x < currentX);
+  const rightNodes = connectedNodes.filter((n) => n.x > currentX);
+
+  // If all connections are on one side, align both positions to that side
+  if (leftNodes.length > 0 && rightNodes.length === 0) {
+    return { sourcePos: Position.Left, targetPos: Position.Left };
+  }
+  if (rightNodes.length > 0 && leftNodes.length === 0) {
+    return { sourcePos: Position.Right, targetPos: Position.Right };
+  }
+
+  // Default case: connections on both sides
+  return { sourcePos: Position.Right, targetPos: Position.Left };
+};
 
 // Supabase, thanks!
 const getLayoutedElements = (
@@ -116,38 +220,85 @@ const getLayoutedElements = (
 ) => {
   const dagreGraph = new dagre.graphlib.Graph();
   dagreGraph.setDefaultEdgeLabel(() => ({}));
+
+  const RANK_GROUP_SIZE = 3; // Number of nodes per rank group
+
   dagreGraph.setGraph({
     rankdir: "LR",
-    align: "UR",
-    nodesep: 25,
-    ranksep: 50,
+    align: "DL",
+    nodesep: 120, // Increased for better horizontal spacing
+    ranksep: 200, // Increased for better rank separation
+    ranker: "network-simplex",
+    marginx: 50,
+    marginy: 50,
   });
 
+  // First, add all nodes to the graph
   nodes.forEach((node) => {
+    const width = getNodeWidth(node);
+    const height = getNodeHeight(node);
     dagreGraph.setNode(node.id, {
-      width: NODE_WIDTH / 2.5,
-      height: (NODE_ROW_HEIGHT / 2.5) * (node.data.columns.length + 1), // columns + header
+      width: width / 2.5,
+      height: height / 2.5,
     });
   });
 
+  // Add edges to the graph
   edges.forEach((edge) => {
     dagreGraph.setEdge(edge.source, edge.target);
   });
 
+  // Find nodes with no relations
+  const connectedNodes = new Set<string>();
+  edges.forEach((edge) => {
+    connectedNodes.add(edge.source);
+    connectedNodes.add(edge.target);
+  });
+
+  // Group nodes into ranks to create a more horizontal layout
+  const connectedNodesList = nodes.filter((node) =>
+    connectedNodes.has(node.id),
+  );
+  const unconnectedNodesList = nodes.filter(
+    (node) => !connectedNodes.has(node.id),
+  );
+
+  // Assign ranks to connected nodes to spread them horizontally
+  connectedNodesList.forEach((node, index) => {
+    const rankGroup = Math.floor(index / RANK_GROUP_SIZE);
+    dagreGraph.setNode(node.id, {
+      ...dagreGraph.node(node.id),
+      rank: rankGroup * 2,
+    });
+  });
+
+  // Place unconnected nodes on the far right
+  unconnectedNodesList.forEach((node) => {
+    dagreGraph.setNode(node.id, {
+      ...dagreGraph.node(node.id),
+      rank: 1000,
+    });
+  });
+
+  // Layout the graph
   dagre.layout(dagreGraph);
 
+  // Apply the layout positions to the nodes
   nodes.forEach((node) => {
     const nodeWithPosition = dagreGraph.node(node.id);
-    node.targetPosition = Position.Left;
-    node.sourcePosition = Position.Right;
-    // We are shifting the dagre node position (anchor=center center) to the top left
-    // so it matches the React Flow node anchor point (top left).
+    const { sourcePos, targetPos } = getNodeEdgePositions(
+      node.id,
+      edges,
+      dagreGraph,
+    );
+
+    node.targetPosition = targetPos;
+    node.sourcePosition = sourcePos;
+
     node.position = {
       x: nodeWithPosition.x - nodeWithPosition.width / 2,
       y: nodeWithPosition.y - nodeWithPosition.height / 2,
     };
-
-    return node;
   });
 
   return { nodes, edges };
