@@ -177,12 +177,18 @@ const getNodeEdgePositions = (
     .map((e) => {
       const connectedId = e.source === nodeId ? e.target : e.source;
       const connectedNode = dagreGraph.node(connectedId);
+      // Filter out edges where the connected node doesn't exist in the graph (like auth.users)
+      if (!connectedNode) {
+        return null;
+      }
+
       return {
         id: connectedId,
         isSource: e.source === nodeId,
         x: connectedNode.x,
       };
-    });
+    })
+    .filter((node): node is NonNullable<typeof node> => node !== null);
 
   // If there's only one connection, align both positions to that side
   if (connectedNodes.length === 1) {
