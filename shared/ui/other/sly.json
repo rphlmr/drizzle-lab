@@ -4,7 +4,7 @@
     {
       "name": "lucide-icons",
       "directory": "./other/svg-icons",
-      "postinstall": ["npm", "run", "build"],
+      "postinstall": ["npm", "run", "build:icons"],
       "transformers": []
     }
   ]

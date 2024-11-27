@@ -5,14 +5,19 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Badge } from "@repo/ui/components/badge";
 import { Button } from "@repo/ui/components/button";
 import { Icon } from "@repo/ui/components/icon";
-import { Label } from "@repo/ui/components/label";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@repo/ui/components/popover";
 import { Separator } from "@repo/ui/components/separator";
-import { Switch } from "@repo/ui/components/switch";
+import { Toggle } from "@repo/ui/components/toggle";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@repo/ui/components/tooltip";
 import { Typography } from "@repo/ui/components/typography";
 import { cn } from "@repo/ui/utils/cn";
 import type {
@@ -23,7 +28,6 @@ import type {
 } from "@xyflow/react";
 import {
   Background,
-  Controls,
   Handle,
   Position,
   ReactFlow,
@@ -33,6 +37,9 @@ import {
   applyNodeChanges,
   PanOnScrollMode,
   useKeyPress,
+  getNodesBounds,
+  useReactFlow,
+  getViewportForBounds,
 } from "@xyflow/react";
 import { toPng } from "html-to-image";
 
@@ -166,59 +173,66 @@ export function DrizzleVisualizer({
         fitView
         fitViewOptions={{ maxZoom: 1 }}
         minZoom={0.05}
+        proOptions={{ hideAttribution: true }}
       >
         {loading && (
           <div className="absolute flex size-full items-center justify-center">
             loading...
           </div>
         )}
-        <Panel position="bottom-center" className="!z-10">
-          <div className="flex items-center gap-2">
-            {hasDescription && (
-              <div className="flex items-center gap-2">
-                <Label htmlFor="explain" className="text-sm">
-                  Explain
-                </Label>
-                <Switch
-                  id="explain"
-                  checked={withExplain}
-                  onCheckedChange={(checked) => {
+        <Panel position="top-right">
+          <div className="flex items-center gap-6">
+            <div className="flex items-center gap-2">
+              <AutoLayoutButton
+                onClick={() => {
+                  compute(snapshot).then(({ nodes }) => {
+                    onNodesChange(
+                      nodes.map((node) => ({
+                        id: node.id,
+                        position: node.position,
+                        type: "position",
+                      })),
+                    );
+                  });
+                }}
+              />
+              <FitViewButton />
+            </div>
+            <div className="flex items-center gap-2">
+              {hasDescription && (
+                <ExplainToggle
+                  pressed={withExplain}
+                  onPressedChange={(pressed) => {
                     setNodes((prev) => {
                       return prev.map((node) => {
                         const update = {
                           ...node,
                         };
-                        update.data.withExplain = checked;
+                        update.data.withExplain = pressed;
                         return update;
                       });
                     });
-                    setWithExplain(checked);
+                    setWithExplain(pressed);
                   }}
                 />
-              </div>
-            )}
-            <Button
-              variant="secondary"
-              onClick={() => {
-                compute(snapshot).then(({ nodes }) => {
-                  onNodesChange(
-                    nodes.map((node) => ({
-                      id: node.id,
-                      position: node.position,
-                      type: "position",
-                    })),
-                  );
-                });
-              }}
-            >
-              Auto layout
-            </Button>
-            <DownloadSchemaButton />
+              )}
+              <DownloadSchemaButton />
+            </div>
+
+            <InfoButton />
           </div>
         </Panel>
         <Background bgColor="#0f0f14" />
-        <Controls />
-        {showMiniMap && <MiniMap nodeStrokeWidth={3} pannable zoomable />}
+        {showMiniMap && (
+          <MiniMap
+            pannable
+            zoomable
+            bgColor="transparent"
+            maskColor="transparent"
+            className="rounded-md border-2 border-muted-foreground/10"
+            nodeColor="#ffffff10"
+          />
+        )}
       </ReactFlow>
     </div>
   );
@@ -744,6 +758,107 @@ function ViewNode({ data }: NodeProps<ViewNodeDefinition>) {
   );
 }
 
+function AutoLayoutButton(props: React.ComponentPropsWithoutRef<"button">) {
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button variant="outline" size="sm" {...props}>
+            Auto layout
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>Automatically layout the nodes</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+}
+
+function FitViewButton() {
+  const { fitView } = useReactFlow();
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button variant="outline" size="icon:sm" onClick={() => fitView()}>
+            <Icon name="shrink" size="sm" />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>Set the viewport to fit the diagram</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+}
+
+function InfoButton() {
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button variant="outline" size="icon:sm">
+          <Icon name="info" size="sm" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-fit">
+        <div className="flex flex-row gap-1">
+          <a
+            href="https://github.com/rphlmr/drizzle-lab/tree/main/packages/api#extensions"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm font-semibold text-blue"
+          >
+            Check how
+          </a>
+          <Typography variant="mutedText" className="text-sm">
+            you can document your schema!
+          </Typography>
+        </div>
+        <Separator className="my-2" />
+        <div className="flex flex-row items-center gap-1">
+          <Typography variant="mutedText" className="text-sm">
+            This diagram is powered by{" "}
+          </Typography>
+          <a
+            href="https://reactflow.dev/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm font-semibold text-blue"
+          >
+            React Flow
+          </a>
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+function ExplainToggle(props: React.ComponentPropsWithoutRef<typeof Toggle>) {
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Toggle
+            variant="outline"
+            size="icon:sm"
+            className="bg-background"
+            {...props}
+          >
+            <Icon
+              name={props.pressed ? "captions" : "captions-off"}
+              size="sm"
+            />
+          </Toggle>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>Display the schema documentation</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+}
+
 function downloadImage(dataUrl: string) {
   const a = document.createElement("a");
 
@@ -752,37 +867,125 @@ function downloadImage(dataUrl: string) {
   a.click();
 }
 
-// const imageWidth = 1024;
-// const imageHeight = 768;
+const PADDING = 100; // Add padding around the nodes
+const MIN_DIMENSION = 1024; // Minimum dimension to ensure quality
+const MAX_DIMENSION = 4096; // Maximum dimension to prevent excessive file size
 
 export function DownloadSchemaButton() {
-  // const { getNodes } = useReactFlow();
-  const onClick = async () => {
-    // we calculate a transform for the nodes so that all nodes are visible
-    // we then overwrite the transform of the `.react-flow__viewport` element
-    // with the style option of the html-to-image library
-    // const nodesBounds = getNodesBounds(getNodes());
-    // const viewport = getViewportForBounds(
-    //   nodesBounds,
-    //   imageWidth,
-    //   imageHeight,
-    //   0.5,
-    //   2,
-    //   2,
-    // );
+  const { getNodes } = useReactFlow();
+  const [isGenerating, setIsGenerating] = useState(false);
 
-    toPng(document.querySelector(".react-flow__viewport") as HTMLElement, {
-      skipFonts: true,
-      backgroundColor: "#0f0f14",
-      filter: (node) => {
-        return !node.dataset?.noPrint;
-      },
-    }).then(downloadImage);
+  const onClick = async () => {
+    setIsGenerating(true);
+
+    try {
+      const nodes = getNodes();
+      const nodesBounds = getNodesBounds(nodes);
+
+      // Add padding to the bounds
+      nodesBounds.x -= PADDING;
+      nodesBounds.y -= PADDING;
+      nodesBounds.width += 2 * PADDING;
+      nodesBounds.height += 2 * PADDING;
+
+      // Calculate dimensions while maintaining aspect ratio
+      const aspectRatio = nodesBounds.width / nodesBounds.height;
+      let imageWidth, imageHeight;
+
+      if (aspectRatio > 1) {
+        // Wider than tall
+        imageWidth = Math.min(
+          Math.max(nodesBounds.width, MIN_DIMENSION),
+          MAX_DIMENSION,
+        );
+        imageHeight = imageWidth / aspectRatio;
+      } else {
+        // Taller than wide
+        imageHeight = Math.min(
+          Math.max(nodesBounds.height, MIN_DIMENSION),
+          MAX_DIMENSION,
+        );
+        imageWidth = imageHeight * aspectRatio;
+      }
+
+      // Round dimensions to integers
+      imageWidth = Math.round(imageWidth);
+      imageHeight = Math.round(imageHeight);
+
+      // Create a hidden container - Prevents UI flickering while generating
+      const hiddenContainer = document.createElement("div");
+      hiddenContainer.style.position = "absolute";
+      hiddenContainer.style.left = "-99999px";
+      hiddenContainer.style.width = `${imageWidth}px`;
+      hiddenContainer.style.height = `${imageHeight}px`;
+      document.body.appendChild(hiddenContainer);
+
+      // Clone the viewport into the hidden container
+      const viewport = document.querySelector(
+        ".react-flow__viewport",
+      ) as HTMLElement;
+
+      if (!viewport) {
+        return;
+      }
+
+      const viewportClone = viewport.cloneNode(true) as HTMLElement;
+      hiddenContainer.appendChild(viewportClone);
+
+      // Calculate and apply transform
+      const transform = getViewportForBounds(
+        nodesBounds,
+        imageWidth,
+        imageHeight,
+        0.1, // Lower minZoom to handle spread out tables better
+        1, // maxZoom
+        1.2, // Slightly increase padding factor
+      );
+
+      viewportClone.style.transform = `translate(${transform.x}px, ${transform.y}px) scale(${transform.zoom})`;
+
+      try {
+        const dataUrl = await toPng(viewportClone, {
+          width: imageWidth,
+          height: imageHeight,
+          skipFonts: true,
+          backgroundColor: "#0f0f14",
+          filter: (node) => {
+            return !node.dataset?.noPrint;
+          },
+        });
+
+        downloadImage(dataUrl);
+      } finally {
+        // Clean up
+        document.body.removeChild(hiddenContainer);
+      }
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   return (
-    <Button variant="secondary" size="icon" onClick={onClick}>
-      <Icon name="image-down" size="sm" />
-    </Button>
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="outline"
+            size="icon:sm"
+            onClick={onClick}
+            disabled={isGenerating}
+          >
+            <Icon
+              name={isGenerating ? "loader-pinwheel" : "image-down"}
+              size="sm"
+              className={cn(isGenerating && "animate-spin")}
+            />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>Download the diagram as a PNG image</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 }
