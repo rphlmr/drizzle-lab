@@ -245,45 +245,45 @@ function TableNode({ data }: NodeProps<TableNodeDefinition>) {
   return (
     <>
       <div className="flex min-w-64 max-w-fit flex-col divide-y rounded-lg border-2 bg-background text-foreground shadow-md">
-        <div>
-          <div className="flex items-center justify-between gap-4 p-2 text-base">
-            <div className="relative flex items-center gap-2">
-              <Icon name="sheet" size="md" />
-              <span>
-                {data.schema ? `${data.schema}.${data.name}` : data.name}
-              </span>
+        <div className="flex w-full p-2 text-base">
+          <div className="flex w-full flex-col gap-4">
+            <div className="flex w-full items-center justify-between gap-4 text-base">
+              <div className="relative flex items-center gap-2">
+                <Icon name="sheet" size="md" />
+                <span>
+                  {data.schema ? `${data.schema}.${data.name}` : data.name}
+                </span>
+              </div>
+              {data.provider && (
+                <Badge
+                  variant="outline"
+                  className="items-center gap-2"
+                  data-no-print
+                >
+                  {!data.isRLSEnabled && (
+                    <Icon
+                      name="triangle-alert"
+                      size="sm"
+                      className="text-orange-400"
+                    />
+                  )}
+                  RLS {data.isRLSEnabled ? "enabled" : "disabled"}
+                </Badge>
+              )}
             </div>
-            {data.provider && (
-              <Badge
-                variant="outline"
-                className="items-center gap-2"
-                data-no-print
-              >
-                {!data.isRLSEnabled && (
-                  <Icon
-                    name="triangle-alert"
-                    size="sm"
-                    className="text-orange-400"
-                  />
-                )}
-                RLS {data.isRLSEnabled ? "enabled" : "disabled"}
-              </Badge>
+            {data.withExplain && data.description && (
+              <Description description={data.description} />
             )}
           </div>
-          {data.withExplain && data.description && (
-            <Typography
-              variant="mutedText"
-              className="flex max-w-96 flex-wrap p-2 text-xs"
-            >
-              {data.description}
-            </Typography>
-          )}
         </div>
         <div className="relative cursor-default divide-y">
           {data.columns.map((column) => {
             return (
-              <div key={column.name} className="relative flex flex-col text-sm">
-                <div className="flex w-full items-center justify-between gap-2 p-2">
+              <div
+                key={column.name}
+                className="relative flex w-full flex-col gap-4 p-2 text-sm"
+              >
+                <div className="flex w-full items-center justify-between gap-2">
                   <div className="relative flex items-center gap-2">
                     {column.isPrimaryKey && (
                       <Icon name="key-round" size="sm" className="text-green" />
@@ -384,12 +384,7 @@ function TableNode({ data }: NodeProps<TableNodeDefinition>) {
                   )}
                 </div>
                 {data.withExplain && column.description && (
-                  <Typography
-                    variant="mutedText"
-                    className="flex max-w-96 flex-wrap p-2 text-xs"
-                  >
-                    {column.description}
-                  </Typography>
+                  <Description description={column.description} />
                 )}
                 <Handle
                   type="target"
@@ -583,9 +578,9 @@ function ViewNode({ data }: NodeProps<ViewNodeDefinition>) {
   return (
     <>
       <div className="flex min-w-64 max-w-fit flex-col divide-y rounded-lg border-2 bg-background text-foreground shadow-md">
-        <div className="flex w-full items-center justify-between p-2 text-base">
-          <div>
-            <div className="flex items-center justify-between gap-4 p-2 text-base">
+        <div className="flex w-full p-2 text-base">
+          <div className="flex w-full flex-col gap-4">
+            <div className="flex w-full items-center justify-between gap-4 text-base">
               <div className="relative flex items-center gap-2">
                 <Icon name="eye" size="md" />
                 <span>
@@ -618,7 +613,7 @@ function ViewNode({ data }: NodeProps<ViewNodeDefinition>) {
                         data-no-print
                         variant="ghost"
                         size="sm"
-                        className="border-none"
+                        className="h-6 border-none"
                       >
                         <span>Definition</span>
                       </Button>
@@ -643,20 +638,18 @@ function ViewNode({ data }: NodeProps<ViewNodeDefinition>) {
               </div>
             </div>
             {data.withExplain && data.description && (
-              <Typography
-                variant="mutedText"
-                className="flex max-w-96 flex-wrap p-2 text-xs"
-              >
-                {data.description}
-              </Typography>
+              <Description description={data.description} />
             )}
           </div>
         </div>
         <div className="relative cursor-default divide-y">
           {data.columns.map((column) => {
             return (
-              <div key={column.name} className="relative flex flex-col text-sm">
-                <div className="flex w-full items-center justify-between gap-2 p-2">
+              <div
+                key={column.name}
+                className="relative flex flex-col gap-4 p-2 text-sm"
+              >
+                <div className="flex w-full items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
                     {column.isPrimaryKey && (
                       <Icon name="key-round" size="sm" className="text-green" />
@@ -723,12 +716,7 @@ function ViewNode({ data }: NodeProps<ViewNodeDefinition>) {
                   )}
                 </div>
                 {data.withExplain && column.description && (
-                  <Typography
-                    variant="mutedText"
-                    className="flex max-w-96 flex-wrap p-2 text-xs"
-                  >
-                    {column.description}
-                  </Typography>
+                  <Description description={column.description} />
                 )}
                 <Handle
                   type="target"
@@ -755,6 +743,19 @@ function ViewNode({ data }: NodeProps<ViewNodeDefinition>) {
         />
       </div>
     </>
+  );
+}
+
+function Description({ description }: { description: string }) {
+  return (
+    <div className="relative rounded-md border border-muted/80 p-2 text-foreground/60">
+      <span className="absolute -top-2 left-1 flex gap-1 bg-background px-1 text-xs">
+        <Icon name="book-text" size="xs" />
+      </span>
+      <Typography className="flex flex-wrap text-xs text-inherit">
+        {description}
+      </Typography>
+    </div>
   );
 }
 
