@@ -181,8 +181,8 @@ export function DrizzleVisualizer({
           </div>
         )}
         <Panel position="top-right">
-          <div className="flex items-center gap-6">
-            <div className="flex items-center gap-2">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-1">
               <AutoLayoutButton
                 onClick={() => {
                   compute(snapshot).then(({ nodes }) => {
@@ -198,7 +198,7 @@ export function DrizzleVisualizer({
               />
               <FitViewButton />
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
               {hasDescription && (
                 <ExplainToggle
                   pressed={withExplain}
@@ -748,13 +748,16 @@ function ViewNode({ data }: NodeProps<ViewNodeDefinition>) {
 
 function Description({ description }: { description: string }) {
   return (
-    <div className="relative rounded-md border border-muted/80 p-2 text-foreground/60">
-      <span className="absolute -top-2 left-1 flex gap-1 bg-background px-1 text-xs">
+    <div className="relative rounded-md border border-muted/80 px-2 py-0.5 text-foreground/60">
+      <span className="absolute -top-2 left-1 flex gap-1 bg-background px-1">
         <Icon name="book-text" size="xs" />
       </span>
-      <Typography className="flex flex-wrap text-xs text-inherit">
+      <span
+        className="flex flex-wrap text-inherit"
+        style={{ fontSize: "0.6rem" }}
+      >
         {description}
-      </Typography>
+      </span>
     </div>
   );
 }
