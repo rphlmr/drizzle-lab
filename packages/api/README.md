@@ -35,26 +35,25 @@ Works for tables and views.
   import { explain } from "@drizzle-lab/api/extensions";
   import { pgTable, text, jsonb } from "drizzle-orm/pg-core";
 
-  export const users = explain(
-    pgTable("users", {
-      id: text("id").primaryKey(),
-      name: text("name").notNull(),
-      metadata: jsonb("metadata").$type<{ role: string }>(),
-    }), // or your table object
-    {
-      description: "Users table storing core user information",
-      columns: {
-        id: "Unique identifier for the user",
-        name: "User's full name",
-        metadata: "Additional user metadata stored as JSON"
+  export const users = pgTable("users", {
+    id: text("id").primaryKey(),
+    name: text("name").notNull(),
+    metadata: jsonb("metadata").$type<{ role: string }>(),
+  });
+  
+  explain(users, {
+    description: "Users table storing core user information",
+    columns: {
+      id: "Unique identifier for the user",
+      name: "User's full name",
+      metadata: "Additional user metadata stored as JSON",
+    },
+    jsonShapes: {
+      metadata: {
+        role: "string",
       },
-      jsonShapes: {
-        metadata: {
-          role: "string"
-        }
-      }
-    }
-  );
+    },
+  });
   ```
 
 ### PostgreSQL API
