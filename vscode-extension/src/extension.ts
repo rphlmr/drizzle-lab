@@ -15,8 +15,6 @@ import { outputChannel } from "./utils";
 import {
   OpenStudioCommand,
   OpenStudio,
-  SelectEnvAndOpenStudio,
-  SelectEnvAndOpenStudioCommand,
 } from "./modules/studio/open-studio/command";
 import {
   StopStudioCommand,
@@ -24,17 +22,20 @@ import {
 } from "./modules/studio/stop-studio/command";
 import { OpenStudioCodeLens } from "./modules/studio/open-studio/codelens";
 import { stopStudio } from "./modules/studio/server";
+import {
+  SelectEnv,
+  SelectEnvCommand,
+} from "./modules/internal/select-env.command";
 
 export function activate(context: vscode.ExtensionContext) {
   checkNodeVersion();
 
   context.subscriptions.push(
+    /* Internal */
+    vscode.commands.registerCommand(SelectEnvCommand, SelectEnv),
+
     /* Studio */
     vscode.commands.registerCommand(OpenStudioCommand, OpenStudio),
-    vscode.commands.registerCommand(
-      SelectEnvAndOpenStudioCommand,
-      SelectEnvAndOpenStudio,
-    ),
     vscode.commands.registerCommand(StopStudioCommand, StopStudio),
     vscode.languages.registerCodeLensProvider(
       { pattern: "**/*{drizzle,config}.ts", language: "typescript" },

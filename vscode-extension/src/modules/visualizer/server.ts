@@ -20,7 +20,7 @@ interface ServerStartResult {
   port: string;
 }
 
-export async function startVisualizer(configPath: string) {
+export async function startVisualizer(configPath: string, envFile?: string) {
   outputChannel.appendLine(`${OutputKey} extension cwd: ${extensionCwd}`);
   outputChannel.appendLine(`${OutputKey} apps cwd: ${appsCwd}`);
   outputChannel.appendLine(
@@ -63,7 +63,12 @@ export async function startVisualizer(configPath: string) {
       TS_CONFIG_PATH: path.join(cwd, "tsconfig.json"),
     };
 
-    $app = spawn(process.execPath, [binPath], {
+    const envFileArg = envFile ? ["--env-file", envFile] : [];
+    outputChannel.appendLine(
+      `${OutputKey} Using env file: ${envFile ? envFile : "none"}`,
+    );
+
+    $app = spawn(process.execPath, [...envFileArg, binPath], {
       stdio: "pipe",
       detached: true,
       shell: false,

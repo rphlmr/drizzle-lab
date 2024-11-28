@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 
 import { findDrizzleConfigLines } from "../../../utils";
 import { OpenVisualizerCommand } from "./command";
+import { SelectEnvCommand } from "../../internal/select-env.command";
 
 export class OpenVisualizerCodeLens implements vscode.CodeLensProvider {
   async provideCodeLenses(
@@ -15,9 +16,9 @@ export class OpenVisualizerCodeLens implements vscode.CodeLensProvider {
 
       return new vscode.CodeLens(range, {
         title: "🌧️ Open Drizzle Visualizer",
-        command: OpenVisualizerCommand,
+        command: SelectEnvCommand,
         tooltip: "Open Drizzle Schema Visualizer",
-        arguments: [document.uri.fsPath],
+        arguments: [document.uri.fsPath, OpenVisualizerCommand],
       });
     });
   }
