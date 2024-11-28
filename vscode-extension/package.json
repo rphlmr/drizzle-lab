@@ -3,7 +3,7 @@
   "displayName": "Drizzle ORM",
   "description": "Adds schema visualizer for Drizzle ORM",
   "preview": true,
-  "version": "0.8.0",
+  "version": "0.9.0",
   "private": true,
   "icon": "icon.png",
   "license": "MIT",
