@@ -24,15 +24,15 @@ const visualizer = command({
   options: {
     config: optionConfig,
     debug,
-    ["save-dir"]: string()
+    "save-dir": string()
       .desc("Directory to save the visualizer data")
       .default(".drizzle"),
-    ["project-id"]: string()
+    "project-id": string()
       .desc(
         "A unique identifier for the current visualized project. It is used as filename to save the visualizer state.",
       )
       .default("visualizer"),
-    ["ts-config"]: tsConfig,
+    "ts-config": tsConfig,
     port: number().desc("Port to run visualizer on").default(64738).alias("p"),
   },
   async transform(options) {
@@ -87,7 +87,7 @@ const visualizer = command({
       ? spawnSync("vite", ["--host"], {
           stdio: "inherit",
         })
-      : spawnSync(process.execPath, [`visualizer/server/index.mjs`], {
+      : spawnSync(process.execPath, ["visualizer/server/index.mjs"], {
           stdio: "inherit",
           cwd: import.meta.dirname,
           env: {
@@ -104,7 +104,7 @@ const snapshot = command({
   options: {
     config: optionConfig,
     debug,
-    ["ts-config"]: tsConfig,
+    "ts-config": tsConfig,
   },
   transform: async (options) => {
     process.env[DRIZZLE_LAB_ENV_KEY.DEBUG] = String(options.debug);
@@ -165,7 +165,7 @@ const sql = command({
   options: {
     config: optionConfig,
     debug,
-    ["ts-config"]: tsConfig,
+    "ts-config": tsConfig,
   },
   transform: async (options) => {
     process.env[DRIZZLE_LAB_ENV_KEY.DEBUG] = String(options.debug);
