@@ -2,7 +2,8 @@ import * as vscode from "vscode";
 
 import { findDrizzleConfigLines } from "../../../utils";
 import { findDrizzleKitPath } from "../server";
-import { SelectEnvAndOpenStudioCommand } from "./command";
+import { SelectEnvCommand } from "../../internal/select-env.command";
+import { OpenStudioCommand } from "./command";
 
 export class OpenStudioCodeLens implements vscode.CodeLensProvider {
   async provideCodeLenses(
@@ -23,9 +24,9 @@ export class OpenStudioCodeLens implements vscode.CodeLensProvider {
 
         return new vscode.CodeLens(range, {
           title: "🌧️ Open Drizzle Studio",
-          command: SelectEnvAndOpenStudioCommand,
+          command: SelectEnvCommand,
           tooltip: "Open Drizzle Studio",
-          arguments: [document.uri.fsPath],
+          arguments: [document.uri.fsPath, OpenStudioCommand],
         });
       },
     );

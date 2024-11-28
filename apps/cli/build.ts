@@ -43,7 +43,7 @@ await bundle.write(config.output);
 await bundle.close();
 
 // Add banner to dist/cli.js
-const banner = `#!/usr/bin/env node\n`;
+const banner = "#!/usr/bin/env node\n";
 const cliFilePath = "dist/cli.js";
 const originalContent = await fs.readFile(cliFilePath, "utf-8");
 await fs.writeFile(cliFilePath, banner + originalContent);

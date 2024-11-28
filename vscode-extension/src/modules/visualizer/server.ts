@@ -9,6 +9,7 @@ let $port: string | undefined = undefined;
 let $app: ChildProcessWithoutNullStreams | undefined = undefined;
 let $processIds: number[] = [];
 let $configPath: string | undefined = undefined;
+let $envFilePath: string | undefined = undefined;
 
 /* Constants */
 const OutputKey = "[Visualizer]";
@@ -20,7 +21,11 @@ interface ServerStartResult {
   port: string;
 }
 
-export async function startVisualizer(configPath: string) {
+export async function startVisualizer(
+  configPath: string,
+  envFilePath?: string,
+) {
+  console.log("envFilePath", envFilePath);
   outputChannel.appendLine(`${OutputKey} extension cwd: ${extensionCwd}`);
   outputChannel.appendLine(`${OutputKey} apps cwd: ${appsCwd}`);
   outputChannel.appendLine(
@@ -37,6 +42,16 @@ export async function startVisualizer(configPath: string) {
     }
 
     $configPath = configPath;
+
+    // if env path has changed, restart the server
+    if ($envFilePath !== envFilePath) {
+      outputChannel.appendLine(
+        `${OutputKey} Env file path changed. Killing server and restarting with new env file path: ${envFilePath}`,
+      );
+      stopVisualizer();
+    }
+
+    $envFilePath = envFilePath;
 
     if (!$port) {
       // random port from 60_000 to 64_000
@@ -61,6 +76,7 @@ export async function startVisualizer(configPath: string) {
       PORT: $port,
       NODE_ENV: "production",
       TS_CONFIG_PATH: path.join(cwd, "tsconfig.json"),
+      DRIZZLE_LAB_ENV_FILE_PATH: envFilePath,
     };
 
     $app = spawn(process.execPath, [binPath], {

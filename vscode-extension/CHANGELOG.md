@@ -4,6 +4,11 @@ All notable changes to the "drizzle-orm" extension will be documented in this fi
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [0.9.0]
+
+- Upgrade to the latest drizzle-lab visualizer
+- Support loading env files in the visualizer
+
 ## [0.8.0]
 
 - New visualizer UI

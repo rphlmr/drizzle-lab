@@ -6,7 +6,7 @@
 
 import { PassThrough } from "node:stream";
 
-import { DRIZZLE_LAB_DEBUG } from "@drizzle-lab/api/config/node";
+import { getEnv } from "@drizzle-lab/api/config/node";
 import type { AppLoadContext, EntryContext } from "@remix-run/node";
 import { createReadableStreamFromReadable } from "@remix-run/node";
 import { RemixServer } from "@remix-run/react";
@@ -29,11 +29,11 @@ if (!global.__server) {
       // eslint-disable-next-line no-console
       console.log(
         `\n${chalk.green(
-          `Drizzle Visualizer`,
+          "Drizzle Visualizer",
         )} is up and running on ${chalk.blue(`http://127.0.0.1:${info.port}`)}\n`,
       );
     },
-    defaultLogger: DRIZZLE_LAB_DEBUG,
+    defaultLogger: getEnv().DRIZZLE_LAB_DEBUG,
   });
 }
 

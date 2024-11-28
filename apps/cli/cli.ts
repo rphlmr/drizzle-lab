@@ -3,8 +3,8 @@ import { spawnSync } from "node:child_process";
 
 import {
   DRIZZLE_LAB_ENV_KEY,
+  getEnv,
   importDrizzleConfig,
-  DRIZZLE_LAB_TS_CONFIG_PATH,
 } from "@drizzle-lab/api/config/node";
 import { command, string, run, boolean, number } from "@drizzle-team/brocli";
 import chalk from "chalk";
@@ -17,23 +17,27 @@ const tsConfig = string()
   .desc(
     "Path to tsconfig.json. It is used to resolve TypeScript paths aliases.",
   )
-  .default(DRIZZLE_LAB_TS_CONFIG_PATH);
+  .default(getEnv().DRIZZLE_LAB_TS_CONFIG_PATH);
+const envPath = string()
+  .desc("Path to a .env file. It is used to load environment variables.")
+  .alias("e");
 
 const visualizer = command({
   name: "visualizer",
   options: {
     config: optionConfig,
     debug,
-    ["save-dir"]: string()
+    "save-dir": string()
       .desc("Directory to save the visualizer data")
       .default(".drizzle"),
-    ["project-id"]: string()
+    "project-id": string()
       .desc(
         "A unique identifier for the current visualized project. It is used as filename to save the visualizer state.",
       )
       .default("visualizer"),
-    ["ts-config"]: tsConfig,
+    "ts-config": tsConfig,
     port: number().desc("Port to run visualizer on").default(64738).alias("p"),
+    "env-path": envPath,
   },
   async transform(options) {
     const DRIZZLE_LAB_CWD = process.cwd();
@@ -46,6 +50,7 @@ const visualizer = command({
       [DRIZZLE_LAB_ENV_KEY.PROJECT_ID]: options["project-id"],
       [DRIZZLE_LAB_ENV_KEY.CWD]: DRIZZLE_LAB_CWD,
       [DRIZZLE_LAB_ENV_KEY.TS_CONFIG_PATH]: options["ts-config"],
+      [DRIZZLE_LAB_ENV_KEY.ENV_FILE_PATH]: options["env-path"],
     } as const;
 
     process.env = {
@@ -87,7 +92,7 @@ const visualizer = command({
       ? spawnSync("vite", ["--host"], {
           stdio: "inherit",
         })
-      : spawnSync(process.execPath, [`visualizer/server/index.mjs`], {
+      : spawnSync(process.execPath, ["visualizer/server/index.mjs"], {
           stdio: "inherit",
           cwd: import.meta.dirname,
           env: {
@@ -104,11 +109,14 @@ const snapshot = command({
   options: {
     config: optionConfig,
     debug,
-    ["ts-config"]: tsConfig,
+    "ts-config": tsConfig,
+    "env-path": envPath,
   },
   transform: async (options) => {
     process.env[DRIZZLE_LAB_ENV_KEY.DEBUG] = String(options.debug);
     process.env[DRIZZLE_LAB_ENV_KEY.TS_CONFIG_PATH] = options["ts-config"];
+    process.env[DRIZZLE_LAB_ENV_KEY.ENV_FILE_PATH] = options["env-path"];
+
     const config = await importDrizzleConfig(options.config);
 
     if (options.debug) {
@@ -165,11 +173,14 @@ const sql = command({
   options: {
     config: optionConfig,
     debug,
-    ["ts-config"]: tsConfig,
+    "ts-config": tsConfig,
+    "env-path": envPath,
   },
   transform: async (options) => {
     process.env[DRIZZLE_LAB_ENV_KEY.DEBUG] = String(options.debug);
     process.env[DRIZZLE_LAB_ENV_KEY.TS_CONFIG_PATH] = options["ts-config"];
+    process.env[DRIZZLE_LAB_ENV_KEY.ENV_FILE_PATH] = options["env-path"];
+
     const config = await importDrizzleConfig(options.config);
 
     if (options.debug) {

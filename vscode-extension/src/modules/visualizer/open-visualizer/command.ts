@@ -7,6 +7,7 @@ export const OpenVisualizerCommand = "drizzle.visualizer:open";
 export async function OpenVisualizer(...args: any[]) {
   const OutputKey = `[${OpenVisualizerCommand}]`;
   const configPath = args[0];
+  const envFilePath = args[1];
 
   if (!configPath || typeof configPath !== "string") {
     toastError(`${OutputKey} Expected config path to be a string`);
@@ -14,7 +15,7 @@ export async function OpenVisualizer(...args: any[]) {
   }
 
   try {
-    const { port } = await startVisualizer(configPath);
+    const { port } = await startVisualizer(configPath, envFilePath);
     const panel = createDrizzleVisualizerPanel();
 
     panel.webview.html = render(`

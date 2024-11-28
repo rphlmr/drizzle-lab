@@ -4,7 +4,7 @@ import path from "node:path";
 import {
   importDrizzleConfig,
   DRIZZLE_LAB_ENV_KEY,
-  DRIZZLE_LAB_DEBUG,
+  getEnv,
 } from "@drizzle-lab/api/config/node";
 import {
   DrizzleVisualizer,
@@ -61,7 +61,7 @@ export async function loader() {
         await fs.readFile(saveFilePath, "utf-8"),
       ) as NodePosition[];
     } catch (e) {
-      if (DRIZZLE_LAB_DEBUG) {
+      if (getEnv().DRIZZLE_LAB_DEBUG) {
         console.warn(
           `Using default nodes positions. Reason is: ${
             e instanceof Error ? e.message : "unknown"

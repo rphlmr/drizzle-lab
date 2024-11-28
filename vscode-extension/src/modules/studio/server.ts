@@ -9,11 +9,12 @@ import { outputChannel } from "../../utils";
 let $app: ChildProcessWithoutNullStreams | undefined = undefined;
 let $processIds: number[] = [];
 let $configPath: string | undefined = undefined;
+let $envFilePath: string | undefined = undefined;
 
 /* Constants */
 const OutputKey = "[Studio]";
 
-export async function startStudio(configPath: string, envFile?: string) {
+export async function startStudio(configPath: string, envFilePath?: string) {
   return new Promise<void>(async (resolve, reject) => {
     // if config path has changed, restart the server
     if ($configPath && $configPath !== configPath) {
@@ -25,6 +26,16 @@ export async function startStudio(configPath: string, envFile?: string) {
 
     $configPath = configPath;
 
+    // if env path has changed, restart the server
+    if ($envFilePath !== envFilePath) {
+      outputChannel.appendLine(
+        `${OutputKey} Env file path changed. Killing server and restarting with new env file path: ${envFilePath}`,
+      );
+      stopStudio();
+    }
+
+    $envFilePath = envFilePath;
+
     // if app is already running on the same config path, return the existing app
     if ($app) {
       outputChannel.appendLine(
@@ -33,9 +44,9 @@ export async function startStudio(configPath: string, envFile?: string) {
       return resolve();
     }
 
-    const envFileArg = envFile ? ["--env-file", envFile] : [];
+    const envFileArg = envFilePath ? ["--env-file", envFilePath] : [];
     outputChannel.appendLine(
-      `${OutputKey} Using env file: ${envFile ? envFile : "none"}`,
+      `${OutputKey} Using env file: ${envFilePath ? envFilePath : "none"}`,
     );
 
     const drizzleKitPath = findDrizzleKitPath($configPath);
