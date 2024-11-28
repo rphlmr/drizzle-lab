@@ -162,6 +162,7 @@ They are all optional.
 | `DRIZZLE_LAB_SAVE_DIR` | Directory to save output | `./drizzle` |
 | `DRIZZLE_LAB_PROJECT_ID` | Project ID to identify the project in json output | `drizzle-lab` |
 | `TS_CONFIG_PATH` | Path to tsconfig.json | `./tsconfig.json` |
+| `DRIZZLE_LAB_ENV_FILE_PATH` | Path to env file | `undefined` |
 
 ## License
 

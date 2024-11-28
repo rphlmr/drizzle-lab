@@ -3,16 +3,13 @@ import path from "node:path";
 import { pathToFileURL } from "node:url";
 
 import chalk from "chalk";
+import { config } from "dotenv";
 import { createJiti } from "jiti";
 
-import {
-  DRIZZLE_LAB_CWD,
-  DRIZZLE_LAB_DEBUG,
-  DRIZZLE_LAB_TS_CONFIG_PATH,
-} from "../config/env.node.ts";
+import { getEnv } from "../config/env.node.ts";
 
 const jiti = createJiti(import.meta.url, {
-  alias: loadTsConfigPathsAlias(DRIZZLE_LAB_CWD),
+  alias: loadTsConfigPathsAlias(getEnv().DRIZZLE_LAB_CWD),
   moduleCache: false,
 });
 
@@ -24,11 +21,15 @@ let warned = false;
  * @node-only - This function is not supported in the browser.
  */
 export async function importModule(path: string) {
-  if (DRIZZLE_LAB_DEBUG) {
+  if (getEnv().DRIZZLE_LAB_DEBUG) {
     console.log("[importModule] Importing module", path);
   }
 
   try {
+    if (getEnv().DRIZZLE_LAB_ENV_FILE_PATH) {
+      config({ path: getEnv().DRIZZLE_LAB_ENV_FILE_PATH });
+    }
+
     let module = await jiti.import<{ default: { default?: any } }>(
       pathToFileURL(path).href,
     );
@@ -52,7 +53,7 @@ export async function importModule(path: string) {
 
     return module;
   } catch (e) {
-    if (DRIZZLE_LAB_DEBUG) {
+    if (getEnv().DRIZZLE_LAB_DEBUG) {
       console.error(
         "[importModule] Failed to import module",
         path,
@@ -65,7 +66,7 @@ export async function importModule(path: string) {
 
 function loadTsConfigPathsAlias(cwd: string) {
   try {
-    const tsconfigPath = path.resolve(cwd, DRIZZLE_LAB_TS_CONFIG_PATH);
+    const tsconfigPath = path.resolve(cwd, getEnv().DRIZZLE_LAB_TS_CONFIG_PATH);
     let rawImport = fs.readFileSync(tsconfigPath, "utf8");
     // Remove single-line comments
     rawImport = rawImport.replace(/\/\/.*$/gm, "");
@@ -86,7 +87,7 @@ function loadTsConfigPathsAlias(cwd: string) {
       return acc;
     }, {});
 
-    if (DRIZZLE_LAB_DEBUG) {
+    if (getEnv().DRIZZLE_LAB_DEBUG) {
       console.log("[tsconfig] Loading tsConfig path", tsconfigPath);
       console.log("[tsconfig] Loaded tsConfig", rawImport);
       console.log("[tsconfig] TS alias", alias);

@@ -3,11 +3,7 @@ import Path from "node:path";
 
 import { glob } from "glob";
 
-import {
-  DRIZZLE_LAB_CWD,
-  DRIZZLE_LAB_DEBUG,
-  DRIZZLE_LAB_PROJECT_ID,
-} from "./env.node.ts";
+import { getEnv } from "./env.node.ts";
 import { configCommonSchema } from "./schema.ts";
 import { importModule } from "../internal/import-module.node.ts";
 import { withStyle } from "../internal/style";
@@ -22,10 +18,10 @@ export type PartialConfig = Partial<Config>;
  */
 export async function importDrizzleConfig(configPath?: string) {
   const defaultTsConfigExists = fs.existsSync(
-    Path.resolve(Path.join(DRIZZLE_LAB_CWD, "drizzle.config.ts")),
+    Path.resolve(Path.join(getEnv().DRIZZLE_LAB_CWD, "drizzle.config.ts")),
   );
   const defaultJsConfigExists = fs.existsSync(
-    Path.resolve(Path.join(DRIZZLE_LAB_CWD, "drizzle.config.js")),
+    Path.resolve(Path.join(getEnv().DRIZZLE_LAB_CWD, "drizzle.config.js")),
   );
 
   const defaultConfigPath = defaultTsConfigExists
@@ -34,7 +30,7 @@ export async function importDrizzleConfig(configPath?: string) {
       ? "drizzle.config.js"
       : "drizzle.config.json";
 
-  if (DRIZZLE_LAB_DEBUG && !configPath) {
+  if (getEnv().DRIZZLE_LAB_DEBUG && !configPath) {
     console.info(
       withStyle.info(
         `No config path provided, using default '${defaultConfigPath}'`,
@@ -43,7 +39,7 @@ export async function importDrizzleConfig(configPath?: string) {
   }
 
   const path = Path.resolve(
-    Path.join(DRIZZLE_LAB_CWD, configPath ?? defaultConfigPath),
+    Path.join(getEnv().DRIZZLE_LAB_CWD, configPath ?? defaultConfigPath),
   );
 
   if (!fs.existsSync(path)) {
@@ -51,7 +47,7 @@ export async function importDrizzleConfig(configPath?: string) {
     throw new Error();
   }
 
-  if (DRIZZLE_LAB_DEBUG) {
+  if (getEnv().DRIZZLE_LAB_DEBUG) {
     console.info(withStyle.info(`Reading config file '${path}'`));
   }
 
@@ -69,13 +65,13 @@ export async function importDrizzleConfig(configPath?: string) {
   return {
     ...config.data,
     schema: prepareFilenames(config.data.schema),
-    projectId: config.data.lab.projectId || DRIZZLE_LAB_PROJECT_ID,
+    projectId: config.data.lab.projectId || getEnv().DRIZZLE_LAB_PROJECT_ID,
   };
 }
 
 const prepareFilenames = (paths: string[]) => {
   const matches = paths.reduce((matches, cur) => {
-    const globMatches = glob.sync(`${DRIZZLE_LAB_CWD}${cur}`);
+    const globMatches = glob.sync(`${getEnv().DRIZZLE_LAB_CWD}${cur}`);
 
     globMatches.forEach((it) => {
       const fileName = fs.lstatSync(it).isDirectory() ? null : Path.resolve(it);
