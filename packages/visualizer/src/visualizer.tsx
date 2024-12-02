@@ -748,8 +748,8 @@ function ViewNode({ data }: NodeProps<ViewNodeDefinition>) {
 
 function Description({ description }: { description: string }) {
   return (
-    <div className="relative rounded-md border border-muted/80 px-2 py-0.5 text-foreground/60">
-      <span className="absolute -top-2 left-1 flex gap-1 bg-background px-1">
+    <div className="relative rounded-md border border-muted/80 px-2 py-0.5 text-foreground/60 flex">
+      <span className="-top-2 left-1 flex gap-1 bg-background pr-1">
         <Icon name="book-text" size="xs" />
       </span>
       <span
