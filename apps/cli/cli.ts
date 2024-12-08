@@ -40,6 +40,10 @@ const visualizer = command({
     "env-path": envPath,
   },
   async transform(options) {
+    disclaimer();
+    checkNodeVersion();
+    await assertOrmCoreVersion();
+
     const DRIZZLE_LAB_CWD = process.cwd();
 
     const cliEnvs = {
@@ -84,10 +88,6 @@ const visualizer = command({
     return options;
   },
   async handler() {
-    disclaimer();
-
-    await assertOrmCoreVersion();
-
     process.env.NODE_ENV === "development"
       ? spawnSync("vite", ["--host"], {
           stdio: "inherit",
@@ -113,6 +113,10 @@ const snapshot = command({
     "env-path": envPath,
   },
   transform: async (options) => {
+    disclaimer();
+    checkNodeVersion();
+    await assertOrmCoreVersion();
+
     process.env[DRIZZLE_LAB_ENV_KEY.DEBUG] = String(options.debug);
     process.env[DRIZZLE_LAB_ENV_KEY.TS_CONFIG_PATH] = options["ts-config"];
     process.env[DRIZZLE_LAB_ENV_KEY.ENV_FILE_PATH] = options["env-path"];
@@ -127,10 +131,6 @@ const snapshot = command({
     return config;
   },
   async handler(config) {
-    disclaimer();
-
-    await assertOrmCoreVersion();
-
     let snapshot = {};
 
     switch (config.dialect) {
@@ -177,6 +177,10 @@ const sql = command({
     "env-path": envPath,
   },
   transform: async (options) => {
+    disclaimer();
+    checkNodeVersion();
+    await assertOrmCoreVersion();
+
     process.env[DRIZZLE_LAB_ENV_KEY.DEBUG] = String(options.debug);
     process.env[DRIZZLE_LAB_ENV_KEY.TS_CONFIG_PATH] = options["ts-config"];
     process.env[DRIZZLE_LAB_ENV_KEY.ENV_FILE_PATH] = options["env-path"];
@@ -191,10 +195,6 @@ const sql = command({
     return config;
   },
   async handler(config) {
-    disclaimer();
-
-    await assertOrmCoreVersion();
-
     let sql = "";
 
     switch (config.dialect) {
@@ -249,7 +249,7 @@ function disclaimer() {
   console.log(
     chalk.yellow(
       `Drizzle Lab is a community-driven work in progress, and it is not guaranteed to work as expected.
-If you want to help improve it, feel free to create an issue on GitHub: https://github.com/rphlmr/drizzle-lab/issues/new or reach out to me on Discord, X, or BlueSky at @rphlmr.`,
+If you want to help improve it, feel free to create an issue on GitHub: https://github.com/rphlmr/drizzle-lab/issues/new or reach out to me on Discord (https://discord.com/channels/1043890932593987624/1310703894329819166), X, or BlueSky at @rphlmr.`,
     ),
   );
 }
@@ -268,5 +268,14 @@ async function assertOrmCoreVersion() {
   } catch (e) {
     console.error("Please install latest version of drizzle-orm");
     throw e;
+  }
+}
+
+function checkNodeVersion() {
+  const [major, minor] = process.version.split("v")[1].split(".").map(Number);
+  if (major <= 20 && minor < 12) {
+    const msg = `Drizzle Visualizer requires Node.js 20.12.0 or higher. You have ${process.version}`;
+    console.log(chalk.red(msg));
+    throw new Error(msg);
   }
 }

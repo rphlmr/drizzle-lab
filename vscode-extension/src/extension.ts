@@ -66,8 +66,9 @@ function checkNodeVersion() {
   outputChannel.appendLine(`Platform: ${process.platform}`);
   outputChannel.appendLine(`Node version: ${process.version}`);
 
-  if (Number(process.version.split("v")[1].split(".")[0]) < 20) {
-    const msg = `Drizzle Visualizer requires Node.js 20 or higher. You have ${process.version}`;
+  const [major, minor] = process.version.split("v")[1].split(".").map(Number);
+  if (major <= 20 && minor < 12) {
+    const msg = `Drizzle Visualizer requires Node.js 20.12.0 or higher. You have ${process.version}`;
     vscode.window.showErrorMessage(msg);
     outputChannel.appendLine(msg);
     throw new Error(msg);
