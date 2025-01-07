@@ -4,6 +4,11 @@ All notable changes to the "drizzle-orm" extension will be documented in this fi
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [0.10.0]
+
+- Upgrade to the latest drizzle-lab visualizer
+- Remove preview flag
+
 ## [0.9.0]
 
 - Upgrade to the latest drizzle-lab visualizer
