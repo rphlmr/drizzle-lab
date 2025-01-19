@@ -213,8 +213,8 @@
   "peerDependencies": {
     "@electric-sql/pglite": ">=0.2.0",
     "@libsql/client-wasm": ">=0.9.0",
-    "drizzle-kit": ">=0.26.0",
-    "drizzle-orm": ">=0.36.0",
+    "drizzle-kit": ">=0.26",
+    "drizzle-orm": ">=0.36",
     "mysql2": ">=3.0.0"
   },
   "optionalDependencies": {

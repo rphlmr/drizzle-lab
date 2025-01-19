@@ -31,7 +31,7 @@
     "packages/*"
   ],
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "prettier": {}
 }
