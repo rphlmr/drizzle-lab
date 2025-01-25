@@ -34,6 +34,7 @@ module.exports = {
     "dist",
     "build",
     "postcss.config.js",
+    "postcss.config.cjs",
   ],
   plugins: [
     "drizzle",

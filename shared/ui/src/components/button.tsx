@@ -6,29 +6,29 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "../utils/cn";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-50",
+  "dzl-inline-flex dzl-text-foreground dzl-items-center dzl-justify-center dzl-whitespace-nowrap dzl-rounded-md dzl-text-sm dzl-font-medium dzl-transition-colors dzl-focus-visible:outline-none dzl-focus-visible:ring-1 dzl-focus-visible:ring-ring dzl-disabled:opacity-50",
   {
     variants: {
       variant: {
         default:
-          "bg-primary text-primary-foreground shadow hover:bg-primary/90",
+          "dzl-bg-primary dzl-text-primary-foreground dzl-shadow dzl-hover:bg-primary/90",
         destructive:
-          "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90",
+          "dzl-bg-destructive dzl-text-destructive-foreground dzl-shadow-sm dzl-hover:bg-destructive/90",
         outline:
-          "border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground",
+          "dzl-border dzl-border-input dzl-bg-background dzl-shadow-sm dzl-hover:bg-accent dzl-hover:text-accent-foreground",
         secondary:
-          "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80",
+          "dzl-bg-secondary dzl-text-secondary-foreground dzl-shadow-sm dzl-hover:bg-secondary/80",
         ghost:
-          "group-[.active]:bg-accent group-[.active]:text-accent-foreground hover:bg-accent hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 hover:underline",
+          "dzl-group-[.active]:bg-accent dzl-group-[.active]:text-accent-foreground dzl-hover:bg-accent dzl-hover:text-accent-foreground",
+        link: "dzl-text-primary dzl-underline-offset-4 dzl-hover:underline",
       },
       size: {
-        default: "h-9 px-4 py-2",
+        default: "dzl-h-9 dzl-px-4 dzl-py-2",
         custom: "",
-        sm: "h-8 rounded-md px-3 text-xs",
-        lg: "h-10 rounded-md px-8",
-        icon: "size-9",
-        ["icon:sm"]: "size-8",
+        sm: "dzl-h-8 dzl-rounded-md dzl-px-3 dzl-text-xs",
+        lg: "dzl-h-10 dzl-rounded-md dzl-px-8",
+        icon: "dzl-size-9",
+        ["icon:sm"]: "dzl-size-8",
       },
     },
     defaultVariants: {
@@ -52,7 +52,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         // eslint-disable-next-line tailwindcss/no-custom-classname
         className={cn(
           buttonVariants({ variant, size, className }),
-          props.disabled && "disabled group",
+          props.disabled && "dzl-disabled dzl-group",
         )}
         ref={ref}
         {...props}

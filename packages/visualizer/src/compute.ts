@@ -1,9 +1,9 @@
 import "@xyflow/react/dist/style.css";
 
 import dagre from "@dagrejs/dagre";
-import type { Snapshot as MySqlSnapshot } from "@drizzle-lab/api/mysql";
-import type { Snapshot as PgSnapshot } from "@drizzle-lab/api/pg";
-import type { Snapshot as SQLiteSnapshot } from "@drizzle-lab/api/sqlite";
+import type { Snapshot as MySqlSnapshot } from "@drizzle-lab/api/mysql/web";
+import type { Snapshot as PgSnapshot } from "@drizzle-lab/api/pg/web";
+import type { Snapshot as SQLiteSnapshot } from "@drizzle-lab/api/sqlite/web";
 import type { Node, Edge } from "@xyflow/react";
 import { Position } from "@xyflow/react";
 

@@ -1,6 +1,6 @@
 {
   "name": "@drizzle-lab/api",
-  "version": "0.29.0",
+  "version": "0.30.2",
   "description": "Drizzle Lab API - Fork of Drizzle Kit API",
   "type": "module",
   "license": "MIT",
@@ -79,6 +79,18 @@
         "require": "./dist/pg/index.node.cjs"
       }
     },
+    "./pg/web": {
+      "import": {
+        "types": "./dist/pg/index.web.d.ts",
+        "import": "./dist/pg/index.web.js",
+        "default": "./dist/pg/index.web.js"
+      },
+      "require": {
+        "types": "./dist/pg/index.web.d.cts",
+        "import": "./dist/pg/index.web.cjs",
+        "require": "./dist/pg/index.web.cjs"
+      }
+    },
     "./sqlite": {
       "import": {
         "types": "./dist/sqlite/index.d.ts",
@@ -103,6 +115,18 @@
         "require": "./dist/sqlite/index.node.cjs"
       }
     },
+    "./sqlite/web": {
+      "import": {
+        "types": "./dist/sqlite/index.web.d.ts",
+        "import": "./dist/sqlite/index.web.js",
+        "default": "./dist/sqlite/index.web.js"
+      },
+      "require": {
+        "types": "./dist/sqlite/index.web.d.cts",
+        "import": "./dist/sqlite/index.web.cjs",
+        "require": "./dist/sqlite/index.web.cjs"
+      }
+    },
     "./mysql": {
       "import": {
         "types": "./dist/mysql/index.d.ts",
@@ -125,6 +149,18 @@
         "types": "./dist/mysql/index.node.d.cts",
         "import": "./dist/mysql/index.node.cjs",
         "require": "./dist/mysql/index.node.cjs"
+      }
+    },
+    "./mysql/web": {
+      "import": {
+        "types": "./dist/mysql/index.web.d.ts",
+        "import": "./dist/mysql/index.web.js",
+        "default": "./dist/mysql/index.web.js"
+      },
+      "require": {
+        "types": "./dist/mysql/index.web.d.cts",
+        "import": "./dist/mysql/index.web.cjs",
+        "require": "./dist/mysql/index.web.cjs"
       }
     },
     "./relations": {
@@ -170,6 +206,10 @@
         "./dist/pg/index.node.d.ts",
         "./dist/pg/index.node.d.cts"
       ],
+      "pg/web": [
+        "./dist/pg/index.web.d.ts",
+        "./dist/pg/index.web.d.cts"
+      ],
       "sqlite": [
         "./dist/sqlite/index.d.ts",
         "./dist/sqlite/index.d.cts"
@@ -178,6 +218,10 @@
         "./dist/sqlite/index.node.d.ts",
         "./dist/sqlite/index.node.d.cts"
       ],
+      "sqlite/web": [
+        "./dist/sqlite/index.web.d.ts",
+        "./dist/sqlite/index.web.d.cts"
+      ],
       "mysql": [
         "./dist/mysql/index.d.ts",
         "./dist/mysql/index.d.cts"
@@ -185,6 +229,10 @@
       "mysql/node": [
         "./dist/mysql/index.node.d.ts",
         "./dist/mysql/index.node.d.cts"
+      ],
+      "mysql/web": [
+        "./dist/mysql/index.web.d.ts",
+        "./dist/mysql/index.web.d.cts"
       ],
       "relations": [
         "./dist/relations/index.d.ts",

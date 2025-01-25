@@ -5,7 +5,8 @@
     "jsx": "react-jsx",
     "noEmit": true,
     "paths": {
-      "@drizzle-lab/api/*": ["../api/src/*"]
+      "@drizzle-lab/api/*": ["../api/src/*"],
+      "@repo/ui/*": ["../../shared/ui/src/*"]
     }
   },
   "include": [

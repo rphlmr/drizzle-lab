@@ -10,7 +10,7 @@ import type {
   Snapshot,
   UniqueConstraint,
 } from "../schema";
-import { sqlToSnapshot } from "./snapshot";
+import { sqlToSnapshot } from "./sql-to-snapshot";
 
 const sqliteImportsList = new Set([
   "sqliteTable",

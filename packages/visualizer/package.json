@@ -1,28 +1,53 @@
 {
   "name": "@drizzle-lab/visualizer",
-  "version": "0.6.0",
+  "version": "0.7.2",
   "type": "module",
-  "private": true,
+  "license": "MIT",
+  "author": "@rphlmr",
+  "homepage": "https://github.com/rphlmr/drizzle-lab#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rphlmr/drizzle-lab.git"
+  },
+  "bugs": {
+    "url": "https://github.com/rphlmr/drizzle-lab/issues"
+  },
   "exports": {
     "./package.json": "./package.json",
-    ".": "./src/index.ts"
+    ".": {
+      "import": {
+        "import": "./dist/index.js",
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    },
+    "./dist/style.css": "./dist/index.css"
   },
+  "files": [
+    "dist"
+  ],
   "scripts": {
+    "build": "tsup --config tsup.config.ts",
+    "check:exports": "attw --pack .",
     "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "prerelease:publish": "npm version prerelease && npm publish --access=public --tag next",
+    "patch:publish": "npm version patch && npm publish --access=public",
+    "minor:publish": "npm version minor && npm publish --access=public"
   },
   "dependencies": {
     "@dagrejs/dagre": "^1.1.4",
-    "@repo/ui": "*",
     "@xyflow/react": "12.4.1",
     "html-to-image": "1.11.11",
     "shiki": "^1.27.2"
   },
   "devDependencies": {
-    "@drizzle-lab/api": "*",
     "@repo/eslint-config": "*",
     "@repo/typescript-config": "*",
+    "@repo/ui": "*",
     "eslint": "^8.56.0",
+    "postcss": "^8.5.1",
+    "tsup": "^8.3.5",
     "typescript": "^5.7.3"
   },
   "peerDependencies": {

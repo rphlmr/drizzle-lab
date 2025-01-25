@@ -1,0 +1,73 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --dzl-background: 240 14.29% 6.86%;
+    --dzl-foreground: 228.68 72.6% 85.69%;
+
+    --dzl-card: 240 14.29% 6.86%;
+    --dzl-card-foreground: 228.68 72.6% 85.69%;
+
+    --dzl-popover: 240 14.29% 6.86%;
+    --dzl-popover-foreground: 228.68 72.6% 85.69%;
+
+    --dzl-primary: 228.68 72.6% 85.69%;
+    --dzl-primary-foreground: 240 5.9% 10%;
+
+    --dzl-secondary: 235 18.75% 12.55%;
+    --dzl-secondary-foreground: 228.68 72.6% 85.69%;
+
+    --dzl-muted: 235 18.75% 12.55%;
+    --dzl-muted-foreground: 240 5% 64.9%;
+
+    --dzl-accent: 235 18.75% 12.55%;
+    --dzl-accent-foreground: 228.68 72.6% 85.69%;
+
+    --dzl-destructive: 0 62.8% 30.6%;
+    --dzl-destructive-foreground: 228.68 72.6% 85.69%;
+
+    --dzl-border: 235 18.75% 14.55%;
+    --dzl-input: 235 18.75% 14.55%;
+    --dzl-ring: 240 4.9% 83.9%;
+    --dzl-green: #c5f74f;
+    --dzl-blue: 220.8 88.65% 72.35%;
+    --dzl-red: 348.84 88.97% 71.57%;
+
+    --dzl-radius: 0.5rem;
+  }
+
+  .dark {
+    --dzl-background: 240 14.29% 6.86%;
+    --dzl-foreground: 228.68 72.6% 85.69%;
+
+    --dzl-card: 240 14.29% 6.86%;
+    --dzl-card-foreground: 228.68 72.6% 85.69%;
+
+    --dzl-popover: 240 14.29% 6.86%;
+    --dzl-popover-foreground: 228.68 72.6% 85.69%;
+
+    --dzl-primary: 228.68 72.6% 85.69%;
+    --dzl-primary-foreground: 240 5.9% 10%;
+
+    --dzl-secondary: 235 18.75% 12.55%;
+    --dzl-secondary-foreground: 228.68 72.6% 85.69%;
+
+    --dzl-muted: 235 18.75% 12.55%;
+    --dzl-muted-foreground: 240 5% 64.9%;
+
+    --dzl-accent: 235 18.75% 12.55%;
+    --dzl-accent-foreground: 228.68 72.6% 85.69%;
+
+    --dzl-destructive: 0 62.8% 30.6%;
+    --dzl-destructive-foreground: 228.68 72.6% 85.69%;
+
+    --dzl-border: 235 18.75% 14.55%;
+    --dzl-input: 235 18.75% 14.55%;
+    --dzl-ring: 240 4.9% 83.9%;
+    --dzl-green: #c5f74f;
+    --dzl-blue: 220.8 88.65% 72.35%;
+    --dzl-red: 348.84 88.97% 71.57%;
+  }
+}
