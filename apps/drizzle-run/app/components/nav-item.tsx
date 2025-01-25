@@ -22,7 +22,7 @@ export function NavItem({
         <Button
           variant="ghost"
           size="icon"
-          className="rounded-lg"
+          className="dzl-rounded-lg"
           aria-label={tooltip}
           onClick={onClick}
         >

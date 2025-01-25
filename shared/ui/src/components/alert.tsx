@@ -5,13 +5,13 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "../utils/cn";
 
 const alertVariants = cva(
-  "relative w-full rounded-lg border px-4 py-3 text-sm [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground [&>svg~*]:pl-7",
+  "dzl-relative dzl-w-full dzl-rounded-lg dzl-border dzl-px-4 dzl-py-3 dzl-text-sm [&>svg+div]:dzl-translate-y-[-3px] [&>svg]:dzl-absolute [&>svg]:dzl-left-4 [&>svg]:dzl-top-4 [&>svg]:dzl-text-foreground [&>svg~*]:dzl-pl-7",
   {
     variants: {
       variant: {
-        default: "bg-background text-foreground",
+        default: "dzl-bg-background dzl-text-foreground",
         destructive:
-          "border-destructive/50 text-destructive dark:border-destructive [&>svg]:text-destructive",
+          "dzl-dark:dzl-border-destructive dzl-border-destructive/50 dzl-text-destructive [&>svg]:dzl-text-destructive",
       },
     },
     defaultVariants: {
@@ -40,7 +40,10 @@ const AlertTitle = React.forwardRef<
   // eslint-disable-next-line jsx-a11y/heading-has-content
   <h5
     ref={ref}
-    className={cn("mb-1 font-medium leading-none tracking-tight", className)}
+    className={cn(
+      "dzl-mb-1 dzl-font-medium dzl-leading-none dzl-tracking-tight",
+      className,
+    )}
     {...props}
   />
 ));
@@ -52,7 +55,7 @@ const AlertDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("text-sm [&_p]:leading-relaxed", className)}
+    className={cn("dzl-text-sm [&_p]:dzl-leading-relaxed", className)}
     {...props}
   />
 ));

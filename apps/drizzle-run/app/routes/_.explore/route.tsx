@@ -179,7 +179,7 @@ export default function Route() {
       <Input
         name="search"
         placeholder="Search playgrounds by keyword"
-        className="max-w-xs text-center"
+        className="dzl-max-w-xs dzl-text-center"
         type="search"
         onChange={(e) => {
           submit(
@@ -219,12 +219,12 @@ export default function Route() {
         ))}
       </ToggleGroup>
 
-      <div className="flex w-full flex-wrap gap-2 overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-primary">
+      <div className="dzl-flex dzl-w-full dzl-flex-wrap dzl-gap-2 dzl-overflow-y-auto dzl-scrollbar-thin dzl-scrollbar-track-transparent dzl-scrollbar-thumb-primary">
         <Suspense
           fallback={
-            <div className="flex flex-col items-center justify-center gap-4">
-              <RainLogo className="h-10 animate-pulse" />
-              <Typography variant="mutedText" className="animate-pulse">
+            <div className="dzl-flex dzl-flex-col dzl-items-center dzl-justify-center dzl-gap-4">
+              <RainLogo className="dzl-h-10 dzl-animate-pulse" />
+              <Typography variant="mutedText" className="dzl-animate-pulse">
                 Loading playgrounds
               </Typography>
             </div>
@@ -234,20 +234,20 @@ export default function Route() {
             {(playgrounds) =>
               playgrounds.map((playground) => (
                 <Link key={playground.id} to={`/${playground.id}`}>
-                  <Card className="hover:bg-accent">
-                    <CardHeader className="flex flex-col gap-2">
-                      <Badge variant="outline" className="w-fit">
+                  <Card className="hover:dzl-bg-accent">
+                    <CardHeader className="dzl-flex dzl-flex-col dzl-gap-2">
+                      <Badge variant="outline" className="dzl-w-fit">
                         {playground.dialect}
                       </Badge>
-                      <CardTitle className="text-lg">
+                      <CardTitle className="dzl-text-lg">
                         {playground.name}
                       </CardTitle>
                     </CardHeader>
                     {playground.description && (
                       <CardContent>{playground.description}</CardContent>
                     )}
-                    <CardFooter className="gap-2">
-                      <Avatar className="size-6">
+                    <CardFooter className="dzl-gap-2">
+                      <Avatar className="dzl-size-6">
                         <AvatarImage
                           src={playground.creator?.avatarUrl || ""}
                           alt={playground.creator?.username}
@@ -272,7 +272,7 @@ export default function Route() {
 
 function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex h-full flex-col items-center gap-6 overflow-hidden p-6">
+    <div className="dzl-flex dzl-h-full dzl-flex-col dzl-items-center dzl-gap-6 dzl-overflow-hidden dzl-p-6">
       {children}
     </div>
   );

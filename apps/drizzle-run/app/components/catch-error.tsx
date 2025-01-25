@@ -27,19 +27,21 @@ export function CatchError({ redirectTo = "/" }: CatchErrorProps) {
   }
 
   return (
-    <div className="flex max-w-60 flex-col items-center gap-4">
-      <Icon name="ghost" className="size-20 text-red" />
-      <Typography variant="largeText" className="mt-2 text-center">
+    <div className="dzl-flex dzl-max-w-60 dzl-flex-col dzl-items-center dzl-gap-4">
+      <Icon name="ghost" className="dzl-size-20 dzl-text-red" />
+      <Typography variant="largeText" className="dzl-mt-2 dzl-text-center">
         {message}
       </Typography>
       {reason ? (
-        <Typography variant="mutedText" className="text-center">
+        <Typography variant="mutedText" className="dzl-text-center">
           {reason}
         </Typography>
       ) : null}
       {paramsError ? (
         <Typography variant="mutedText">
-          <pre className="text-xs">{JSON.stringify(paramsError, null, 2)}</pre>
+          <pre className="dzl-text-xs">
+            {JSON.stringify(paramsError, null, 2)}
+          </pre>
         </Typography>
       ) : null}
       <Link

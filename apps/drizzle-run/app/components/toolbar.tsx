@@ -13,7 +13,7 @@ export function Toolbar({ children }: { children: React.ReactNode }) {
   return createPortal(
     <>
       {children}
-      <Separator orientation="vertical" className="mx-2 h-6" />
+      <Separator orientation="vertical" className="dzl-mx-2 dzl-h-6" />
     </>,
     outlet,
   );

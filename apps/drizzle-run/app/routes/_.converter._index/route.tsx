@@ -122,26 +122,26 @@ export default function Route() {
     <ResizablePanelGroup
       autoSaveId="converter"
       direction="horizontal"
-      className="relative size-full"
+      className="dzl-relative dzl-size-full"
     >
       <ResizablePanel
         ref={editorPanelRef}
         defaultSize={50}
-        className="relative p-4 pl-0"
+        className="dzl-relative dzl-p-4 dzl-pl-0"
       >
         <Badge
           variant="secondary"
-          className="absolute right-4 top-4 z-10 w-fit"
+          className="dzl-absolute dzl-right-4 dzl-top-4 dzl-z-10 dzl-w-fit"
         >
           Drizzle Schema
         </Badge>
 
         {editor.hasTag("setup") && (
-          <div className="flex h-full flex-col items-center justify-center gap-4 p-4">
+          <div className="dzl-flex dzl-h-full dzl-flex-col dzl-items-center dzl-justify-center dzl-gap-4 dzl-p-4">
             {editor.hasTag("starting") && (
               <>
-                <RainLogo className="h-10 animate-pulse" />
-                <Typography variant="mutedText" className="animate-pulse">
+                <RainLogo className="dzl-h-10 dzl-animate-pulse" />
+                <Typography variant="mutedText" className="dzl-animate-pulse">
                   {editor.hasTag("starting:boot") && "Starting editor"}
                   {editor.hasTag("starting:types") && "Loading types"}
                   {editor.hasTag("starting:prepare") && "Preparing playground"}
@@ -150,7 +150,7 @@ export default function Route() {
             )}
             {editor.hasTag("start_failed") && editorSetupError && (
               <>
-                <RainLogo className="h-10 text-red" />
+                <RainLogo className="dzl-h-10 dzl-text-red" />
                 <p>{editorSetupError.message}</p>
                 {editorSetupError.cause ? (
                   <p>{editorSetupError.cause}</p>
@@ -182,15 +182,18 @@ export default function Route() {
           editorPanelRef.current?.resize(50);
         }}
       />
-      <ResizablePanel defaultSize={50} className="relative p-4 pl-0">
+      <ResizablePanel
+        defaultSize={50}
+        className="dzl-relative dzl-p-4 dzl-pl-0"
+      >
         <Badge
           variant="secondary"
-          className="absolute right-4 top-4 z-10 flex w-fit items-center gap-1"
+          className="dzl-absolute dzl-right-4 dzl-top-4 dzl-z-10 dzl-flex dzl-w-fit dzl-items-center dzl-gap-1"
         >
           Generated SQL
           <Button
             size="icon"
-            className="size-fit rounded-none"
+            className="dzl-size-fit dzl-rounded-none"
             variant="ghost"
             onClick={() => {
               if (!sql) {
@@ -203,17 +206,17 @@ export default function Route() {
           >
             <Icon
               name={copied ? "clipboard-check" : "clipboard"}
-              className={cn(copied && "text-green")}
+              className={cn(copied && "dzl-text-green")}
             />
           </Button>
         </Badge>
 
         {editor.hasTag("setup") && (
-          <div className="flex h-full flex-col items-center justify-center gap-4 p-4">
+          <div className="dzl-flex dzl-h-full dzl-flex-col dzl-items-center dzl-justify-center dzl-gap-4 dzl-p-4">
             {editor.hasTag("starting") && (
               <>
-                <RainLogo className="h-10 animate-pulse" />
-                <Typography variant="mutedText" className="animate-pulse">
+                <RainLogo className="dzl-h-10 dzl-animate-pulse" />
+                <Typography variant="mutedText" className="dzl-animate-pulse">
                   {editor.hasTag("starting:boot") && "Starting editor"}
                   {editor.hasTag("starting:types") && "Loading types"}
                   {editor.hasTag("starting:prepare") && "Preparing playground"}
@@ -222,7 +225,7 @@ export default function Route() {
             )}
             {editor.hasTag("start_failed") && editorSetupError && (
               <>
-                <RainLogo className="h-10 text-red" />
+                <RainLogo className="dzl-h-10 dzl-text-red" />
                 <p>{editorSetupError.message}</p>
                 {editorSetupError.cause ? (
                   <p>{editorSetupError.cause}</p>

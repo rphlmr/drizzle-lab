@@ -10,10 +10,10 @@ export function AnonymousCTA() {
   const location = useLocation();
 
   return (
-    <div className="flex max-w-52 flex-col items-center gap-2">
-      <div className="flex items-center gap-1">
-        <DrizzleLogo className="h-12" />
-        <Typography as="span" className="pt-1 text-lg text-green">
+    <div className="dzl-flex dzl-max-w-52 dzl-flex-col dzl-items-center dzl-gap-2">
+      <div className="dzl-flex dzl-items-center dzl-gap-1">
+        <DrizzleLogo className="dzl-h-12" />
+        <Typography as="span" className="dzl-pt-1 dzl-text-lg dzl-text-green">
           Run
         </Typography>
       </div>

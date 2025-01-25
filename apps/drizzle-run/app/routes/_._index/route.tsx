@@ -73,20 +73,26 @@ export default function Route() {
 
   return (
     <Layout>
-      <div className="flex w-fit flex-col items-center">
-        <div className="flex items-center gap-1">
-          <DrizzleLogo className="h-20" />
+      <div className="dzl-flex dzl-w-fit dzl-flex-col dzl-items-center">
+        <div className="dzl-flex dzl-items-center dzl-gap-1">
+          <DrizzleLogo className="dzl-h-20" />
 
-          <Typography as="span" className="pt-2 text-3xl text-green">
+          <Typography
+            as="span"
+            className="dzl-pt-2 dzl-text-3xl dzl-text-green"
+          >
             Run
           </Typography>
         </div>
-        <Badge variant="secondary" className="bg-amber-950 text-amber-500">
+        <Badge
+          variant="secondary"
+          className="dzl-bg-amber-950 dzl-text-amber-500"
+        >
           Work in progress
         </Badge>
       </div>
 
-      <div className="flex flex-col items-center gap-4">
+      <div className="dzl-flex dzl-flex-col dzl-items-center dzl-gap-4">
         <Typography>
           Would you like to see what the community has shared?
         </Typography>
@@ -100,12 +106,12 @@ export default function Route() {
         </Link>
       </div>
 
-      <NewPlaygroundWizard className="max-w-[80%]">
+      <NewPlaygroundWizard className="dzl-max-w-[80%]">
         {playgrounds.length > 0 ? <RecentPlaygrounds /> : null}
       </NewPlaygroundWizard>
 
       {!isAuthenticated && (
-        <div className="flex flex-col items-center justify-center gap-4">
+        <div className="dzl-flex dzl-flex-col dzl-items-center dzl-justify-center dzl-gap-4">
           <Link
             to={path("/auth/sign-in", {
               [QUERY_KEY.redirectTo]: location.pathname,
@@ -118,7 +124,7 @@ export default function Route() {
               Sign in with GitHub
             </Icon>
           </Link>
-          <Typography variant="smallText" className="text-center">
+          <Typography variant="smallText" className="dzl-text-center">
             Share your playgrounds and save them for later
           </Typography>
         </div>
@@ -129,8 +135,8 @@ export default function Route() {
 
 function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex h-full flex-col items-center">
-      <div className="flex size-full flex-col items-center justify-center gap-20">
+    <div className="dzl-flex dzl-h-full dzl-flex-col dzl-items-center">
+      <div className="dzl-flex dzl-size-full dzl-flex-col dzl-items-center dzl-justify-center dzl-gap-20">
         {children}
       </div>
     </div>
@@ -148,7 +154,7 @@ function RecentPlaygrounds() {
           You don't have any playgrounds yet
         </Typography>
       ) : (
-        <div className="flex flex-col gap-2 overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-primary">
+        <div className="dzl-flex dzl-flex-col dzl-gap-2 dzl-overflow-y-auto dzl-scrollbar-thin dzl-scrollbar-track-transparent dzl-scrollbar-thumb-primary">
           {playgrounds.map((playground) => (
             <Link
               to={`/${playground.id}`}
@@ -156,16 +162,16 @@ function RecentPlaygrounds() {
               className={cn(
                 buttonVariants({
                   variant: "outline",
-                  className: "justify-start",
+                  className: "dzl-justify-start",
                 }),
-                "w-full shrink-0 gap-2 overflow-hidden px-2",
+                "dzl-w-full dzl-shrink-0 dzl-gap-2 dzl-overflow-hidden dzl-px-2",
               )}
             >
               <Badge variant="outline">{playground.dialect}</Badge>
 
               {playground.isShared && <Badge variant="outline">shared</Badge>}
 
-              <Typography variant="smallText" className="truncate">
+              <Typography variant="smallText" className="dzl-truncate">
                 {playground.name}
               </Typography>
             </Link>
