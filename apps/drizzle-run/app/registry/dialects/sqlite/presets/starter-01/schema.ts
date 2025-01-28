@@ -8,8 +8,8 @@ import { relations } from "drizzle-orm";
 import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 export const users = sqliteTable("users", {
-  id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
-  name: text("name").notNull(),
+  id: integer({ mode: "number" }).primaryKey({ autoIncrement: true }),
+  name: text().notNull(),
   createdAt: integer("created_at", { mode: "timestamp" })
     .notNull()
     .$defaultFn(() => new Date()),
@@ -20,8 +20,8 @@ export const usersRelations = relations(users, ({ many }) => ({
 }));
 
 export const posts = sqliteTable("posts", {
-  id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
-  content: text("content").notNull(),
+  id: integer({ mode: "number" }).primaryKey({ autoIncrement: true }),
+  content: text().notNull(),
   authorId: integer("author_id")
     .notNull()
     .references(() => users.id),
