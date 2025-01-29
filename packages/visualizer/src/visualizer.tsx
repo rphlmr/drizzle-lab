@@ -54,9 +54,8 @@ import type {
   ViewNodeDefinition,
   TableNodeDefinition,
 } from "./compute";
-import { Icon, IconSprite } from "./icons";
-
 import { useHighlighter } from "./highlighter";
+import { Icon, IconSprite } from "./icons";
 
 function storageKey(key: string) {
   return `${key}.nodes.positions`;
@@ -322,7 +321,7 @@ function TableNode({ data }: NodeProps<TableNodeDefinition>) {
 
   return (
     <>
-      <div className="dzl-flex dzl-min-w-64 dzl-max-w-fit dzl-flex-col dzl-divide-y dzl-divide-border dzl-rounded-lg dzl-border-border dzl-border-2 dzl-bg-background dzl-text-foreground dzl-shadow-md">
+      <div className="dzl-flex dzl-min-w-64 dzl-max-w-fit dzl-flex-col dzl-divide-y dzl-divide-border dzl-rounded-lg dzl-border-2 dzl-border-border dzl-bg-background dzl-text-foreground dzl-shadow-md">
         <div className="dzl-flex dzl-w-full dzl-p-2 dzl-text-base">
           <div className="dzl-flex dzl-w-full dzl-flex-col dzl-gap-4">
             <div className="dzl-flex dzl-w-full dzl-items-center dzl-justify-between dzl-gap-4 dzl-text-base">
@@ -671,7 +670,7 @@ function ViewNode({ data }: NodeProps<ViewNodeDefinition>) {
 
   return (
     <>
-      <div className="dzl-border-border dzl-flex dzl-min-w-64 dzl-max-w-fit dzl-flex-col dzl-divide-border dzl-divide-y dzl-rounded-lg dzl-border-2 dzl-bg-background dzl-text-foreground dzl-shadow-md">
+      <div className="dzl-flex dzl-min-w-64 dzl-max-w-fit dzl-flex-col dzl-divide-y dzl-divide-border dzl-rounded-lg dzl-border-2 dzl-border-border dzl-bg-background dzl-text-foreground dzl-shadow-md">
         <div className="dzl-flex dzl-w-full dzl-p-2 dzl-text-base">
           <div className="dzl-flex dzl-w-full dzl-flex-col dzl-gap-4">
             <div className="dzl-flex dzl-w-full dzl-items-center dzl-justify-between dzl-gap-4 dzl-text-base">
@@ -848,7 +847,7 @@ function ViewNode({ data }: NodeProps<ViewNodeDefinition>) {
 function Description({ description }: { description: string }) {
   return (
     <div className="dzl-relative dzl-flex dzl-rounded-md dzl-border dzl-border-muted/80 dzl-px-2 dzl-py-0.5 dzl-text-foreground/60">
-      <span className="dzl-top-[-0.5rem] dzl-left-1 dzl-flex dzl-gap-1 dzl-bg-background dzl-pr-1">
+      <span className="dzl-left-1 dzl-top-[-0.5rem] dzl-flex dzl-gap-1 dzl-bg-background dzl-pr-1">
         <Icon name="book-text" size="xs" />
       </span>
       <span
@@ -904,7 +903,7 @@ function InfoButton() {
           <Icon name="info" size="sm" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="dzl-w-fit dzl-dark">
+      <PopoverContent className="dzl-dark dzl-w-fit">
         {/* <div className="dzl-flex dzl-flex-row dzl-gap-1">
           <a
             href="https://github.com/rphlmr/drizzle-lab/tree/main/packages/api#extensions"

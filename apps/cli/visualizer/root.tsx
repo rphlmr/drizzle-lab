@@ -38,7 +38,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Meta />
         <Links />
       </head>
-      <body className="dark h-dvh w-screen overscroll-none">
+      <body className="dark dzl-h-dvh dzl-w-screen dzl-overscroll-none">
         {children}
         <ScrollRestoration />
         <Scripts />

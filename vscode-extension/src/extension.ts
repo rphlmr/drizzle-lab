@@ -38,7 +38,7 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand(OpenStudioCommand, OpenStudio),
     vscode.commands.registerCommand(StopStudioCommand, StopStudio),
     vscode.languages.registerCodeLensProvider(
-      { pattern: "**/*{drizzle,config}.ts", language: "typescript" },
+      { pattern: "**/*{drizzle,config}*.ts", language: "typescript" },
       new OpenStudioCodeLens(),
     ),
 
@@ -46,7 +46,7 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand(OpenVisualizerCommand, OpenVisualizer),
     vscode.commands.registerCommand(StopVisualizerCommand, StopVisualizer),
     vscode.languages.registerCodeLensProvider(
-      { pattern: "**/*{drizzle,config}.ts", language: "typescript" },
+      { pattern: "**/*{drizzle,config}*.ts", language: "typescript" },
       new OpenVisualizerCodeLens(),
     ),
   );

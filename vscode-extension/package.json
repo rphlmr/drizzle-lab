@@ -2,7 +2,7 @@
   "name": "vscode-drizzle-orm",
   "displayName": "Drizzle ORM",
   "description": "Adds schema visualizer for Drizzle ORM",
-  "version": "0.10.0",
+  "version": "0.11.1",
   "private": true,
   "icon": "icon.png",
   "license": "MIT",
