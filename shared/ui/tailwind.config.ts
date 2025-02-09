@@ -10,7 +10,6 @@ const config = {
     "../../packages/visualizer/src/**/*.{ts,tsx}",
   ],
   blocklist: [],
-  prefix: "dzl-",
   theme: {
     container: {
       center: true,

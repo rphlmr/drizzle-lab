@@ -143,15 +143,15 @@ export default function Index() {
   );
 
   return (
-    <div className="dzl-relative dzl-flex dzl-size-full dzl-flex-col">
+    <div className="relative flex size-full flex-col">
       {/* <div className="absolute left-0 top-0 z-50 flex w-full items-center justify-center">
         <span className="text-sm font-medium">Drizzle Lab - Visualizer</span>
       </div> */}
-      <Alert className="dzl-pointer-events-none dzl-absolute dzl-top-0 dzl-z-10 dzl-flex dzl-w-full dzl-flex-col dzl-border-none dzl-bg-transparent">
-        <span className="dzl-text-sm dzl-font-bold dzl-text-muted-foreground/50">
+      <Alert className="pointer-events-none absolute top-0 z-10 flex w-full flex-col border-none bg-transparent">
+        <span className="text-sm font-bold text-muted-foreground/50">
           Drizzle Lab - Visualizer
         </span>
-        <p className="dzl-text-sm dzl-text-muted-foreground/30">
+        <p className="text-sm text-muted-foreground/30">
           It can still have bugs!
         </p>
       </Alert>
@@ -183,16 +183,16 @@ export function ErrorBoundary() {
   }
 
   return (
-    <div className="dzl-flex dzl-size-full dzl-flex-col dzl-items-center dzl-justify-center dzl-gap-4 dzl-overflow-hidden dzl-p-4">
-      <span className="dzl-text-sm dzl-font-bold">Something went wrong ⛈️</span>
-      <span className="dzl-text-sm dzl-text-muted-foreground">
+    <div className="flex size-full flex-col items-center justify-center gap-4 overflow-hidden p-4">
+      <span className="text-sm font-bold">Something went wrong ⛈️</span>
+      <span className="text-sm text-muted-foreground">
         JavaScript is harder than we think. It drives me crazy.
       </span>
       <Button variant="outline" onClick={() => window.location.reload()}>
         Refresh
       </Button>
       <img src="error.webp" alt="Error" />
-      <span className="dzl-text-center dzl-text-sm dzl-font-bold dzl-text-rose-600">
+      <span className="text-center text-sm font-bold text-rose-600">
         {message}
       </span>
     </div>

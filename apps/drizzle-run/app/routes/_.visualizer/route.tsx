@@ -56,11 +56,11 @@ export function ErrorBoundary() {
 
 export default function Route() {
   return (
-    <div className="dzl-flex dzl-size-full dzl-flex-col dzl-items-center dzl-justify-center dzl-gap-12">
+    <div className="flex size-full flex-col items-center justify-center gap-12">
       <Typography variant="largeText">
         Drizzle Visualizer is now available as a standalone app.
       </Typography>
-      <code className="dzl-text-muted-foreground">
+      <code className="text-muted-foreground">
         npx drizzle-lab@latest visualizer
       </code>
       <Link

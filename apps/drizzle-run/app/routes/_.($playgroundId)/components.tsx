@@ -59,15 +59,12 @@ export function PlaygroundSelector({
     <AlertDialog>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button
-            variant="outline"
-            className="dzl-w-fit dzl-max-w-[260px] dzl-gap-2 dzl-px-2"
-          >
+          <Button variant="outline" className="w-fit max-w-[260px] gap-2 px-2">
             <Badge variant="outline">{metadata.dialect}</Badge>
-            <span className="dzl-truncate">{metadata.name}</span>
+            <span className="truncate">{metadata.name}</span>
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="dzl-w-[200px]">
+        <DropdownMenuContent className="w-[200px]">
           <AlertDialogTrigger asChild>
             <DropdownMenuItem
               disabled={readOnly}
@@ -78,17 +75,13 @@ export function PlaygroundSelector({
               <Icon
                 name="file-pen-line"
                 size="md"
-                className="dzl-mr-2 dzl-text-center"
+                className="mr-2 text-center"
               />
               <span>Edit</span>
             </DropdownMenuItem>
           </AlertDialogTrigger>
           <DropdownMenuItem onSelect={onFork}>
-            <Icon
-              name="git-fork"
-              size="md"
-              className="dzl-mr-2 dzl-text-center"
-            />
+            <Icon name="git-fork" size="md" className="mr-2 text-center" />
             <span>Fork</span>
           </DropdownMenuItem>
           <AlertDialogTrigger asChild>
@@ -101,7 +94,7 @@ export function PlaygroundSelector({
               <Icon
                 name="list-restart"
                 size="md"
-                className="dzl-mr-2 dzl-text-center"
+                className="mr-2 text-center"
               />
               <span>Discard changes</span>
             </DropdownMenuItem>
@@ -115,11 +108,7 @@ export function PlaygroundSelector({
                 setType("delete");
               }}
             >
-              <Icon
-                name="trash-2"
-                size="md"
-                className="dzl-mr-2 dzl-text-center"
-              />
+              <Icon name="trash-2" size="md" className="mr-2 text-center" />
               <span>Delete</span>
             </DropdownMenuItem>
           </AlertDialogTrigger>
@@ -128,7 +117,7 @@ export function PlaygroundSelector({
       {type === "edit" && (
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogDescription className="dzl-text-foreground">
+            <AlertDialogDescription className="text-foreground">
               <Input
                 placeholder="Playground name"
                 value={name}
@@ -140,7 +129,7 @@ export function PlaygroundSelector({
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction asChild>
               <Button
-                className="dzl-w-fit dzl-self-end"
+                className="w-fit self-end"
                 size="sm"
                 type="submit"
                 onClick={() => {
@@ -157,7 +146,7 @@ export function PlaygroundSelector({
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              <Icon name="triangle-alert" size="xl" className="dzl-text-red">
+              <Icon name="triangle-alert" size="xl" className="text-red">
                 Are you absolutely sure?
               </Icon>
             </AlertDialogTitle>
@@ -180,7 +169,7 @@ export function PlaygroundSelector({
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              <Icon name="triangle-alert" size="xl" className="dzl-text-red">
+              <Icon name="triangle-alert" size="xl" className="text-red">
                 Are you absolutely sure?
               </Icon>
             </AlertDialogTitle>
@@ -205,7 +194,7 @@ export function PlaygroundSelector({
 
 export function PlaygroundActions() {
   return (
-    <div className="dzl-flex dzl-items-center dzl-gap-1">
+    <div className="flex items-center gap-1">
       <Popover>
         <Tooltip>
           <PopoverTrigger asChild>
@@ -217,7 +206,7 @@ export function PlaygroundActions() {
           </PopoverTrigger>
           <TooltipContent>Fork this playground</TooltipContent>
         </Tooltip>
-        <PopoverContent className="dzl-w-fit">
+        <PopoverContent className="w-fit">
           <AnonymousCTA />
         </PopoverContent>
       </Popover>
@@ -232,7 +221,7 @@ export function PlaygroundActions() {
           </PopoverTrigger>
           <TooltipContent>Share your playground</TooltipContent>
         </Tooltip>
-        <PopoverContent className="dzl-w-fit">
+        <PopoverContent className="w-fit">
           <AnonymousCTA />
         </PopoverContent>
       </Popover>

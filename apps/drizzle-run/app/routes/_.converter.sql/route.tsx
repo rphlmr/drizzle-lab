@@ -125,9 +125,9 @@ export default function Route() {
       <ResizablePanel
         ref={editorPanelRef}
         defaultSize={50}
-        className="dzl-relative dzl-p-4 dzl-pl-0"
+        className="relative p-4 pl-0"
       >
-        <div className="dzl-absolute dzl-right-4 dzl-top-4 dzl-z-10 dzl-flex dzl-items-center dzl-gap-1">
+        <div className="absolute right-4 top-4 z-10 flex items-center gap-1">
           <Select
             value={dialect}
             onValueChange={(value) => setDialect(value as Dialect)}
@@ -136,7 +136,7 @@ export default function Route() {
               className={buttonVariants({
                 variant: "secondary",
                 size: "sm",
-                className: "dzl-w-fit dzl-h-6",
+                className: "w-fit h-6",
               })}
             >
               <SelectValue placeholder="Select a dialect" />
@@ -149,17 +149,17 @@ export default function Route() {
               ))}
             </SelectContent>
           </Select>
-          <Badge variant="secondary" className="dzl-w-fit">
+          <Badge variant="secondary" className="w-fit">
             SQL schema
           </Badge>
         </div>
 
         {editor.hasTag("setup") && (
-          <div className="dzl-flex dzl-h-full dzl-flex-col dzl-items-center dzl-justify-center dzl-gap-4 dzl-p-4">
+          <div className="flex h-full flex-col items-center justify-center gap-4 p-4">
             {editor.hasTag("starting") && (
               <>
-                <RainLogo className="dzl-h-10 dzl-animate-pulse" />
-                <Typography variant="mutedText" className="dzl-animate-pulse">
+                <RainLogo className="h-10 animate-pulse" />
+                <Typography variant="mutedText" className="animate-pulse">
                   {editor.hasTag("starting:boot") && "Starting editor"}
                   {editor.hasTag("starting:types") && "Loading types"}
                   {editor.hasTag("starting:prepare") && "Preparing playground"}
@@ -168,7 +168,7 @@ export default function Route() {
             )}
             {editor.hasTag("start_failed") && editorSetupError && (
               <>
-                <RainLogo className="dzl-h-10 dzl-text-red" />
+                <RainLogo className="h-10 text-red" />
                 <p>{editorSetupError.message}</p>
                 {editorSetupError.cause ? (
                   <p>{editorSetupError.cause}</p>
@@ -202,18 +202,15 @@ export default function Route() {
           editorPanelRef.current?.resize(50);
         }}
       />
-      <ResizablePanel
-        defaultSize={50}
-        className="dzl-relative dzl-p-4 dzl-pl-0"
-      >
+      <ResizablePanel defaultSize={50} className="relative p-4 pl-0">
         <Badge
           variant="secondary"
-          className="dzl-absolute dzl-right-4 dzl-top-4 dzl-z-10 dzl-flex dzl-w-fit dzl-items-center dzl-gap-1"
+          className="absolute right-4 top-4 z-10 flex w-fit items-center gap-1"
         >
           Generated Drizzle schema
           <Button
             size="icon"
-            className="dzl-size-fit dzl-rounded-none"
+            className="size-fit rounded-none"
             variant="ghost"
             onClick={() => {
               if (!schema) {
@@ -226,17 +223,17 @@ export default function Route() {
           >
             <Icon
               name={copied ? "clipboard-check" : "clipboard"}
-              className={cn(copied && "dzl-text-green")}
+              className={cn(copied && "text-green")}
             />
           </Button>
         </Badge>
 
         {editor.hasTag("setup") && (
-          <div className="dzl-flex dzl-h-full dzl-flex-col dzl-items-center dzl-justify-center dzl-gap-4 dzl-p-4">
+          <div className="flex h-full flex-col items-center justify-center gap-4 p-4">
             {editor.hasTag("starting") && (
               <>
-                <RainLogo className="dzl-h-10 dzl-animate-pulse" />
-                <Typography variant="mutedText" className="dzl-animate-pulse">
+                <RainLogo className="h-10 animate-pulse" />
+                <Typography variant="mutedText" className="animate-pulse">
                   {editor.hasTag("starting:boot") && "Starting editor"}
                   {editor.hasTag("starting:types") && "Loading types"}
                   {editor.hasTag("starting:prepare") && "Preparing playground"}
@@ -245,7 +242,7 @@ export default function Route() {
             )}
             {editor.hasTag("start_failed") && editorSetupError && (
               <>
-                <RainLogo className="dzl-h-10 dzl-text-red" />
+                <RainLogo className="h-10 text-red" />
                 <p>{editorSetupError.message}</p>
                 {editorSetupError.cause ? (
                   <p>{editorSetupError.cause}</p>

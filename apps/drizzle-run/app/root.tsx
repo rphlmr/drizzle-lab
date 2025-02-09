@@ -75,7 +75,7 @@ export default function App() {
 
 export function ErrorBoundary() {
   return (
-    <div className="dzl-flex dzl-h-screen dzl-items-center dzl-justify-center">
+    <div className="flex h-screen items-center justify-center">
       <CatchError redirectTo="/" />
     </div>
   );

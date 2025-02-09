@@ -67,11 +67,11 @@ export default function Route() {
       <Toolbar>
         <HowTo />
       </Toolbar>
-      <div className="dzl-flex dzl-size-full dzl-flex-col">
-        <Badge className="dzl-mt-2 dzl-w-fit dzl-self-center dzl-bg-amber-950 dzl-text-amber-500">
+      <div className="flex size-full flex-col">
+        <Badge className="mt-2 w-fit self-center bg-amber-950 text-amber-500">
           Experimental features. No guarantees it will work or be kept.
         </Badge>
-        <div className="dzl-relative dzl-flex dzl-items-center dzl-justify-center dzl-gap-2 dzl-self-center dzl-py-2">
+        <div className="relative flex items-center justify-center gap-2 self-center py-2">
           <NavLink
             to={path("/converter")}
             end
@@ -79,7 +79,7 @@ export default function Route() {
               buttonVariants({
                 variant: isActive ? "secondary" : "ghost",
                 size: "sm",
-                className: cn(isActive && "dzl-pointer-events-none"),
+                className: cn(isActive && "pointer-events-none"),
               })
             }
           >
@@ -92,7 +92,7 @@ export default function Route() {
               buttonVariants({
                 variant: isActive ? "secondary" : "ghost",
                 size: "sm",
-                className: cn(isActive && "dzl-pointer-events-none"),
+                className: cn(isActive && "pointer-events-none"),
               })
             }
           >
@@ -127,7 +127,7 @@ function HowTo() {
             Everything runs in your browser, the schema is only persisted in
             session storage to prevent loss on unexpected refreshes.
           </Typography>
-          <Typography variant="smallText" className="dzl-text-red">
+          <Typography variant="smallText" className="text-red">
             SQL to Drizzle does not support MySQL
             <br />
             (does not work in the browser, yet?)
@@ -137,7 +137,7 @@ function HowTo() {
             href="https://orm.drizzle.team/docs/sql-schema-declaration"
             target="_blank"
             rel="noreferrer"
-            className="dzl-flex dzl-items-center dzl-gap-2 hover:dzl-underline"
+            className="flex items-center gap-2 hover:underline"
           >
             <Typography variant="smallText">Drizzle documentation</Typography>
             <Icon name="external-link" size="md" />

@@ -242,57 +242,51 @@ export default function MainLayout() {
 
   return (
     <>
-      <div className="dzl-grid dzl-size-full dzl-grid-rows-[auto_1fr]">
-        <header className="dzl-grid dzl-h-14 dzl-grid-cols-3 dzl-items-center dzl-justify-between dzl-gap-1 dzl-border-b dzl-px-4">
-          <div className="dzl-flex dzl-items-center dzl-gap-2">
-            <NavLink to="/" className="dzl-flex dzl-items-center dzl-gap-1">
-              <DrizzleLogo className="dzl-h-10" />
-              <Typography
-                as="span"
-                className="dzl-pt-0.5 dzl-text-base dzl-text-green"
-              >
+      <div className="grid size-full grid-rows-[auto_1fr]">
+        <header className="grid h-14 grid-cols-3 items-center justify-between gap-1 border-b px-4">
+          <div className="flex items-center gap-2">
+            <NavLink to="/" className="flex items-center gap-1">
+              <DrizzleLogo className="h-10" />
+              <Typography as="span" className="pt-0.5 text-base text-green">
                 Run
               </Typography>
             </NavLink>
-            <Badge
-              variant="secondary"
-              className="dzl-bg-amber-950 dzl-text-amber-500"
-            >
+            <Badge variant="secondary" className="bg-amber-950 text-amber-500">
               Work in progress
             </Badge>
             <Badge variant="outline">Drizzle {version}</Badge>
           </div>
 
-          <div className="dzl-flex dzl-w-full dzl-items-center dzl-justify-center">
+          <div className="flex w-full items-center justify-center">
             <Popover open={open} onOpenChange={setOpen}>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className="dzl-max-w-60 dzl-gap-1"
+                  className="max-w-60 gap-1"
                   role="combobox"
                 >
                   <Icon name={currentApp.icon} size="md" />
-                  <span className="dzl-truncate">{currentApp.label}</span>
+                  <span className="truncate">{currentApp.label}</span>
                   <CommandShortcut>{`${meta}K`}</CommandShortcut>
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="dzl-p-0">
+              <PopoverContent className="p-0">
                 <Command loop>
                   <CommandInput placeholder="Type a command or search..." />
-                  <CommandList className="dzl-max-h-96">
+                  <CommandList className="max-h-96">
                     <CommandEmpty>No results found.</CommandEmpty>
                     <CommandGroup heading="Playground">
                       <CommandItem onSelect={() => setOpenList(!openList)}>
                         <Popover open={openList} onOpenChange={setOpenList}>
-                          <PopoverTrigger className="dzl-flex dzl-w-full dzl-items-center dzl-justify-between dzl-gap-1 dzl-outline-none">
-                            <div className="dzl-flex dzl-items-center dzl-gap-1">
+                          <PopoverTrigger className="flex w-full items-center justify-between gap-1 outline-none">
+                            <div className="flex items-center gap-1">
                               <Icon name="folder-open" size="md" />
-                              <span className="dzl-truncate">Open</span>
+                              <span className="truncate">Open</span>
                             </div>
                             <Icon name="chevron-right" size="md" />
                           </PopoverTrigger>
                           <PopoverContent
-                            className="dzl-w-96 dzl-p-0"
+                            className="w-96 p-0"
                             side="right"
                             align="start"
                             alignOffset={-11}
@@ -311,7 +305,7 @@ export default function MainLayout() {
                                         navigate(`/${playground.id}`);
                                         setOpen(false);
                                       }}
-                                      className="dzl-gap-2"
+                                      className="gap-2"
                                     >
                                       <Badge variant="outline">
                                         {playground.dialect}
@@ -321,7 +315,7 @@ export default function MainLayout() {
                                         <Badge variant="outline">shared</Badge>
                                       )}
 
-                                      <span className="dzl-truncate">
+                                      <span className="truncate">
                                         {playground.name}
                                       </span>
 
@@ -337,11 +331,11 @@ export default function MainLayout() {
                         </Popover>
                       </CommandItem>
                       <CommandItem
-                        className="dzl-gap-1"
+                        className="gap-1"
                         onSelect={() => dialog.open("new_playground")}
                       >
                         <Icon name="box-plus" size="md" />
-                        <span className="dzl-truncate">New playground</span>
+                        <span className="truncate">New playground</span>
                       </CommandItem>
                     </CommandGroup>
                     <CommandSeparator />
@@ -364,7 +358,7 @@ export default function MainLayout() {
                             }}
                           >
                             <Icon name={app.icon} size="md" />
-                            <span className="dzl-truncate">{app.label}</span>
+                            <span className="truncate">{app.label}</span>
                           </CommandItem>
                         ))}
                     </CommandGroup>
@@ -379,7 +373,7 @@ export default function MainLayout() {
                         keywords={["editor", "settings"]}
                       >
                         <Icon name="panel-top" size="md" />
-                        <span className="dzl-truncate">Editor</span>
+                        <span className="truncate">Editor</span>
                       </CommandItem>
                     </CommandGroup>
                     <CommandSeparator />
@@ -395,10 +389,10 @@ export default function MainLayout() {
                         }}
                       >
                         <Icon name="book-text" size="md" />
-                        <span className="dzl-truncate">Docs</span>
+                        <span className="truncate">Docs</span>
                       </CommandItem>
                       <CommandItem
-                        className="dzl-gap-1"
+                        className="gap-1"
                         onSelect={() => {
                           window.open(
                             "https://github.com/rphlmr/drizzle-run",
@@ -408,7 +402,7 @@ export default function MainLayout() {
                         }}
                       >
                         <Icon name="github" size="md" />
-                        <span className="dzl-truncate">GitHub</span>
+                        <span className="truncate">GitHub</span>
                       </CommandItem>
                     </CommandGroup>
                   </CommandList>
@@ -417,11 +411,11 @@ export default function MainLayout() {
             </Popover>
           </div>
 
-          <div className="dzl-flex dzl-items-center dzl-justify-end dzl-gap-1">
-            <ToolbarOutlet className="dzl-flex dzl-items-center dzl-gap-1" />
+          <div className="flex items-center justify-end gap-1">
+            <ToolbarOutlet className="flex items-center gap-1" />
             <Suspense
               fallback={
-                <Skeleton className="dzl-size-5 dzl-cursor-pointer dzl-rounded-full" />
+                <Skeleton className="size-5 cursor-pointer rounded-full" />
               }
             >
               <Await resolve={user}>
@@ -437,7 +431,7 @@ export default function MainLayout() {
                       )}
                     >
                       {user ? (
-                        <Avatar className="dzl-size-5">
+                        <Avatar className="size-5">
                           <AvatarImage
                             src={user.avatarUrl || ""}
                             alt={user.username}
@@ -451,10 +445,10 @@ export default function MainLayout() {
                       )}
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
-                      <div className="dzl-flex dzl-flex-col dzl-items-center dzl-gap-2 dzl-px-2 dzl-py-1.5">
+                      <div className="flex flex-col items-center gap-2 px-2 py-1.5">
                         {user ? (
                           <>
-                            <Avatar className="dzl-size-14">
+                            <Avatar className="size-14">
                               <AvatarImage
                                 src={user.avatarUrl || ""}
                                 alt={user.username}
@@ -463,7 +457,7 @@ export default function MainLayout() {
                                 {user.username.substring(0, 2).toUpperCase()}
                               </AvatarFallback>
                             </Avatar>
-                            <div className="dzl-flex dzl-flex-col dzl-items-center dzl-gap-1">
+                            <div className="flex flex-col items-center gap-1">
                               <Typography variant="largeText">
                                 {user.fullName}
                               </Typography>
@@ -480,7 +474,7 @@ export default function MainLayout() {
                         <>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem
-                            className="focus:dzl-bg-destructive"
+                            className="focus:bg-destructive"
                             onClick={() => {
                               dialog.open("log_out");
                             }}
@@ -488,7 +482,7 @@ export default function MainLayout() {
                             <Icon
                               name="log-out"
                               size="md"
-                              className="dzl-text-center"
+                              className="text-center"
                             >
                               Use Prisma
                             </Icon>
@@ -502,7 +496,7 @@ export default function MainLayout() {
             </Suspense>
           </div>
         </header>
-        <div className="dzl-grid dzl-size-full dzl-grid-cols-1 dzl-overflow-hidden">
+        <div className="grid size-full grid-cols-1 overflow-hidden">
           <Outlet />
         </div>
         {!hasReadBanner && !isMobileAppLayout && <WelcomeBanner />}
@@ -511,7 +505,7 @@ export default function MainLayout() {
         <>
           {dialog.type === "new_playground" && (
             <Dialog open onOpenChange={dialog.toggle}>
-              <DialogContent className="dzl-md:dzl-max-w-[80%] dzl-h-96">
+              <DialogContent className="md:max-w-[80%] h-96">
                 <NewPlaygroundWizard />
               </DialogContent>
             </Dialog>
@@ -532,17 +526,13 @@ function LogOutDialog({ close }: Closable) {
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>
-            <Icon name="triangle-alert" size="xl" className="dzl-text-red">
+            <Icon name="triangle-alert" size="xl" className="text-red">
               Please note
             </Icon>
           </AlertDialogTitle>
           <AlertDialogDescription>
             <span>All playgrounds that have not been saved</span>
-            <Icon
-              size="md"
-              name="cloud-upload"
-              className="dzl-mx-1 dzl-text-green"
-            />
+            <Icon size="md" name="cloud-upload" className="mx-1 text-green" />
             <span>could be lost.</span>
           </AlertDialogDescription>
         </AlertDialogHeader>
@@ -569,12 +559,10 @@ function WelcomeBanner() {
   const { revalidate } = useRevalidator();
 
   return (
-    <Alert className="dzl-absolute dzl-bottom-4 dzl-left-4 dzl-w-fit">
-      <AlertTitle className="dzl-text-lg">
-        👋 Welcome to Drizzle Run!
-      </AlertTitle>
-      <AlertDescription className="dzl-flex dzl-flex-col dzl-gap-2">
-        <div className="dzl-flex dzl-flex-col">
+    <Alert className="absolute bottom-4 left-4 w-fit">
+      <AlertTitle className="text-lg">👋 Welcome to Drizzle Run!</AlertTitle>
+      <AlertDescription className="flex flex-col gap-2">
+        <div className="flex flex-col">
           <p>
             You can use this tool to learn how to use Drizzle and share your
             playgrounds
@@ -585,7 +573,7 @@ function WelcomeBanner() {
               target="_blank"
               rel="noreferrer"
               href="https://github.com/rphlmr/drizzle-run"
-              className="dzl-text-blue"
+              className="text-blue"
             >
               GitHub
             </a>
@@ -598,7 +586,7 @@ function WelcomeBanner() {
             target="_blank"
             rel="noreferrer"
             href="https://x.com/rphlmr"
-            className="dzl-text-green"
+            className="text-green"
           >
             @rphlmr
           </a>{" "}
@@ -611,7 +599,7 @@ function WelcomeBanner() {
             target="_blank"
             rel="noreferrer"
             href="https://x.com/DrizzleORM"
-            className="dzl-text-green"
+            className="text-green"
           >
             @DrizzleORM
           </a>{" "}
@@ -619,7 +607,7 @@ function WelcomeBanner() {
             target="_blank"
             rel="noreferrer"
             href="https://x.com/ElectricSQL"
-            className="dzl-text-green"
+            className="text-green"
           >
             @ElectricSQL
           </a>{" "}
@@ -627,7 +615,7 @@ function WelcomeBanner() {
             target="_blank"
             rel="noreferrer"
             href="https://turso.tech/libsql"
-            className="dzl-text-green"
+            className="text-green"
           >
             @tursodatabase
           </a>{" "}
@@ -635,7 +623,7 @@ function WelcomeBanner() {
             target="_blank"
             rel="noreferrer"
             href="https://x.com/statelyai"
-            className="dzl-text-green"
+            className="text-green"
           >
             @statelyai
           </a>{" "}
@@ -644,7 +632,7 @@ function WelcomeBanner() {
             target="_blank"
             rel="noreferrer"
             href="https://x.com/supabase"
-            className="dzl-text-green"
+            className="text-green"
           >
             @supabase
           </a>
@@ -652,7 +640,7 @@ function WelcomeBanner() {
 
         <Button
           variant="secondary"
-          className="dzl-w-fit"
+          className="w-fit"
           onClick={() => {
             localStorage.setItem("hasReadBanner", "true");
             revalidate();

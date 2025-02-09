@@ -37,7 +37,7 @@ export function FieldError({ field, className, ...props }: FieldErrorProps) {
     <Typography
       variant="smallText"
       id={meta.errorId}
-      className={cn("dzl-font-medium dzl-text-destructive", className)}
+      className={cn("font-medium text-destructive", className)}
       {...props}
     >
       {error}

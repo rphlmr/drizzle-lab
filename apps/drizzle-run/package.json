@@ -36,8 +36,6 @@
   "dependencies": {
     "@conform-to/react": "^1.1.3",
     "@conform-to/zod": "^1.1.3",
-    "@drizzle-lab/api": "*",
-    "@drizzle-lab/visualizer": "*",
     "@electric-sql/pglite": "^0.2.3",
     "@electric-sql/pglite-v1": "npm:@electric-sql/pglite@0.1.5",
     "@epic-web/cachified": "^5.2.0",
@@ -77,8 +75,6 @@
   "devDependencies": {
     "@flydotio/dockerfile": "^0.5.8",
     "@remix-run/dev": "^2.14.0",
-    "@repo/eslint-config": "*",
-    "@repo/typescript-config": "*",
     "@shikijs/monaco": "^1.14.1",
     "@types/react": "^18.3.4",
     "@types/react-dom": "^18.3.0",
