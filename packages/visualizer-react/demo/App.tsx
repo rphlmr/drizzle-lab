@@ -1,14 +1,12 @@
-import { Visualizer } from "../src";
-import "./App.css";
+import { DrizzleVisualizer } from "../src";
+import * as schema from "./schema";
 
-function App() {
+import "../src/styles.css";
+
+export default function App() {
   return (
-    <>
-      <div>
-        <Visualizer data={{}} />
-      </div>
-    </>
+    <div style={{ height: "100%", width: "100%" }}>
+      <DrizzleVisualizer dialect="postgresql" schema={schema} />
+    </div>
   );
 }
-
-export default App;
