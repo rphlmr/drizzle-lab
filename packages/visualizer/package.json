@@ -1,5 +1,5 @@
 {
-  "name": "@drizzle/visualizer",
+  "name": "@drizzle-lab/visualizer",
   "version": "0.8.0",
   "type": "module",
   "license": "MIT",
