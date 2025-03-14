@@ -7,7 +7,7 @@
 
 @layer theme, base, components, utilities;
 
-:root {
+[data-theme-dv="light"] {
   --background: hsl(0 0% 100%);
   --foreground: hsl(240 10% 3.9%);
 
