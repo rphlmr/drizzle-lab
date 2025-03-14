@@ -16,7 +16,9 @@
     "drizzle-run:start:local": "npm run -w drizzle-run start:local",
     "drizzle-run:start": "npm run -w drizzle-run start",
     "prod:drizzle-run:deploy": "fly deploy -c apps/drizzle-run/fly.toml --dockerfile apps/drizzle-run/Dockerfile --ignorefile .dockerignore --remote-only",
-    "postinstall": "patch-package"
+    "postinstall": "patch-package",
+    "package:api:install": "cd packages/api && npm install",
+    "package:visualizer:install": "cd packages/visualizer && npm install"
   },
   "devDependencies": {
     "patch-package": "^8.0.0",

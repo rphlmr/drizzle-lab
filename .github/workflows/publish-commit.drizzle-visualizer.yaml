@@ -25,6 +25,9 @@ jobs:
           node-version: "22.x"
           cache: "npm"
 
+      - name: Install linked dependencies
+        run: cd ../api && npm install
+
       - name: Install dependencies
         run: npm install
 
