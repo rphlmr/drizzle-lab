@@ -321,7 +321,7 @@ export function DrizzleVisualizer({
               <InfoButton />
             </div>
           </Panel>
-          <Background bgColor={theme === "dark" ? "#0f0f14" : undefined} />
+          <Background bgColor={theme === "dark" ? "#0f0f14" : "#fff"} />
           {showMiniMap && (
             <MiniMap
               pannable

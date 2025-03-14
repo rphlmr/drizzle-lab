@@ -1,13 +1,11 @@
-@import "tailwindcss/utilities.css" layer(utilities) prefix(dv);
-@import "tailwindcss/theme.css" layer(theme) prefix(dv);
+@import "tailwindcss/utilities.css" prefix(dv);
+@import "tailwindcss/theme.css" prefix(dv);
 
 @plugin "tailwindcss-animate";
 
 @custom-variant dark (&:where([data-theme-dv=dark], [data-theme-dv=dark] *));
 
-@layer theme, base, utilities;
-
-:root {
+[data-theme-dv="light"] {
   --dv-background: hsl(0 0% 100%);
   --dv-foreground: hsl(240 10% 3.9%);
 
@@ -83,6 +81,9 @@
   --dv-green: #c5f74f;
   --dv-blue: hsl(220.8 88.65% 72.35%);
   --dv-red: hsl(348.84 88.97% 71.57%);
+
+  --dv-radius: 0.6rem;
+
   --dv-chart-1: hsl(220 70% 50%);
   --dv-chart-2: hsl(160 60% 45%);
   --dv-chart-3: hsl(30 80% 55%);
@@ -146,18 +147,16 @@
   }
 }
 
-@layer base {
-  [data-app="drizzle-visualizer"] {
-    @apply dv:text-foreground dv:font-sans;
+[data-app="drizzle-visualizer"] {
+  @apply dv:text-foreground dv:font-sans;
 
-    pre {
-      @apply dv:m-0;
-    }
+  pre {
+    @apply dv:m-0;
+  }
 
-    /* * {
+  /* * {
       @apply dv:border-border dv:outline-ring/50;
     } */
-  }
 }
 
 .container {
