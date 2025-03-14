@@ -1,9 +1,6 @@
 name: "[Drizzle Visualizer] 🚀 pkg-pr-new"
 
 on:
-  push:
-    paths:
-      - "packages/visualizer/**"
   pull_request:
     paths:
       - "packages/visualizer/**"
