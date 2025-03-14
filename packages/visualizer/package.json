@@ -1,6 +1,5 @@
 {
   "name": "@drizzle/visualizer",
-  "private": true,
   "version": "0.8.0",
   "type": "module",
   "license": "MIT",
