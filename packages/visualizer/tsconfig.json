@@ -1,18 +1,36 @@
 {
-  "extends": "@repo/typescript-config/react-library.json",
   "compilerOptions": {
-    "outDir": "dist",
-    "jsx": "react-jsx",
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+    "target": "ES2021",
+    "useDefineForClassFields": true,
+    "lib": ["ES2021", "DOM", "DOM.Iterable"],
+    "types": ["vite/client"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+    "noImplicitAny": false,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
     "noEmit": true,
+    "jsx": "react-jsx",
+
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true,
+
+    "baseUrl": ".",
     "paths": {
-      "@drizzle-lab/api/*": ["../api/src/*"],
-      "@repo/ui/*": ["../../shared/ui/src/*"]
+      "~/*": ["./src/*"],
+      "@repo/ui/*": ["../../shared/ui/src/*"],
+      "@drizzle-lab/api/*/web": ["../api/src/*/index.web"]
     }
   },
-  "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    "../../shared/typescript-config/reset.d.ts"
-  ],
-  "exclude": ["node_modules", "dist"]
+  "include": ["demo", "src"],
+  "exclude": ["../api/*", "node_modules"]
 }

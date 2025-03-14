@@ -1,30 +1,28 @@
 "use client";
 
 import "@xyflow/react/dist/style.css";
-import "./style.css";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { schemaToSnapshot as mysqlSchemaToSnapshot } from "@drizzle-lab/api/mysql/web";
 import { schemaToSnapshot as pgSchemaToSnapshot } from "@drizzle-lab/api/pg/web";
 import { schemaToSnapshot as sqliteSchemaToSnapshot } from "@drizzle-lab/api/sqlite/web";
-import { Badge } from "@repo/ui/components/badge";
-import { Button } from "@repo/ui/components/button";
+import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@repo/ui/components/popover";
-import { Separator } from "@repo/ui/components/separator";
-import { Toggle } from "@repo/ui/components/toggle";
+} from "~/components/ui/popover";
+import { Separator } from "~/components/ui/separator";
+import { Toggle } from "~/components/ui/toggle";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@repo/ui/components/tooltip";
-import { Typography } from "@repo/ui/components/typography";
-import { cn } from "@repo/ui/utils/cn";
+} from "~/components/ui/tooltip";
+import { cn } from "~/lib/utils";
 import type {
   NodePositionChange,
   NodeProps,
@@ -55,7 +53,26 @@ import type {
   TableNodeDefinition,
 } from "./compute";
 import { useHighlighter } from "./highlighter";
-import { Icon, IconSprite } from "./icons";
+import {
+  BadgeCheckIcon,
+  BookTextIcon,
+  CableIcon,
+  CaptionsOffIcon,
+  CaptionsIcon,
+  DiamondIcon,
+  EyeIcon,
+  InfoIcon,
+  KeyRoundIcon,
+  LinkIcon,
+  LockIcon,
+  SheetIcon,
+  ShieldCheckIcon,
+  ShrinkIcon,
+  TriangleAlertIcon,
+  ImageDownIcon,
+  LoaderPinwheelIcon,
+} from "lucide-react";
+import { ThemeProvider } from "./components/theme";
 
 function storageKey(key: string) {
   return `${key}.nodes.positions`;
@@ -109,6 +126,7 @@ type DrizzleVisualizerBaseProps = {
   initialNodesPositions?: NodePosition[];
   onNodesPositionsChange?: (nodesPositions: NodePosition[]) => void;
   showMiniMap?: boolean;
+  theme?: "dark" | "light";
 };
 
 type SnapshotOption = {
@@ -146,6 +164,7 @@ export function DrizzleVisualizer({
   initialNodesPositions,
   onNodesPositionsChange,
   showMiniMap = true,
+  theme = "dark",
   ...snapshotOrSchema
 }: DrizzleVisualizerProps) {
   const [snapshot, setSnapshot] = useState<Snapshot | null>(null);
@@ -227,474 +246,444 @@ export function DrizzleVisualizer({
   }, [snapshot, setEdges, setNodes, initialNodesPositions]);
 
   return (
-    <div className={cn("dzl-size-full", className)}>
-      <IconSprite />
-      <ReactFlow
-        panOnScroll
-        panOnScrollMode={
-          shiftPressed ? PanOnScrollMode.Horizontal : PanOnScrollMode.Vertical
-        }
-        zoomOnScroll={false}
-        nodeTypes={nodeTypes}
-        colorMode="dark"
-        nodes={nodes}
-        edges={edges}
-        onNodesChange={onNodesChange}
-        snapToGrid
-        snapGrid={[20, 20]}
-        fitView
-        fitViewOptions={{ maxZoom: 1 }}
-        minZoom={0.05}
-        proOptions={{ hideAttribution: true }}
+    <ThemeProvider value={theme}>
+      <div
+        data-app="drizzle-visualizer"
+        data-theme-dv={theme}
+        className={cn("dv:size-full", className)}
       >
-        {loading && (
-          <div className="dzl-absolute dzl-flex dzl-size-full dzl-items-center dzl-justify-center">
-            loading...
-          </div>
-        )}
-        <Panel position="top-right">
-          <div className="dzl-flex dzl-items-center dzl-gap-4">
-            <div className="dzl-flex dzl-items-center dzl-gap-1">
-              <AutoLayoutButton
-                onClick={() => {
-                  if (!snapshot) {
-                    return;
-                  }
-
-                  compute(snapshot).then(({ nodes }) => {
-                    onNodesChange(
-                      nodes.map((node) => ({
-                        id: node.id,
-                        position: node.position,
-                        type: "position",
-                      })),
-                    );
-                  });
-                }}
-              />
-              <FitViewButton />
+        <ReactFlow
+          panOnScroll
+          panOnScrollMode={
+            shiftPressed ? PanOnScrollMode.Horizontal : PanOnScrollMode.Vertical
+          }
+          zoomOnScroll={false}
+          nodeTypes={nodeTypes}
+          colorMode={theme}
+          nodes={nodes}
+          edges={edges}
+          onNodesChange={onNodesChange}
+          snapToGrid
+          snapGrid={[20, 20]}
+          fitView
+          fitViewOptions={{ maxZoom: 1 }}
+          minZoom={0.05}
+          proOptions={{ hideAttribution: true }}
+        >
+          {loading && (
+            <div className="dv:absolute dv:flex dv:size-full dv:items-center dv:justify-center">
+              loading...
             </div>
-            <div className="dzl-flex dzl-items-center dzl-gap-1">
-              {hasDescription && (
-                <ExplainToggle
-                  pressed={withExplain}
-                  onPressedChange={(pressed) => {
-                    setNodes((prev) => {
-                      return prev.map((node) => {
-                        const update = {
-                          ...node,
-                        };
-                        update.data.withExplain = pressed;
-                        return update;
-                      });
+          )}
+          <Panel position="top-right">
+            <div className="dv:flex dv:items-center dv:gap-4">
+              <div className="dv:flex dv:items-center dv:gap-1">
+                <AutoLayoutButton
+                  onClick={() => {
+                    if (!snapshot) {
+                      return;
+                    }
+
+                    compute(snapshot).then(({ nodes }) => {
+                      onNodesChange(
+                        nodes.map((node) => ({
+                          id: node.id,
+                          position: node.position,
+                          type: "position",
+                        })),
+                      );
                     });
-                    setWithExplain(pressed);
                   }}
                 />
-              )}
-              <DownloadSchemaButton />
-            </div>
+                <FitViewButton />
+              </div>
+              <div className="dv:flex dv:items-center dv:gap-1">
+                {hasDescription && (
+                  <ExplainToggle
+                    pressed={withExplain}
+                    onPressedChange={(pressed) => {
+                      setNodes((prev) => {
+                        return prev.map((node) => {
+                          const update = {
+                            ...node,
+                          };
+                          update.data.withExplain = pressed;
+                          return update;
+                        });
+                      });
+                      setWithExplain(pressed);
+                    }}
+                  />
+                )}
+                <DownloadSchemaButton />
+              </div>
 
-            <InfoButton />
-          </div>
-        </Panel>
-        <Background bgColor="#0f0f14" />
-        {showMiniMap && (
-          <MiniMap
-            pannable
-            zoomable
-            bgColor="transparent"
-            maskColor="transparent"
-            className="dzl-rounded-md dzl-border-2 dzl-border-muted-foreground/10"
-            nodeColor="#ffffff10"
-          />
-        )}
-      </ReactFlow>
-    </div>
+              <InfoButton />
+            </div>
+          </Panel>
+          <Background bgColor={theme === "dark" ? "#0f0f14" : undefined} />
+          {showMiniMap && (
+            <MiniMap
+              pannable
+              zoomable
+              bgColor="transparent"
+              maskColor="transparent"
+              className="dv:rounded-md dv:border-2 dv:border-muted-foreground/10"
+              nodeColor={theme === "dark" ? "#ffffff10" : undefined}
+            />
+          )}
+        </ReactFlow>
+      </div>
+    </ThemeProvider>
   );
 }
 
 function TableNode({ data }: NodeProps<TableNodeDefinition>) {
   const highlighter = useHighlighter();
   const hiddenNodeConnector =
-    "!dzl-h-px !dzl-w-px !dzl-min-w-0 !dzl-min-h-0 !dzl-cursor-grab !dzl-border-0 !dzl-opacity-0";
+    "dv:h-px! dv:w-px! dv:min-w-0! dv:min-h-0! dv:cursor-grab! dv:border-0! dv:opacity-0!";
 
   return (
-    <>
-      <div className="dzl-flex dzl-min-w-64 dzl-max-w-fit dzl-flex-col dzl-divide-y dzl-divide-border dzl-rounded-lg dzl-border-2 dzl-border-border dzl-bg-background dzl-text-foreground dzl-shadow-md">
-        <div className="dzl-flex dzl-w-full dzl-p-2 dzl-text-base">
-          <div className="dzl-flex dzl-w-full dzl-flex-col dzl-gap-4">
-            <div className="dzl-flex dzl-w-full dzl-items-center dzl-justify-between dzl-gap-4 dzl-text-base">
-              <div className="relative dzl-flex dzl-items-center dzl-gap-2">
-                <Icon name="sheet" size="md" />
-                <span>
-                  {data.schema ? `${data.schema}.${data.name}` : data.name}
-                </span>
-              </div>
-              {data.provider && (
-                <Badge
-                  variant="outline"
-                  className="dzl-items-center dzl-gap-2"
-                  data-no-print
-                >
-                  {!data.isRLSEnabled && (
-                    <Icon
-                      name="triangle-alert"
-                      size="sm"
-                      className="dzl-text-orange-400"
-                    />
-                  )}
-                  RLS {data.isRLSEnabled ? "enabled" : "disabled"}
-                </Badge>
-              )}
+    <div className="dv:flex dv:min-w-64 dv:flex-col dv:divide-y dv:divide-border dv:rounded-lg dv:border-2 dv:border-border dv:bg-background dv:text-foreground dv:shadow-md">
+      <div className="dv:flex dv:p-2 dv:text-base">
+        <div className="dv:flex dv:flex-col dv:gap-4">
+          <div className="dv:flex dv:items-center dv:justify-between dv:gap-4 dv:text-base">
+            <div className="relative dv:flex dv:items-center dv:gap-2">
+              <SheetIcon className="dv:size-5" />
+              <span>
+                {data.schema ? `${data.schema}.${data.name}` : data.name}
+              </span>
             </div>
-            {data.withExplain && data.description && (
-              <Description description={data.description} />
+            {data.provider && (
+              <Badge
+                variant="outline"
+                className="dv:items-center dv:gap-2"
+                data-no-print
+              >
+                {!data.isRLSEnabled && (
+                  <TriangleAlertIcon className="dv:text-orange-400 dv:size-4" />
+                )}
+                RLS {data.isRLSEnabled ? "enabled" : "disabled"}
+              </Badge>
             )}
           </div>
+          {data.withExplain && data.description && (
+            <Description description={data.description} />
+          )}
         </div>
-        <div className="dzl-relative dzl-cursor-default dzl-divide-y dzl-divide-border">
-          {data.columns.map((column) => {
-            return (
-              <div
-                key={column.name}
-                className="dzl-relative dzl-flex dzl-w-full dzl-flex-col dzl-gap-4 dzl-p-2 dzl-text-sm"
-              >
-                <div className="dzl-flex dzl-w-full dzl-items-center dzl-justify-between dzl-gap-2">
-                  <div className="dzl-relative dzl-flex dzl-items-center dzl-gap-2">
-                    {column.isPrimaryKey && (
-                      <Icon
-                        name="key-round"
-                        size="sm"
-                        className="dzl-text-green"
+      </div>
+      <div className="dv:relative dv:cursor-default dv:divide-y dv:divide-border">
+        {data.columns.map((column) => {
+          return (
+            <div
+              key={column.name}
+              className="dv:relative dv:flex dv:flex-col dv:gap-4 dv:p-2 dv:text-sm"
+            >
+              <div className="dv:flex dv:w-full dv:items-center dv:justify-between dv:gap-2">
+                <div className="dv:relative dv:flex dv:items-center dv:gap-2">
+                  {column.isPrimaryKey && (
+                    <KeyRoundIcon className="dv:text-green dv:size-4" />
+                  )}
+                  {column.isForeignKey && (
+                    <>
+                      <span className="dv:mr-1 dv:size-4" />
+                      <Popover data-no-print>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="custom"
+                            className="dv:absolute dv:-left-1 dv:p-1"
+                          >
+                            <LinkIcon className="dv:text-green dv:size-4" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-fit">
+                          <div className="dv:flex dv:gap-2 dv:p-2">
+                            <span className="dv:text-xs dv:text-muted-foreground">
+                              on delete:
+                            </span>
+                            <span className="dv:text-xs">
+                              {column.onDelete}
+                            </span>
+                            <span className="dv:text-xs dv:text-muted-foreground">
+                              on update:
+                            </span>
+                            <span className="dv:text-xs">
+                              {column.onUpdate}
+                            </span>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
+                    </>
+                  )}
+                  {column.isUnique && (
+                    <BadgeCheckIcon className="dv:text-secondary-foreground dv:size-4" />
+                  )}
+                  <DiamondIcon
+                    className={cn(
+                      "dv:size-4",
+                      column.isNotNull && "dv:fill-secondary-foreground",
+                    )}
+                  />
+                  {column.name}
+                </div>
+                <span className="dv:px-2 dv:py-1 dv:text-xs dv:text-muted-foreground">
+                  {column.enumValues
+                    ? column.enumValues.join(" | ")
+                    : column.dataType}
+                  {!column.isNotNull && " | null"}
+                </span>
+                {(column.default || column.defaultFn || column.jsonShape) && (
+                  <Popover data-no-print>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="custom"
+                        className="dv:absolute dv:right-1 dv:px-2 dv:py-1"
+                      >
+                        <span className="dv:text-xs dv:text-muted-foreground">
+                          {column.enumValues
+                            ? column.enumValues.join(" | ")
+                            : column.dataType}
+                          {!column.isNotNull && " | null"}
+                        </span>
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="dv:flex dv:w-fit dv:flex-row dv:items-center dv:gap-2">
+                      <span className="dv:text-xs dv:text-muted-foreground">
+                        {column.jsonShape ? "shape" : "default"}:
+                      </span>
+                      <pre
+                        className="dv:text-sm"
+                        dangerouslySetInnerHTML={{
+                          __html:
+                            highlighter?.codeToHtml(
+                              String(
+                                column.default ||
+                                  column.defaultFn ||
+                                  column.jsonShape ||
+                                  "",
+                              ),
+                              {
+                                theme: "tokyo-night",
+                                lang: column.default ? "sql" : "typescript",
+                              },
+                            ) || "",
+                        }}
                       />
-                    )}
-                    {column.isForeignKey && (
-                      <>
-                        <span className="dzl-mr-1 dzl-size-4" />
-                        <Popover data-no-print>
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant="outline"
-                              size="custom"
-                              className="dzl-absolute dzl--left-1 dzl-p-1"
-                            >
-                              <Icon
-                                name="link"
-                                size="sm"
-                                className="dzl-text-green"
-                              />
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-fit">
-                            <div className="dzl-flex dzl-gap-2 dzl-p-2">
-                              <span className="dzl-text-xs dzl-text-muted-foreground">
-                                on delete:
-                              </span>
-                              <span className="dzl-text-xs">
-                                {column.onDelete}
-                              </span>
-                              <span className="dzl-text-xs dzl-text-muted-foreground">
-                                on update:
-                              </span>
-                              <span className="dzl-text-xs">
-                                {column.onUpdate}
-                              </span>
-                            </div>
-                          </PopoverContent>
-                        </Popover>
-                      </>
-                    )}
-                    {column.isUnique && (
-                      <Icon
-                        name="badge-check"
-                        size="sm"
-                        className="dzl-text-secondary-foreground"
+                    </PopoverContent>
+                  </Popover>
+                )}
+              </div>
+              {data.withExplain && column.description && (
+                <Description description={column.description} />
+              )}
+              <Handle
+                type="target"
+                position={Position.Left}
+                id={`${column.name}-left`}
+                className={cn(hiddenNodeConnector, "dv:left-0!")}
+              />
+
+              <Handle
+                type="source"
+                position={Position.Right}
+                id={`${column.name}-right`}
+                className={cn(hiddenNodeConnector, "dv:right-0!")}
+              />
+            </div>
+          );
+        })}
+
+        {data.checks.length > 0 && <Separator className="h-1" />}
+        {data.checks.map((check) => {
+          return (
+            <div key={check.name} className="dv:relative dv:flex dv:text-sm">
+              <div className="dv:relative dv:flex dv:w-full dv:items-center dv:justify-between dv:gap-2 dv:p-2">
+                <div className="dv:relative dv:flex dv:items-center dv:gap-2">
+                  <span className="dv:mr-1 dv:size-4" />
+                  <Popover data-no-print>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="custom"
+                        className="dv:absolute dv:-left-1 dv:p-1"
+                      >
+                        <ShieldCheckIcon className="dv:text-green dv:size-4" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="dv:w-fit">
+                      <pre
+                        className="dv:text-sm"
+                        dangerouslySetInnerHTML={{
+                          __html:
+                            highlighter?.codeToHtml(String(check.value), {
+                              theme: "tokyo-night",
+                              lang: "sql",
+                            }) || "",
+                        }}
                       />
-                    )}
-                    <Icon
-                      name="diamond"
+                    </PopoverContent>
+                  </Popover>
+                  {check.name}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+
+        {data.policies.length > 0 && <Separator className="h-1" />}
+        {data.policies.map((policy) => {
+          return (
+            <div key={policy.name} className="dv:relative dv:flex dv:text-sm">
+              <div className="dv:flex dv:w-full dv:items-center dv:justify-between dv:gap-2 dv:p-2">
+                <div className="dv:flex dv:items-center dv:gap-2">
+                  <LockIcon className="dv:text-green dv:size-4" />
+                  {policy.name}
+                </div>
+                <Popover data-no-print>
+                  <PopoverTrigger asChild>
+                    <Button
+                      data-no-print
+                      variant="ghost"
                       size="sm"
-                      className={cn(
-                        column.isNotNull && "dzl-fill-secondary-foreground",
-                      )}
-                    />
-                    {column.name}
-                  </div>
-                  <span className="dzl-px-2 dzl-py-1 dzl-text-xs dzl-text-muted-foreground">
-                    {column.enumValues
-                      ? column.enumValues.join(" | ")
-                      : column.dataType}
-                    {!column.isNotNull && " | null"}
-                  </span>
-                  {(column.default || column.defaultFn || column.jsonShape) && (
-                    <Popover data-no-print>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          size="custom"
-                          className="dzl-absolute dzl-right-1 dzl-px-2 dzl-py-1"
-                        >
-                          <span className="dzl-text-xs dzl-text-muted-foreground">
-                            {column.enumValues
-                              ? column.enumValues.join(" | ")
-                              : column.dataType}
-                            {!column.isNotNull && " | null"}
-                          </span>
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="dzl-flex dzl-w-fit dzl-flex-row dzl-items-center dzl-gap-2">
-                        <span className="dzl-text-xs dzl-text-muted-foreground">
-                          {column.jsonShape ? "shape" : "default"}:
+                      className="dv:border-none"
+                    >
+                      <span>Show definition</span>
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="dv:w-fit">
+                    <div className="dv:flex dv:items-center dv:gap-2">
+                      <span className="dv:text-xs dv:text-muted-foreground">
+                        as
+                      </span>
+                      <span>{policy.as}</span>
+                    </div>
+                    <div className="dv:flex dv:items-center dv:gap-2">
+                      <span className="dv:text-xs dv:text-muted-foreground">
+                        to
+                      </span>
+                      <span>{policy.to ? policy.to.join(", ") : "public"}</span>
+                    </div>
+                    <div className="dv:flex dv:items-center dv:gap-2">
+                      <span className="dv:text-xs dv:text-muted-foreground">
+                        for
+                      </span>
+                      <span>{policy.for}</span>
+                    </div>
+                    {policy.using ? (
+                      <div className="dv:flex dv:items-center dv:gap-2">
+                        <span className="dv:text-xs dv:text-muted-foreground">
+                          using
                         </span>
                         <pre
-                          className="dzl-text-sm"
+                          className="dv:text-sm"
                           dangerouslySetInnerHTML={{
                             __html:
-                              highlighter?.codeToHtml(
-                                String(
-                                  column.default ||
-                                    column.defaultFn ||
-                                    column.jsonShape ||
-                                    "",
-                                ),
-                                {
-                                  theme: "tokyo-night",
-                                  lang: column.default ? "sql" : "typescript",
-                                },
-                              ) || "",
-                          }}
-                        />
-                      </PopoverContent>
-                    </Popover>
-                  )}
-                </div>
-                {data.withExplain && column.description && (
-                  <Description description={column.description} />
-                )}
-                <Handle
-                  type="target"
-                  position={Position.Left}
-                  id={`${column.name}-left`}
-                  className={cn(hiddenNodeConnector, "!dzl-left-0")}
-                />
-
-                <Handle
-                  type="source"
-                  position={Position.Right}
-                  id={`${column.name}-right`}
-                  className={cn(hiddenNodeConnector, "!dzl-right-0")}
-                />
-              </div>
-            );
-          })}
-
-          {data.checks.length > 0 && <Separator className="h-1" />}
-          {data.checks.map((check) => {
-            return (
-              <div
-                key={check.name}
-                className="dzl-relative dzl-flex dzl-text-sm"
-              >
-                <div className="dzl-relative dzl-flex dzl-w-full dzl-items-center dzl-justify-between dzl-gap-2 dzl-p-2">
-                  <div className="dzl-relative dzl-flex dzl-items-center dzl-gap-2">
-                    <span className="dzl-mr-1 dzl-size-4" />
-                    <Popover data-no-print>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          size="custom"
-                          className="dzl-absolute dzl--left-1 dzl-p-1"
-                        >
-                          <Icon
-                            name="shield-check"
-                            size="sm"
-                            className="dzl-text-green"
-                          />
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="dzl-w-fit">
-                        <pre
-                          className="dzl-text-sm"
-                          dangerouslySetInnerHTML={{
-                            __html:
-                              highlighter?.codeToHtml(String(check.value), {
+                              highlighter?.codeToHtml(String(policy.using), {
                                 theme: "tokyo-night",
                                 lang: "sql",
                               }) || "",
                           }}
                         />
-                      </PopoverContent>
-                    </Popover>
-                    {check.name}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-
-          {data.policies.length > 0 && <Separator className="h-1" />}
-          {data.policies.map((policy) => {
-            return (
-              <div
-                key={policy.name}
-                className="dzl-relative dzl-flex dzl-text-sm"
-              >
-                <div className="dzl-flex dzl-w-full dzl-items-center dzl-justify-between dzl-gap-2 dzl-p-2">
-                  <div className="dzl-flex dzl-items-center dzl-gap-2">
-                    <Icon name="lock" size="sm" className="dzl-text-green" />
-                    {policy.name}
-                  </div>
-                  <Popover data-no-print>
-                    <PopoverTrigger asChild>
-                      <Button
-                        data-no-print
-                        variant="ghost"
-                        size="sm"
-                        className="dzl-border-none"
-                      >
-                        <span>Show definition</span>
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="dzl-w-fit">
-                      <div className="dzl-flex dzl-items-center dzl-gap-2">
-                        <span className="dzl-text-xs dzl-text-muted-foreground">
-                          as
-                        </span>
-                        <span>{policy.as}</span>
                       </div>
-                      <div className="dzl-flex dzl-items-center dzl-gap-2">
-                        <span className="dzl-text-xs dzl-text-muted-foreground">
-                          to
+                    ) : null}
+                    {policy.withCheck ? (
+                      <div className="dv:flex dv:items-center dv:gap-2">
+                        <span className="dv:text-xs dv:text-muted-foreground">
+                          with check
                         </span>
-                        <span>
-                          {policy.to ? policy.to.join(", ") : "public"}
-                        </span>
-                      </div>
-                      <div className="dzl-flex dzl-items-center dzl-gap-2">
-                        <span className="dzl-text-xs dzl-text-muted-foreground">
-                          for
-                        </span>
-                        <span>{policy.for}</span>
-                      </div>
-                      {policy.using ? (
-                        <div className="dzl-flex dzl-items-center dzl-gap-2">
-                          <span className="dzl-text-xs dzl-text-muted-foreground">
-                            using
-                          </span>
-                          <pre
-                            className="dzl-text-sm"
-                            dangerouslySetInnerHTML={{
-                              __html:
-                                highlighter?.codeToHtml(String(policy.using), {
+                        <pre
+                          className="dv:text-sm"
+                          dangerouslySetInnerHTML={{
+                            __html:
+                              highlighter?.codeToHtml(
+                                String(policy.withCheck),
+                                {
                                   theme: "tokyo-night",
                                   lang: "sql",
-                                }) || "",
-                            }}
-                          />
-                        </div>
-                      ) : null}
-                      {policy.withCheck ? (
-                        <div className="dzl-flex dzl-items-center dzl-gap-2">
-                          <span className="dzl-text-xs dzl-text-muted-foreground">
-                            with check
-                          </span>
-                          <pre
-                            className="dzl-text-sm"
-                            dangerouslySetInnerHTML={{
-                              __html:
-                                highlighter?.codeToHtml(
-                                  String(policy.withCheck),
-                                  {
-                                    theme: "tokyo-night",
-                                    lang: "sql",
-                                  },
-                                ) || "",
-                            }}
-                          />
-                        </div>
-                      ) : null}
-                    </PopoverContent>
-                  </Popover>
-                </div>
+                                },
+                              ) || "",
+                          }}
+                        />
+                      </div>
+                    ) : null}
+                  </PopoverContent>
+                </Popover>
               </div>
-            );
-          })}
+            </div>
+          );
+        })}
 
-          {data.relations.length > 0 && <Separator className="dzl-h-1" />}
-          {data.relations.map((relation) => {
-            return (
-              <div
-                key={relation.fieldName}
-                className="dzl-relative dzl-flex dzl-text-sm"
-              >
-                <div className="dzl-flex dzl-w-full dzl-items-center dzl-justify-between dzl-gap-2 dzl-p-2">
-                  <div className="dzl-flex dzl-items-center dzl-gap-2">
-                    <Icon name="cable" size="sm" className="dzl-text-green" />
-                    {relation.fieldName}
-                    <span className="dzl-text-xs dzl-text-muted-foreground">
-                      {relation.type}
-                    </span>
-                  </div>
-                  <span className="dzl-flex dzl-items-center dzl-text-xs dzl-text-muted-foreground">
-                    {relation.referencedTableName}
-                    {relation.type === "one" ? " | null" : "[]"}
+        {data.relations.length > 0 && <Separator className="dv:h-1" />}
+        {data.relations.map((relation) => {
+          return (
+            <div
+              key={relation.fieldName}
+              className="dv:relative dv:flex dv:text-sm"
+            >
+              <div className="dv:flex dv:w-full dv:items-center dv:justify-between dv:gap-2 dv:p-2">
+                <div className="dv:flex dv:items-center dv:gap-2">
+                  <CableIcon className="dv:text-green dv:size-4" />
+                  {relation.fieldName}
+                  <span className="dv:text-xs dv:text-muted-foreground">
+                    {relation.type}
                   </span>
                 </div>
-
-                <Handle
-                  type="target"
-                  position={Position.Right}
-                  id={`${relation.fieldName}`}
-                  className={cn(hiddenNodeConnector, "!dzl-right-0")}
-                />
+                <span className="dv:flex dv:items-center dv:text-xs dv:text-muted-foreground">
+                  {relation.referencedTableName}
+                  {relation.type === "one" ? " | null" : "[]"}
+                </span>
               </div>
-            );
-          })}
-        </div>
-        <Handle
-          type="source"
-          position={Position.Bottom}
-          id="relation"
-          className={cn(hiddenNodeConnector, "!dzl-bottom-0")}
-        />
+
+              <Handle
+                type="target"
+                position={Position.Right}
+                id={`${relation.fieldName}`}
+                className={cn(hiddenNodeConnector, "dv:right-0!")}
+              />
+            </div>
+          );
+        })}
       </div>
-    </>
+      <Handle
+        type="source"
+        position={Position.Bottom}
+        id="relation"
+        className={cn(hiddenNodeConnector, "dv:bottom-0!")}
+      />
+    </div>
   );
 }
 
 function ViewNode({ data }: NodeProps<ViewNodeDefinition>) {
   const highlighter = useHighlighter();
   const hiddenNodeConnector =
-    "!dzl-h-px !dzl-w-px !dzl-min-w-0 !dzl-min-h-0 !dzl-cursor-grab !dzl-border-0 !dzl-opacity-0";
+    "dv:h-px! dv:w-px! dv:min-w-0! dv:min-h-0! dv:cursor-grab! dv:border-0! dv:opacity-0!";
 
   return (
     <>
-      <div className="dzl-flex dzl-min-w-64 dzl-max-w-fit dzl-flex-col dzl-divide-y dzl-divide-border dzl-rounded-lg dzl-border-2 dzl-border-border dzl-bg-background dzl-text-foreground dzl-shadow-md">
-        <div className="dzl-flex dzl-w-full dzl-p-2 dzl-text-base">
-          <div className="dzl-flex dzl-w-full dzl-flex-col dzl-gap-4">
-            <div className="dzl-flex dzl-w-full dzl-items-center dzl-justify-between dzl-gap-4 dzl-text-base">
-              <div className="dzl-relative dzl-flex dzl-items-center dzl-gap-2">
-                <Icon name="eye" size="md" />
+      <div className="dv:flex dv:min-w-64 dv:flex-col dv:divide-y dv:divide-border dv:rounded-lg dv:border-2 dv:border-border dv:bg-background dv:text-foreground dv:shadow-md">
+        <div className="dv:flex dv:p-2 dv:text-base">
+          <div className="dv:flex dv:w-full dv:flex-col dv:gap-4">
+            <div className="dv:flex dv:items-center dv:justify-between dv:gap-4 dv:text-base">
+              <div className="dv:relative dv:flex dv:items-center dv:gap-2">
+                <EyeIcon className="dv:size-5" />
                 <span>
                   {data.schema && data.schema !== "public"
                     ? `${data.schema}.${data.name}`
                     : data.name}
                 </span>
               </div>
-              <div className="dzl-flex dzl-items-center dzl-gap-2">
+              <div className="dv:flex dv:items-center dv:gap-2">
                 {data.provider && (
                   <Badge
                     variant="outline"
-                    className="dzl-items-center dzl-gap-2"
+                    className="dv:items-center dv:gap-2"
                     data-no-print
                   >
                     {!data.with?.securityInvoker && (
-                      <Icon
-                        name="triangle-alert"
-                        size="sm"
-                        className="dzl-text-orange-400"
-                      />
+                      <TriangleAlertIcon className="dv:text-orange-400 dv:size-4" />
                     )}
                     RLS {data.with?.securityInvoker ? "enabled" : "disabled"}
                   </Badge>
@@ -706,14 +695,14 @@ function ViewNode({ data }: NodeProps<ViewNodeDefinition>) {
                         data-no-print
                         variant="ghost"
                         size="sm"
-                        className="dzl-h-6 dzl-border-none"
+                        className="dv:h-6 dv:border-none"
                       >
                         <span>Definition</span>
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="dzl-w-fit dzl-max-w-80">
+                    <PopoverContent className="dv:w-fit dv:max-w-80">
                       <pre
-                        className="dzl-flex dzl-flex-wrap dzl-overflow-hidden dzl-text-sm"
+                        className="dv:flex dv:flex-wrap dv:overflow-hidden dv:text-sm"
                         dangerouslySetInnerHTML={{
                           __html:
                             highlighter?.codeToHtml(String(data.definition), {
@@ -733,42 +722,33 @@ function ViewNode({ data }: NodeProps<ViewNodeDefinition>) {
             )}
           </div>
         </div>
-        <div className="dzl-relative dzl-cursor-default dzl-divide-y dzl-divide-border">
+        <div className="dv:relative dv:cursor-default dv:divide-y dv:divide-border">
           {data.columns.map((column) => {
             return (
               <div
                 key={column.name}
-                className="dzl-relative dzl-flex dzl-flex-col dzl-gap-4 dzl-p-2 dzl-text-sm"
+                className="dv:relative dv:flex dv:flex-col dv:gap-4 dv:p-2 dv:text-sm"
               >
-                <div className="dzl-flex dzl-w-full dzl-items-center dzl-justify-between dzl-gap-2">
-                  <div className="dzl-flex dzl-items-center dzl-gap-2">
+                <div className="dv:flex dv:w-full dv:items-center dv:justify-between dv:gap-2">
+                  <div className="dv:flex dv:items-center dv:gap-2">
                     {column.isPrimaryKey && (
-                      <Icon
-                        name="key-round"
-                        size="sm"
-                        className="dzl-text-green"
-                      />
+                      <KeyRoundIcon className="dv:text-green dv:size-4" />
                     )}
                     {/* {column.isForeignKey && (
                       <Icon name="link" size="sm" className="text-green" />
                     )} */}
                     {column.isUnique && (
-                      <Icon
-                        name="badge-check"
-                        size="sm"
-                        className="dzl-text-secondary-foreground"
-                      />
+                      <BadgeCheckIcon className="dv:text-secondary-foreground dv:size-4" />
                     )}
-                    <Icon
-                      name="diamond"
-                      size="sm"
+                    <DiamondIcon
                       className={cn(
-                        column.isNotNull && "dzl-fill-secondary-foreground",
+                        "dv:size-4",
+                        column.isNotNull && "dv:fill-secondary-foreground",
                       )}
                     />
                     {column.name}
                   </div>
-                  <span className="dzl-px-2 dzl-py-1 dzl-text-xs dzl-text-muted-foreground">
+                  <span className="dv:px-2 dv:py-1 dv:text-xs dv:text-muted-foreground">
                     {column.enumValues
                       ? column.enumValues.join(" | ")
                       : column.dataType}
@@ -780,9 +760,9 @@ function ViewNode({ data }: NodeProps<ViewNodeDefinition>) {
                         <Button
                           variant="outline"
                           size="custom"
-                          className="dzl-absolute dzl-right-1 dzl-px-2 dzl-py-1"
+                          className="dv:absolute dv:right-1 dv:px-2 dv:py-1"
                         >
-                          <span className="dzl-text-xs dzl-text-muted-foreground">
+                          <span className="dv:text-xs dv:text-muted-foreground">
                             {column.enumValues
                               ? column.enumValues.join(" | ")
                               : column.dataType}
@@ -790,12 +770,12 @@ function ViewNode({ data }: NodeProps<ViewNodeDefinition>) {
                           </span>
                         </Button>
                       </PopoverTrigger>
-                      <PopoverContent className="dzl-flex dzl-w-fit dzl-flex-row dzl-items-center dzl-gap-2">
-                        <span className="dzl-text-xs dzl-text-muted-foreground">
+                      <PopoverContent className="dv:flex dv:w-fit dv:flex-row dv:items-center dv:gap-2">
+                        <span className="dv:text-xs dv:text-muted-foreground">
                           default:
                         </span>
                         <pre
-                          className="dzl-text-sm"
+                          className="dv:text-sm"
                           dangerouslySetInnerHTML={{
                             __html:
                               highlighter?.codeToHtml(
@@ -820,14 +800,14 @@ function ViewNode({ data }: NodeProps<ViewNodeDefinition>) {
                   type="target"
                   position={Position.Left}
                   id={`${column.name}-left`}
-                  className={cn(hiddenNodeConnector, "!dzl-left-0")}
+                  className={cn(hiddenNodeConnector, "dv:left-0!")}
                 />
 
                 <Handle
                   type="source"
                   position={Position.Right}
                   id={`${column.name}-right`}
-                  className={cn(hiddenNodeConnector, "!dzl-right-0")}
+                  className={cn(hiddenNodeConnector, "dv:right-0!")}
                 />
               </div>
             );
@@ -837,7 +817,7 @@ function ViewNode({ data }: NodeProps<ViewNodeDefinition>) {
           type="source"
           position={Position.Bottom}
           id="relation"
-          className={cn(hiddenNodeConnector, "!dzl-bottom-0")}
+          className={cn(hiddenNodeConnector, "dv:bottom-0!")}
         />
       </div>
     </>
@@ -846,12 +826,12 @@ function ViewNode({ data }: NodeProps<ViewNodeDefinition>) {
 
 function Description({ description }: { description: string }) {
   return (
-    <div className="dzl-relative dzl-flex dzl-rounded-md dzl-border dzl-border-muted/80 dzl-px-2 dzl-py-0.5 dzl-text-foreground/60">
-      <span className="dzl-left-1 dzl-top-[-0.5rem] dzl-flex dzl-gap-1 dzl-bg-background dzl-pr-1">
-        <Icon name="book-text" size="xs" />
+    <div className="dv:relative dv:flex dv:rounded-md dv:border dv:border-muted/80 dv:px-2 dv:py-0.5 dv:text-foreground/60">
+      <span className="dv:left-1 dv:top-[-0.5rem] dv:flex dv:gap-1 dv:bg-background dv:pr-1">
+        <BookTextIcon className="dv:size-4" />
       </span>
       <span
-        className="dzl-flex-wrap dzl-text-inherit"
+        className="dv:flex-wrap dv:text-inherit"
         style={{ fontSize: "0.6rem" }}
       >
         {description}
@@ -884,7 +864,7 @@ function FitViewButton() {
       <Tooltip>
         <TooltipTrigger asChild>
           <Button variant="outline" size="icon:sm" onClick={() => fitView()}>
-            <Icon name="shrink" size="sm" />
+            <ShrinkIcon className="dv:size-4" />
           </Button>
         </TooltipTrigger>
         <TooltipContent>
@@ -900,33 +880,33 @@ function InfoButton() {
     <Popover>
       <PopoverTrigger asChild>
         <Button variant="outline" size="icon:sm">
-          <Icon name="info" size="sm" />
+          <InfoIcon className="dv:size-4" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="dzl-dark dzl-w-fit">
-        {/* <div className="dzl-flex dzl-flex-row dzl-gap-1">
+      <PopoverContent className="dv:w-fit">
+        {/* <div className="dv:flex dv:flex-row dv:gap-1">
           <a
             href="https://github.com/rphlmr/drizzle-lab/tree/main/packages/api#extensions"
             target="_blank"
             rel="noopener noreferrer"
-            className="dzl-text-sm dzl-font-semibold dzl-text-blue"
+            className="dv:text-sm dv:font-semibold dv:text-blue"
           >
             Check how
           </a>
-          <Typography variant="mutedText" className="dzl-text-sm">
+          <Typography variant="mutedText" className="dv:text-sm">
             you can document your schema!
           </Typography>
         </div>
         <Separator className="my-2" /> */}
-        <div className="dzl-flex dzl-flex-row dzl-items-center dzl-gap-1">
-          <Typography variant="mutedText" className="dzl-text-sm">
+        <div className="dv:flex dv:flex-row dv:items-center dv:gap-1">
+          <span className="dv:text-sm dv:text-muted-foreground">
             This diagram is powered by{" "}
-          </Typography>
+          </span>
           <a
             href="https://reactflow.dev/"
             target="_blank"
             rel="noopener noreferrer"
-            className="dzl-text-sm dzl-font-semibold dzl-text-blue"
+            className="dv:text-sm dv:font-semibold dv:text-blue"
           >
             React Flow
           </a>
@@ -937,6 +917,7 @@ function InfoButton() {
 }
 
 function ExplainToggle(props: React.ComponentPropsWithoutRef<typeof Toggle>) {
+  const Icon = props.pressed ? CaptionsIcon : CaptionsOffIcon;
   return (
     <TooltipProvider>
       <Tooltip>
@@ -944,13 +925,10 @@ function ExplainToggle(props: React.ComponentPropsWithoutRef<typeof Toggle>) {
           <Toggle
             variant="outline"
             size="icon:sm"
-            className="dzl-bg-background"
+            className="dv:bg-background"
             {...props}
           >
-            <Icon
-              name={props.pressed ? "captions" : "captions-off"}
-              size="sm"
-            />
+            <Icon className="dv:size-4" />
           </Toggle>
         </TooltipTrigger>
         <TooltipContent>
@@ -1067,6 +1045,8 @@ export function DownloadSchemaButton() {
     }
   };
 
+  const Icon = isGenerating ? LoaderPinwheelIcon : ImageDownIcon;
+
   return (
     <TooltipProvider>
       <Tooltip>
@@ -1078,9 +1058,7 @@ export function DownloadSchemaButton() {
             disabled={isGenerating}
           >
             <Icon
-              name={isGenerating ? "loader-pinwheel" : "image-down"}
-              size="sm"
-              className={cn(isGenerating && "dzl-animate-spin")}
+              className={cn("dv:size-4", isGenerating && "dv:animate-spin")}
             />
           </Button>
         </TooltipTrigger>

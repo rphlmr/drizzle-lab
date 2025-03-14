@@ -43,8 +43,8 @@
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
-    "@repo/eslint-config": "*",
-    "@repo/typescript-config": "*",
+    "@repo/eslint-config": "../eslint-config",
+    "@repo/typescript-config": "../typescript-config",
     "@sly-cli/sly": "^1.14.0",
     "@types/eslint": "^8.56.1",
     "@types/node": "^20.14.13",

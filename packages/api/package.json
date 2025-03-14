@@ -252,8 +252,8 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@repo/eslint-config": "*",
-    "@repo/typescript-config": "*",
+    "@repo/eslint-config": "../../shared/eslint-config",
+    "@repo/typescript-config": "../../shared/typescript-config",
     "eslint": "^8.56.0",
     "tsup": "^8.3.5",
     "typescript": "^5.3.3"

@@ -1,5 +1,5 @@
 {
-  "extends": "@repo/typescript-config/node-library.json",
+  "extends": "../../shared/typescript-config/node-library.json",
   "compilerOptions": {
     "noImplicitAny": false,
     "allowImportingTsExtensions": true

@@ -1,6 +1,7 @@
 {
-  "name": "@drizzle-lab/visualizer",
-  "version": "0.7.2",
+  "name": "@drizzle/visualizer",
+  "private": true,
+  "version": "0.8.0",
   "type": "module",
   "license": "MIT",
   "author": "@rphlmr",
@@ -21,34 +22,56 @@
         "default": "./dist/index.js"
       }
     },
-    "./dist/style.css": "./dist/index.css"
+    "./style.css": "./dist/style.css"
   },
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "tsup --config tsup.config.ts",
-    "check:exports": "attw --pack .",
-    "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
-    "typecheck": "tsc --noEmit",
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "eslint .",
+    "preview": "vite preview",
     "prerelease:publish": "npm version prerelease && npm publish --access=public --tag next",
     "patch:publish": "npm version patch && npm publish --access=public",
     "minor:publish": "npm version minor && npm publish --access=public"
   },
   "dependencies": {
     "@dagrejs/dagre": "^1.1.4",
-    "@xyflow/react": "12.4.1",
-    "html-to-image": "1.11.11",
-    "shiki": "^1.27.2"
+    "@radix-ui/react-popover": "^1.1.6",
+    "@radix-ui/react-separator": "^1.1.2",
+    "@radix-ui/react-slot": "^1.1.2",
+    "@radix-ui/react-toggle": "^1.1.2",
+    "@radix-ui/react-tooltip": "^1.1.8",
+    "@xyflow/react": "^12.4.2",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "html-to-image": "^1.11.11",
+    "lucide-react": "^0.475.0",
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0",
+    "shiki": "^2.3.2",
+    "tailwind-merge": "^3.0.1",
+    "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
-    "@repo/eslint-config": "*",
-    "@repo/typescript-config": "*",
-    "@repo/ui": "*",
-    "eslint": "^8.56.0",
-    "postcss": "^8.5.1",
-    "tsup": "^8.3.5",
-    "typescript": "^5.7.3"
+    "@eslint/js": "^9.17.0",
+    "@tailwindcss/postcss": "^4.0.5",
+    "@tailwindcss/vite": "^4.0.1",
+    "@types/node": "^22.12.0",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "@vitejs/plugin-react": "^4.3.4",
+    "eslint": "^9.17.0",
+    "eslint-plugin-react-hooks": "^5.0.0",
+    "eslint-plugin-react-refresh": "^0.4.16",
+    "globals": "^15.14.0",
+    "tailwindcss": "^4.0.1",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.18.2",
+    "vite": "^6.1.0",
+    "vite-plugin-dts": "^4.5.0",
+    "vite-tsconfig-paths": "^5.1.4"
   },
   "peerDependencies": {
     "drizzle-orm": ">=0.36",

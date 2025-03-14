@@ -5,9 +5,9 @@
   "files": [
     "base.js"
   ],
-  "devDependencies": {
+  "dependencies": {
     "@remix-run/eslint-config": "^2.10.3",
-    "@repo/eslint-plugin-node-imports": "*",
+    "@repo/eslint-plugin-node-imports": "../eslint-plugin-node-imports",
     "@typescript-eslint/eslint-plugin": "^7.17.0",
     "@typescript-eslint/parser": "^7.17.0",
     "@typescript-eslint/utils": "^7.17.0",
