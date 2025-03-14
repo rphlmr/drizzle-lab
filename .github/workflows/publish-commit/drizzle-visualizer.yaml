@@ -1,15 +1,20 @@
-name: 🚀 pkg-pr-new
+name: "[Drizzle Visualizer] 🚀 pkg-pr-new"
+
+path_filter: &path_filter
+  - "packages/visualizer/**"
+
 on:
   push:
-    paths:
-      - "packages/**"
+    paths: *path_filter
   pull_request:
-    paths:
-      - "packages/**"
+    paths: *path_filter
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/visualizer
 
     steps:
       - name: Checkout code
