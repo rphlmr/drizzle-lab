@@ -72,6 +72,7 @@ import {
   ImageDownIcon,
   LoaderPinwheelIcon,
 } from "lucide-react";
+import { ThemeProvider } from "./components/theme";
 
 function storageKey(key: string) {
   return `${key}.nodes.positions`;
@@ -125,6 +126,7 @@ type DrizzleVisualizerBaseProps = {
   initialNodesPositions?: NodePosition[];
   onNodesPositionsChange?: (nodesPositions: NodePosition[]) => void;
   showMiniMap?: boolean;
+  theme?: "dark" | "light";
 };
 
 type SnapshotOption = {
@@ -162,6 +164,7 @@ export function DrizzleVisualizer({
   initialNodesPositions,
   onNodesPositionsChange,
   showMiniMap = true,
+  theme = "dark",
   ...snapshotOrSchema
 }: DrizzleVisualizerProps) {
   const [snapshot, setSnapshot] = useState<Snapshot | null>(null);
@@ -243,93 +246,95 @@ export function DrizzleVisualizer({
   }, [snapshot, setEdges, setNodes, initialNodesPositions]);
 
   return (
-    <div
-      data-app="drizzle-visualizer"
-      data-theme-dv="dark"
-      className={cn("dv:size-full", className)}
-    >
-      <ReactFlow
-        panOnScroll
-        panOnScrollMode={
-          shiftPressed ? PanOnScrollMode.Horizontal : PanOnScrollMode.Vertical
-        }
-        zoomOnScroll={false}
-        nodeTypes={nodeTypes}
-        colorMode="dark"
-        nodes={nodes}
-        edges={edges}
-        onNodesChange={onNodesChange}
-        snapToGrid
-        snapGrid={[20, 20]}
-        fitView
-        fitViewOptions={{ maxZoom: 1 }}
-        minZoom={0.05}
-        proOptions={{ hideAttribution: true }}
+    <ThemeProvider value={theme}>
+      <div
+        data-app="drizzle-visualizer"
+        data-theme-dv={theme}
+        className={cn("dv:size-full", className)}
       >
-        {loading && (
-          <div className="dv:absolute dv:flex dv:size-full dv:items-center dv:justify-center">
-            loading...
-          </div>
-        )}
-        <Panel position="top-right">
-          <div className="dv:flex dv:items-center dv:gap-4">
-            <div className="dv:flex dv:items-center dv:gap-1">
-              <AutoLayoutButton
-                onClick={() => {
-                  if (!snapshot) {
-                    return;
-                  }
-
-                  compute(snapshot).then(({ nodes }) => {
-                    onNodesChange(
-                      nodes.map((node) => ({
-                        id: node.id,
-                        position: node.position,
-                        type: "position",
-                      })),
-                    );
-                  });
-                }}
-              />
-              <FitViewButton />
+        <ReactFlow
+          panOnScroll
+          panOnScrollMode={
+            shiftPressed ? PanOnScrollMode.Horizontal : PanOnScrollMode.Vertical
+          }
+          zoomOnScroll={false}
+          nodeTypes={nodeTypes}
+          colorMode={theme}
+          nodes={nodes}
+          edges={edges}
+          onNodesChange={onNodesChange}
+          snapToGrid
+          snapGrid={[20, 20]}
+          fitView
+          fitViewOptions={{ maxZoom: 1 }}
+          minZoom={0.05}
+          proOptions={{ hideAttribution: true }}
+        >
+          {loading && (
+            <div className="dv:absolute dv:flex dv:size-full dv:items-center dv:justify-center">
+              loading...
             </div>
-            <div className="dv:flex dv:items-center dv:gap-1">
-              {hasDescription && (
-                <ExplainToggle
-                  pressed={withExplain}
-                  onPressedChange={(pressed) => {
-                    setNodes((prev) => {
-                      return prev.map((node) => {
-                        const update = {
-                          ...node,
-                        };
-                        update.data.withExplain = pressed;
-                        return update;
-                      });
+          )}
+          <Panel position="top-right">
+            <div className="dv:flex dv:items-center dv:gap-4">
+              <div className="dv:flex dv:items-center dv:gap-1">
+                <AutoLayoutButton
+                  onClick={() => {
+                    if (!snapshot) {
+                      return;
+                    }
+
+                    compute(snapshot).then(({ nodes }) => {
+                      onNodesChange(
+                        nodes.map((node) => ({
+                          id: node.id,
+                          position: node.position,
+                          type: "position",
+                        })),
+                      );
                     });
-                    setWithExplain(pressed);
                   }}
                 />
-              )}
-              <DownloadSchemaButton />
-            </div>
+                <FitViewButton />
+              </div>
+              <div className="dv:flex dv:items-center dv:gap-1">
+                {hasDescription && (
+                  <ExplainToggle
+                    pressed={withExplain}
+                    onPressedChange={(pressed) => {
+                      setNodes((prev) => {
+                        return prev.map((node) => {
+                          const update = {
+                            ...node,
+                          };
+                          update.data.withExplain = pressed;
+                          return update;
+                        });
+                      });
+                      setWithExplain(pressed);
+                    }}
+                  />
+                )}
+                <DownloadSchemaButton />
+              </div>
 
-            <InfoButton />
-          </div>
-        </Panel>
-        <Background bgColor="#0f0f14" />
-        {showMiniMap && (
-          <MiniMap
-            pannable
-            zoomable
-            bgColor="transparent"
-            maskColor="transparent"
-            className="dv:rounded-md dv:border-2 dv:border-muted-foreground/10"
-            nodeColor="#ffffff10"
-          />
-        )}
-      </ReactFlow>
-    </div>
+              <InfoButton />
+            </div>
+          </Panel>
+          <Background bgColor={theme === "dark" ? "#0f0f14" : undefined} />
+          {showMiniMap && (
+            <MiniMap
+              pannable
+              zoomable
+              bgColor="transparent"
+              maskColor="transparent"
+              className="dv:rounded-md dv:border-2 dv:border-muted-foreground/10"
+              nodeColor={theme === "dark" ? "#ffffff10" : undefined}
+            />
+          )}
+        </ReactFlow>
+      </div>
+    </ThemeProvider>
   );
 }
 

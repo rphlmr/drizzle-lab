@@ -4,6 +4,7 @@ import * as React from "react";
 import * as SeparatorPrimitive from "@radix-ui/react-separator";
 
 import { cn } from "~/lib/utils";
+import { useTheme } from "../theme";
 
 function Separator({
   className,
@@ -11,10 +12,11 @@ function Separator({
   decorative = true,
   ...props
 }: React.ComponentProps<typeof SeparatorPrimitive.Root>) {
+  const theme = useTheme();
   return (
     <SeparatorPrimitive.Root
       data-app="drizzle-visualizer"
-      data-theme-dv="dark"
+      data-theme-dv={theme}
       data-slot="separator-root"
       decorative={decorative}
       orientation={orientation}

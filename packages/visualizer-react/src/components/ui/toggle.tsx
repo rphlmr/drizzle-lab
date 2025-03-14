@@ -3,6 +3,7 @@ import * as TogglePrimitive from "@radix-ui/react-toggle";
 import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "~/lib/utils";
+import { useTheme } from "../theme";
 
 const toggleVariants = cva(
   "dv:inline-flex dv:items-center dv:justify-center dv:gap-2 dv:rounded-md dv:text-sm dv:font-medium dv:transition-colors dv:hover:bg-muted dv:hover:text-muted-foreground dv:disabled:pointer-events-none dv:disabled:opacity-50 dv:data-[state=on]:bg-accent dv:data-[state=on]:text-accent-foreground dv:[&_svg]:pointer-events-none dv:[&_svg:not([class*='size-'])]:size-4 dv:[&_svg]:shrink-0 dv:ring-ring/10 dv:dark:ring-ring/20 dv:dark:outline-ring/40 dv:outline-ring/50 dv:focus-visible:ring-4 dv:focus-visible:outline-1 dv:aria-invalid:focus-visible:ring-0 dv:transition-[color,box-shadow]",
@@ -34,10 +35,11 @@ function Toggle({
   ...props
 }: React.ComponentProps<typeof TogglePrimitive.Root> &
   VariantProps<typeof toggleVariants>) {
+  const theme = useTheme();
   return (
     <TogglePrimitive.Root
       data-app="drizzle-visualizer"
-      data-theme-dv="dark"
+      data-theme-dv={theme}
       data-slot="toggle"
       className={cn(toggleVariants({ variant, size, className }))}
       {...props}

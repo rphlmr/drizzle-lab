@@ -2,6 +2,7 @@ import * as React from "react";
 import * as PopoverPrimitive from "@radix-ui/react-popover";
 
 import { cn } from "~/lib/utils";
+import { useTheme } from "../theme";
 
 function Popover({
   ...props
@@ -12,14 +13,7 @@ function Popover({
 function PopoverTrigger({
   ...props
 }: React.ComponentProps<typeof PopoverPrimitive.Trigger>) {
-  return (
-    <PopoverPrimitive.Trigger
-      data-app="drizzle-visualizer"
-      data-theme-dv="dark"
-      data-slot="popover-trigger"
-      {...props}
-    />
-  );
+  return <PopoverPrimitive.Trigger data-slot="popover-trigger" {...props} />;
 }
 
 function PopoverContent({
@@ -28,11 +22,12 @@ function PopoverContent({
   sideOffset = 4,
   ...props
 }: React.ComponentProps<typeof PopoverPrimitive.Content>) {
+  const theme = useTheme();
   return (
     <PopoverPrimitive.Portal>
       <PopoverPrimitive.Content
         data-app="drizzle-visualizer"
-        data-theme-dv="dark"
+        data-theme-dv={theme}
         data-slot="popover-content"
         align={align}
         sideOffset={sideOffset}
