@@ -13,8 +13,7 @@ export default defineConfig({
     react(),
     tailwindcss(),
     dts({
-      include: ["src"],
-      tsconfigPath: "./tsconfig.json",
+      rollupTypes: true,
     }),
     tsconfigPaths(),
   ],
