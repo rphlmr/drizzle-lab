@@ -1,11 +1,11 @@
-@import "tailwindcss/utilities.css" layer(dvutilities) prefix(dv);
-@import "tailwindcss/theme.css" layer(dvtheme) prefix(dv);
+@import "tailwindcss/utilities.css" layer(utilities) prefix(dv);
+@import "tailwindcss/theme.css" layer(theme) prefix(dv);
 
 @plugin "tailwindcss-animate";
 
 @custom-variant dark (&:where([data-theme-dv=dark], [data-theme-dv=dark] *));
 
-@layer dvtheme, dvbase, dvcomponents, dvutilities;
+@layer theme, base, utilities;
 
 :root {
   --dv-background: hsl(0 0% 100%);
@@ -146,7 +146,7 @@
   }
 }
 
-@layer dvbase {
+@layer base {
   [data-app="drizzle-visualizer"] {
     @apply dv:text-foreground dv:font-sans;
 
