@@ -1,13 +1,12 @@
 name: "[Drizzle Visualizer] 🚀 pkg-pr-new"
 
-path_filter: &path_filter
-  - "packages/visualizer/**"
-
 on:
   push:
-    paths: *path_filter
+    paths:
+      - "packages/visualizer/**"
   pull_request:
-    paths: *path_filter
+    paths:
+      - "packages/visualizer/**"
 
 jobs:
   build:
