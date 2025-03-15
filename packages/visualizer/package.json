@@ -25,7 +25,7 @@
   },
   "files": ["dist"],
   "scripts": {
-    "preinstall": "node scripts/preinstall.mjs",
+    "pnpm:devPreinstall": "node scripts/preinstall.mjs",
     "postinstall": "patch-package",
     "prepublishOnly": "npm pkg delete scripts",
     "dev": "vite",
@@ -82,5 +82,8 @@
   "engines": {
     "node": ">=22.0.0"
   },
-  "packageManager": "pnpm@10.6.3+sha512.bb45e34d50a9a76e858a95837301bfb6bd6d35aea2c5d52094fa497a467c43f5c440103ce2511e9e0a2f89c3d6071baac3358fc68ac6fb75e2ceb3d2736065e6"
+  "packageManager": "pnpm@10.6.3+sha512.bb45e34d50a9a76e858a95837301bfb6bd6d35aea2c5d52094fa497a467c43f5c440103ce2511e9e0a2f89c3d6071baac3358fc68ac6fb75e2ceb3d2736065e6",
+  "pnpm": {
+    "onlyBuiltDependencies": ["esbuild"]
+  }
 }

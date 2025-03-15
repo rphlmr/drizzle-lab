@@ -13,7 +13,7 @@ const internalDependenciesRoot = Object.entries(tsConfig.compilerOptions.paths)
   .flatMap(([, value]) => value[0].split("/src")[0]);
 
 for (const dependency of internalDependenciesRoot) {
-  console.log(`\n⏳ Installing dependencies for ${dependency}`);
+  console.log(`\n⏳ Installing node_modules for internal dependency ${dependency}`);
   execSync(`cd ${dependency} && pnpm install`, { stdio: "inherit" });
-  console.log(`\n✅ Finished installing dependencies for ${dependency}`);
+  console.log(`\n✅ Finished installing node_modules for ${dependency}`);
 }
