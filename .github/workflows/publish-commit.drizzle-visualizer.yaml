@@ -40,10 +40,8 @@ jobs:
           node-version-file: "package.json"
           cache: "npm"
 
-      - name: 📥 Download deps
-        uses: bahmutov/npm-install@v1
-        with:
-          useLockFile: false
+      - name: 📥 Install dependencies
+        run: npm install --no-package-lock
 
       - name: 🔎 Type check
         run: npm run typecheck
@@ -63,10 +61,8 @@ jobs:
           node-version-file: "package.json"
           cache: "npm"
 
-      - name: 📥 Download deps
-        uses: bahmutov/npm-install@v1
-        with:
-          useLockFile: false
+      - name: 📥 Install dependencies
+        run: npm install --no-package-lock
 
       - name: 🏗️ Build
         run: npm run build
