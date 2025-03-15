@@ -223,5 +223,9 @@
     "drizzle-kit": ">=0.26",
     "drizzle-orm": ">=0.36",
     "mysql2": ">=3.0.0"
-  }
+  },
+  "optionalDependencies": {
+    "@rollup/rollup-linux-x64-musl": "^4.25.0"
+  },
+  "prettier": {}
 }
