@@ -22,12 +22,6 @@ jobs:
           node-version: "22.x"
           cache: "npm"
 
-      - name: Install api dependencies
-        run: cd ../api && npm install
-
-      - name: Install ui dependencies
-        run: cd ../../shared/ui && npm install
-
       - name: Install dependencies
         run: npm install
 

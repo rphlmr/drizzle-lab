@@ -27,6 +27,7 @@
     "dist"
   ],
   "scripts": {
+    "preinstall": "node preinstall.mjs",
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
@@ -82,5 +83,6 @@
   "engines": {
     "node": ">=22.0.0"
   },
+  "packageManager": "npm@11.0.0",
   "prettier": {}
 }
