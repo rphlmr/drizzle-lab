@@ -1,13 +1,13 @@
 name: "[Drizzle Visualizer] 🚀 pkg-pr-new"
 
+concurrency:
+  group: ${{ github.repository }}-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   pull_request:
     paths:
       - "packages/visualizer/**"
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
 
 defaults:
   run:
@@ -28,9 +28,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 🚦 Cancel Previous Runs
-        uses: styfle/cancel-workflow-action@0.12.1
-
       - name: ⬇️ Checkout repo
         uses: actions/checkout@v4
 
@@ -83,4 +80,4 @@ jobs:
         run: pnpm prepublishOnly
 
       - name: 📦 Publish
-        run: pnpm dlx pkg-pr-new publish
+        run: pnpm dlx pkg-pr-new publish --packageManager=pnpm
