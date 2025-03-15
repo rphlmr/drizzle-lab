@@ -34,8 +34,8 @@ jobs:
       - name: ⬇️ Checkout repo
         uses: actions/checkout@v4
 
-      - uses: 👷 pnpm/action-setup@v4
-        name: Install pnpm
+      - name: 👷 Install pnpm
+        uses: pnpm/action-setup@v4
 
       - name: ⎔ Setup node
         uses: actions/setup-node@v4
@@ -61,8 +61,8 @@ jobs:
       - name: ⬇️ Checkout repo
         uses: actions/checkout@v4
 
-      - uses: 👷 pnpm/action-setup@v4
-        name: Install pnpm
+      - name: 👷 Install pnpm
+        uses: pnpm/action-setup@v4
 
       - name: ⎔ Setup node
         uses: actions/setup-node@v4
