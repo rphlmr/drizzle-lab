@@ -1,6 +1,7 @@
-import * as React from "react";
+import type * as React from "react";
+
 import * as TogglePrimitive from "@radix-ui/react-toggle";
-import { cva, type VariantProps } from "class-variance-authority";
+import { type VariantProps, cva } from "class-variance-authority";
 
 import { cn } from "~/lib/utils";
 import { useTheme } from "../theme";
@@ -18,14 +19,14 @@ const toggleVariants = cva(
         default: "dv:h-9 dv:px-2 dv:min-w-9",
         sm: "dv:h-8 dv:px-1.5 dv:min-w-8",
         lg: "dv:h-10 dv:px-2.5 dv:min-w-10",
-        ["icon:sm"]: "dv:size-8",
+        "icon:sm": "dv:size-8",
       },
     },
     defaultVariants: {
       variant: "default",
       size: "default",
     },
-  },
+  }
 );
 
 function Toggle({
@@ -33,8 +34,7 @@ function Toggle({
   variant,
   size,
   ...props
-}: React.ComponentProps<typeof TogglePrimitive.Root> &
-  VariantProps<typeof toggleVariants>) {
+}: React.ComponentProps<typeof TogglePrimitive.Root> & VariantProps<typeof toggleVariants>) {
   const theme = useTheme();
   return (
     <TogglePrimitive.Root

@@ -24,7 +24,6 @@
     "baseUrl": ".",
     "paths": {
       "~/*": ["./src/*"],
-      "@repo/ui/*": ["../../shared/ui/src/*"],
       "@drizzle-lab/api/*/web": ["../api/src/*/index.web"]
     }
   },

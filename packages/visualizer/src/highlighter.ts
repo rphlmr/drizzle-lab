@@ -1,23 +1,9 @@
 import React from "react";
 
-import { createHighlighterCore, type HighlighterCore } from "shiki/core";
+import { type HighlighterCore, createHighlighterCore } from "shiki/core";
 import { createOnigurumaEngine } from "shiki/engine/oniguruma";
 
 import tokyoNight from "@shikijs/themes/tokyo-night";
-
-// export const highlighter = await createHighlighter({
-//   themes: [
-//     {
-//       ...tokyoNight,
-//       colors: {
-//         ...tokyoNight.colors,
-//         "editor.background": "transparent",
-//         "editorGutter.background": "#00000000",
-//       },
-//     },
-//   ],
-//   langs: ["sql", "typescript"],
-// });
 
 declare global {
   interface Window {
@@ -43,10 +29,7 @@ const createHighlighterInstance = () => {
           },
         },
       ],
-      langs: [
-        import("@shikijs/langs/sql"),
-        import("@shikijs/langs/typescript"),
-      ],
+      langs: [import("@shikijs/langs/sql"), import("@shikijs/langs/typescript")],
       engine: createOnigurumaEngine(import("shiki/wasm")),
     }).then((instance) => {
       window.__highlighter = instance;
@@ -59,7 +42,7 @@ const createHighlighterInstance = () => {
 
 export function useHighlighter() {
   const [highlighter, setHighlighter] = React.useState<HighlighterCore | null>(
-    typeof window !== "undefined" ? window.__highlighter : null,
+    typeof window !== "undefined" ? window.__highlighter : null
   );
 
   React.useEffect(() => {

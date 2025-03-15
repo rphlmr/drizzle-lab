@@ -8,6 +8,10 @@ import { execSync } from "node:child_process";
 
 import tsConfig from "./tsconfig.json" with { type: "json" };
 
+console.log("\n⏳ Installing root dependencies");
+execSync("cd ../.. && npm install", { stdio: "inherit" });
+console.log("\n✅ Finished installing root dependencies");
+
 const internalDependenciesRoot = Object.entries(tsConfig.compilerOptions.paths)
   .filter(([key]) => key.startsWith("@"))
   .flatMap(([, value]) => value[0].split("/src")[0]);

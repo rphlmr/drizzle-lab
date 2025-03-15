@@ -5,27 +5,68 @@ on:
     paths:
       - "packages/visualizer/**"
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: packages/visualizer
+
 jobs:
-  build:
+  lint:
+    name: ⬣ Linting
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: packages/visualizer
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v4
+      - uses: biomejs/setup-biome@v2
+      - run: biome ci . --reporter=github
 
-      - run: corepack enable
-      - uses: actions/setup-node@v4
+  typecheck:
+    name: 🔎 Type check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🛑 Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.12.1
+
+      - name: ⬇️ Checkout repo
+        uses: actions/checkout@v4
+
+      - name: ⎔ Setup node
+        uses: actions/setup-node@v4
         with:
-          node-version: "22.x"
-          cache: "npm"
+          node-version-file: "package.json"
 
-      - name: Install dependencies
-        run: npm install
+      - name: 📥 Download deps
+        uses: bahmutov/npm-install@v1
+        with:
+          useLockFile: true
 
-      - name: Build
+      - name: 🔎 Type check
+        run: npm run typecheck
+
+  build:
+    name: 🏗️ Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: ⬇️ Checkout repo
+        uses: actions/checkout@v4
+
+      - name: ⎔ Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: "package.json"
+
+      - name: 📥 Download deps
+        uses: bahmutov/npm-install@v1
+        with:
+          useLockFile: true
+
+      - name: 🏗️ Build
         run: npm run build
 
-      - run: npx pkg-pr-new publish
+      - name: 📦 Publish
+        run: npx pkg-pr-new publish

@@ -2,102 +2,77 @@
 
 import "@xyflow/react/dist/style.css";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { schemaToSnapshot as mysqlSchemaToSnapshot } from "@drizzle-lab/api/mysql/web";
 import { schemaToSnapshot as pgSchemaToSnapshot } from "@drizzle-lab/api/pg/web";
 import { schemaToSnapshot as sqliteSchemaToSnapshot } from "@drizzle-lab/api/sqlite/web";
-import { Badge } from "~/components/ui/badge";
-import { Button } from "~/components/ui/button";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "~/components/ui/popover";
-import { Separator } from "~/components/ui/separator";
-import { Toggle } from "~/components/ui/toggle";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "~/components/ui/tooltip";
-import { cn } from "~/lib/utils";
-import type {
-  NodePositionChange,
-  NodeProps,
-  Edge,
-  NodeChange,
-} from "@xyflow/react";
+import type { Edge, NodeChange, NodePositionChange, NodeProps } from "@xyflow/react";
 import {
   Background,
   Handle,
+  MiniMap,
+  PanOnScrollMode,
+  Panel,
   Position,
   ReactFlow,
-  useEdgesState,
-  MiniMap,
-  Panel,
   applyNodeChanges,
-  PanOnScrollMode,
-  useKeyPress,
   getNodesBounds,
-  useReactFlow,
   getViewportForBounds,
+  useEdgesState,
+  useKeyPress,
+  useReactFlow,
 } from "@xyflow/react";
 import { toPng } from "html-to-image";
+import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover";
+import { Separator } from "~/components/ui/separator";
+import { Toggle } from "~/components/ui/toggle";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "~/components/ui/tooltip";
+import { cn } from "~/lib/utils";
 
-import { compute } from "./compute";
-import type {
-  Snapshot,
-  ViewNodeDefinition,
-  TableNodeDefinition,
-} from "./compute";
-import { useHighlighter } from "./highlighter";
 import {
   BadgeCheckIcon,
   BookTextIcon,
   CableIcon,
-  CaptionsOffIcon,
   CaptionsIcon,
+  CaptionsOffIcon,
   DiamondIcon,
   EyeIcon,
+  ImageDownIcon,
   InfoIcon,
   KeyRoundIcon,
   LinkIcon,
+  LoaderPinwheelIcon,
   LockIcon,
   SheetIcon,
   ShieldCheckIcon,
   ShrinkIcon,
   TriangleAlertIcon,
-  ImageDownIcon,
-  LoaderPinwheelIcon,
 } from "lucide-react";
 import { ThemeProvider, useTheme } from "./components/theme";
+import { compute } from "./compute";
+import type { Snapshot, TableNodeDefinition, ViewNodeDefinition } from "./compute";
+import { useHighlighter } from "./highlighter";
 
 function storageKey(key: string) {
   return `${key}.nodes.positions`;
 }
 
-export type NodePosition = Required<
-  Pick<NodePositionChange, "id" | "position">
->;
+export type NodePosition = Required<Pick<NodePositionChange, "id" | "position">>;
 
 function saveNodesPositions(projectId: string, nodesPositions: NodePosition[]) {
   sessionStorage.setItem(storageKey(projectId), JSON.stringify(nodesPositions));
 }
 
 function getSavedNodesPositions(projectId: string) {
-  return JSON.parse(
-    sessionStorage.getItem(storageKey(projectId)) || "[]",
-  ) as NodePosition[];
+  return JSON.parse(sessionStorage.getItem(storageKey(projectId)) || "[]") as NodePosition[];
 }
 
 type DrizzleSchema = Record<string, unknown>;
 
-function getSnapshot(
-  schema: DrizzleSchema,
-  dialect: "postgresql" | "mysql" | "sqlite" | "turso",
-) {
+function getSnapshot(schema: DrizzleSchema, dialect: "postgresql" | "mysql" | "sqlite" | "turso") {
   switch (dialect) {
     case "postgresql": {
       return pgSchemaToSnapshot(schema);
@@ -133,8 +108,7 @@ type SnapshotOption = {
   snapshot: Snapshot;
 };
 
-type DrizzleSnapshotVisualizerProps = DrizzleVisualizerBaseProps &
-  SnapshotOption;
+type DrizzleSnapshotVisualizerProps = DrizzleVisualizerBaseProps & SnapshotOption;
 
 type SchemaOption = {
   schema: DrizzleSchema;
@@ -146,18 +120,12 @@ type DrizzleSchemaVisualizerProps = DrizzleVisualizerBaseProps & SchemaOption;
 type DrizzleVisualizerProps = DrizzleVisualizerBaseProps &
   (DrizzleSnapshotVisualizerProps | DrizzleSchemaVisualizerProps);
 
-function isSchemaOption(
-  snapshotOrSchema: SnapshotOption | SchemaOption,
-): snapshotOrSchema is SchemaOption {
+function isSchemaOption(snapshotOrSchema: SnapshotOption | SchemaOption): snapshotOrSchema is SchemaOption {
   return "dialect" in snapshotOrSchema;
 }
 
-export function DrizzleVisualizer(
-  props: DrizzleSnapshotVisualizerProps,
-): React.ReactNode;
-export function DrizzleVisualizer(
-  props: DrizzleSchemaVisualizerProps,
-): React.ReactNode;
+export function DrizzleVisualizer(props: DrizzleSnapshotVisualizerProps): React.ReactNode;
+export function DrizzleVisualizer(props: DrizzleSchemaVisualizerProps): React.ReactNode;
 export function DrizzleVisualizer({
   loading,
   className,
@@ -167,6 +135,7 @@ export function DrizzleVisualizer({
   theme = "dark",
   ...snapshotOrSchema
 }: DrizzleVisualizerProps) {
+  const snapshotOrSchemaRef = useRef(snapshotOrSchema);
   const [snapshot, setSnapshot] = useState<Snapshot | null>(null);
   const projectId = snapshot?.projectId || "drizzle-lab";
   const [withExplain, setWithExplain] = useState(false);
@@ -179,6 +148,7 @@ export function DrizzleVisualizer({
     Object.values(snapshot?.views || {}).some((view) => view.description);
 
   useEffect(() => {
+    const snapshotOrSchema = snapshotOrSchemaRef.current;
     const snapshot = isSchemaOption(snapshotOrSchema)
       ? getSnapshot(snapshotOrSchema.schema, snapshotOrSchema.dialect)
       : snapshotOrSchema.snapshot;
@@ -188,9 +158,7 @@ export function DrizzleVisualizer({
 
   const onNodesChange = useCallback(
     (changes: NodeChange<NodeTypes>[]) => {
-      const positionUpdate = changes.filter(
-        (change) => change.type === "position" || change.type === "dimensions",
-      );
+      const positionUpdate = changes.filter((change) => change.type === "position" || change.type === "dimensions");
 
       if (positionUpdate.length === 0) {
         return;
@@ -201,12 +169,10 @@ export function DrizzleVisualizer({
 
         // only save positions when we have finished moving around. it prevents massive triggers
         if (positionUpdate.every((u) => u.type === "position" && !u.dragging)) {
-          const updatedNodesPositions: NodePosition[] = updatedNodes.map(
-            (node) => ({
-              id: node.id,
-              position: node.position,
-            }),
-          );
+          const updatedNodesPositions: NodePosition[] = updatedNodes.map((node) => ({
+            id: node.id,
+            position: node.position,
+          }));
 
           onNodesPositionsChange?.(updatedNodesPositions);
           saveNodesPositions(projectId, updatedNodesPositions);
@@ -215,7 +181,7 @@ export function DrizzleVisualizer({
         return updatedNodes;
       });
     },
-    [onNodesPositionsChange, projectId],
+    [onNodesPositionsChange, projectId]
   );
 
   useEffect(() => {
@@ -225,13 +191,10 @@ export function DrizzleVisualizer({
 
     compute(snapshot)
       .then(({ nodes, edges }) => {
-        const defaultPositions =
-          initialNodesPositions || getSavedNodesPositions(snapshot.projectId);
+        const defaultPositions = initialNodesPositions || getSavedNodesPositions(snapshot.projectId);
 
         const updatedNodes = nodes.map((node) => {
-          const defaultPosition = defaultPositions.find(
-            (p) => p.id === node.id,
-          );
+          const defaultPosition = defaultPositions.find((p) => p.id === node.id);
 
           if (defaultPosition?.position) {
             node.position = defaultPosition.position;
@@ -243,20 +206,14 @@ export function DrizzleVisualizer({
         setEdges(edges);
       })
       .catch(console.error);
-  }, [snapshot, setEdges, setNodes, initialNodesPositions]);
+  }, [snapshot, setEdges, initialNodesPositions]);
 
   return (
     <ThemeProvider value={theme}>
-      <div
-        data-app="drizzle-visualizer"
-        data-theme={theme}
-        className={cn("dv:size-full", className)}
-      >
+      <div data-app="drizzle-visualizer" data-theme={theme} className={cn("dv:size-full", className)}>
         <ReactFlow
           panOnScroll
-          panOnScrollMode={
-            shiftPressed ? PanOnScrollMode.Horizontal : PanOnScrollMode.Vertical
-          }
+          panOnScrollMode={shiftPressed ? PanOnScrollMode.Horizontal : PanOnScrollMode.Vertical}
           zoomOnScroll={false}
           nodeTypes={nodeTypes}
           colorMode={theme || "dark"}
@@ -271,9 +228,7 @@ export function DrizzleVisualizer({
           proOptions={{ hideAttribution: true }}
         >
           {loading && (
-            <div className="dv:absolute dv:flex dv:size-full dv:items-center dv:justify-center">
-              loading...
-            </div>
+            <div className="dv:absolute dv:flex dv:size-full dv:items-center dv:justify-center">loading...</div>
           )}
           <Panel position="top-right">
             <div className="dv:flex dv:items-center dv:gap-4">
@@ -290,7 +245,7 @@ export function DrizzleVisualizer({
                           id: node.id,
                           position: node.position,
                           type: "position",
-                        })),
+                        }))
                       );
                     });
                   }}
@@ -340,8 +295,7 @@ export function DrizzleVisualizer({
 
 function TableNode({ data }: NodeProps<TableNodeDefinition>) {
   const highlighter = useHighlighter();
-  const hiddenNodeConnector =
-    "dv:h-px! dv:w-px! dv:min-w-0! dv:min-h-0! dv:cursor-grab! dv:border-0! dv:opacity-0!";
+  const hiddenNodeConnector = "dv:h-px! dv:w-px! dv:min-w-0! dv:min-h-0! dv:cursor-grab! dv:border-0! dv:opacity-0!";
 
   return (
     <div className="dv:flex dv:min-w-64 dv:flex-col dv:divide-y dv:divide-border dv:rounded-lg dv:border-2 dv:border-border dv:bg-background dv:text-foreground dv:shadow-md">
@@ -350,101 +304,59 @@ function TableNode({ data }: NodeProps<TableNodeDefinition>) {
           <div className="dv:flex dv:items-center dv:justify-between dv:gap-4 dv:text-base">
             <div className="relative dv:flex dv:items-center dv:gap-2">
               <SheetIcon className="dv:size-5" />
-              <span>
-                {data.schema ? `${data.schema}.${data.name}` : data.name}
-              </span>
+              <span>{data.schema ? `${data.schema}.${data.name}` : data.name}</span>
             </div>
             {data.provider && (
-              <Badge
-                variant="outline"
-                className="dv:items-center dv:gap-2"
-                data-no-print
-              >
-                {!data.isRLSEnabled && (
-                  <TriangleAlertIcon className="dv:text-orange-400 dv:size-4" />
-                )}
+              <Badge variant="outline" className="dv:items-center dv:gap-2" data-no-print>
+                {!data.isRLSEnabled && <TriangleAlertIcon className="dv:text-orange-400 dv:size-4" />}
                 RLS {data.isRLSEnabled ? "enabled" : "disabled"}
               </Badge>
             )}
           </div>
-          {data.withExplain && data.description && (
-            <Description description={data.description} />
-          )}
+          {data.withExplain && data.description && <Description description={data.description} />}
         </div>
       </div>
       <div className="dv:relative dv:cursor-default dv:divide-y dv:divide-border">
         {data.columns.map((column) => {
           return (
-            <div
-              key={column.name}
-              className="dv:relative dv:flex dv:flex-col dv:gap-4 dv:p-2 dv:text-sm"
-            >
+            <div key={column.name} className="dv:relative dv:flex dv:flex-col dv:gap-4 dv:p-2 dv:text-sm">
               <div className="dv:flex dv:w-full dv:items-center dv:justify-between dv:gap-2">
                 <div className="dv:relative dv:flex dv:items-center dv:gap-2">
-                  {column.isPrimaryKey && (
-                    <KeyRoundIcon className="dv:text-green dv:size-4" />
-                  )}
+                  {column.isPrimaryKey && <KeyRoundIcon className="dv:text-green dv:size-4" />}
                   {column.isForeignKey && (
                     <>
                       <span className="dv:mr-1 dv:size-4" />
                       <Popover data-no-print>
                         <PopoverTrigger asChild>
-                          <Button
-                            variant="outline"
-                            size="custom"
-                            className="dv:absolute dv:-left-1 dv:p-1"
-                          >
+                          <Button variant="outline" size="custom" className="dv:absolute dv:-left-1 dv:p-1">
                             <LinkIcon className="dv:text-green dv:size-4" />
                           </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-fit">
                           <div className="dv:flex dv:gap-2 dv:p-2">
-                            <span className="dv:text-xs dv:text-muted-foreground">
-                              on delete:
-                            </span>
-                            <span className="dv:text-xs">
-                              {column.onDelete}
-                            </span>
-                            <span className="dv:text-xs dv:text-muted-foreground">
-                              on update:
-                            </span>
-                            <span className="dv:text-xs">
-                              {column.onUpdate}
-                            </span>
+                            <span className="dv:text-xs dv:text-muted-foreground">on delete:</span>
+                            <span className="dv:text-xs">{column.onDelete}</span>
+                            <span className="dv:text-xs dv:text-muted-foreground">on update:</span>
+                            <span className="dv:text-xs">{column.onUpdate}</span>
                           </div>
                         </PopoverContent>
                       </Popover>
                     </>
                   )}
-                  {column.isUnique && (
-                    <BadgeCheckIcon className="dv:text-secondary-foreground dv:size-4" />
-                  )}
-                  <DiamondIcon
-                    className={cn(
-                      "dv:size-4",
-                      column.isNotNull && "dv:fill-secondary-foreground",
-                    )}
-                  />
+                  {column.isUnique && <BadgeCheckIcon className="dv:text-secondary-foreground dv:size-4" />}
+                  <DiamondIcon className={cn("dv:size-4", column.isNotNull && "dv:fill-secondary-foreground")} />
                   {column.name}
                 </div>
                 <span className="dv:px-2 dv:py-1 dv:text-xs dv:text-muted-foreground">
-                  {column.enumValues
-                    ? column.enumValues.join(" | ")
-                    : column.dataType}
+                  {column.enumValues ? column.enumValues.join(" | ") : column.dataType}
                   {!column.isNotNull && " | null"}
                 </span>
                 {(column.default || column.defaultFn || column.jsonShape) && (
                   <Popover data-no-print>
                     <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        size="custom"
-                        className="dv:absolute dv:right-1 dv:px-2 dv:py-1"
-                      >
+                      <Button variant="outline" size="custom" className="dv:absolute dv:right-1 dv:px-2 dv:py-1">
                         <span className="dv:text-xs dv:text-muted-foreground">
-                          {column.enumValues
-                            ? column.enumValues.join(" | ")
-                            : column.dataType}
+                          {column.enumValues ? column.enumValues.join(" | ") : column.dataType}
                           {!column.isNotNull && " | null"}
                         </span>
                       </Button>
@@ -458,16 +370,11 @@ function TableNode({ data }: NodeProps<TableNodeDefinition>) {
                         dangerouslySetInnerHTML={{
                           __html:
                             highlighter?.codeToHtml(
-                              String(
-                                column.default ||
-                                  column.defaultFn ||
-                                  column.jsonShape ||
-                                  "",
-                              ),
+                              String(column.default || column.defaultFn || column.jsonShape || ""),
                               {
                                 theme: "tokyo-night",
                                 lang: column.default ? "sql" : "typescript",
-                              },
+                              }
                             ) || "",
                         }}
                       />
@@ -475,9 +382,7 @@ function TableNode({ data }: NodeProps<TableNodeDefinition>) {
                   </Popover>
                 )}
               </div>
-              {data.withExplain && column.description && (
-                <Description description={column.description} />
-              )}
+              {data.withExplain && column.description && <Description description={column.description} />}
               <Handle
                 type="target"
                 position={Position.Left}
@@ -504,11 +409,7 @@ function TableNode({ data }: NodeProps<TableNodeDefinition>) {
                   <span className="dv:mr-1 dv:size-4" />
                   <Popover data-no-print>
                     <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        size="custom"
-                        className="dv:absolute dv:-left-1 dv:p-1"
-                      >
+                      <Button variant="outline" size="custom" className="dv:absolute dv:-left-1 dv:p-1">
                         <ShieldCheckIcon className="dv:text-green dv:size-4" />
                       </Button>
                     </PopoverTrigger>
@@ -543,39 +444,26 @@ function TableNode({ data }: NodeProps<TableNodeDefinition>) {
                 </div>
                 <Popover data-no-print>
                   <PopoverTrigger asChild>
-                    <Button
-                      data-no-print
-                      variant="ghost"
-                      size="sm"
-                      className="dv:border-none"
-                    >
+                    <Button data-no-print variant="ghost" size="sm" className="dv:border-none">
                       <span>Show definition</span>
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="dv:w-fit">
                     <div className="dv:flex dv:items-center dv:gap-2">
-                      <span className="dv:text-xs dv:text-muted-foreground">
-                        as
-                      </span>
+                      <span className="dv:text-xs dv:text-muted-foreground">as</span>
                       <span>{policy.as}</span>
                     </div>
                     <div className="dv:flex dv:items-center dv:gap-2">
-                      <span className="dv:text-xs dv:text-muted-foreground">
-                        to
-                      </span>
+                      <span className="dv:text-xs dv:text-muted-foreground">to</span>
                       <span>{policy.to ? policy.to.join(", ") : "public"}</span>
                     </div>
                     <div className="dv:flex dv:items-center dv:gap-2">
-                      <span className="dv:text-xs dv:text-muted-foreground">
-                        for
-                      </span>
+                      <span className="dv:text-xs dv:text-muted-foreground">for</span>
                       <span>{policy.for}</span>
                     </div>
                     {policy.using ? (
                       <div className="dv:flex dv:items-center dv:gap-2">
-                        <span className="dv:text-xs dv:text-muted-foreground">
-                          using
-                        </span>
+                        <span className="dv:text-xs dv:text-muted-foreground">using</span>
                         <pre
                           className="dv:text-sm"
                           dangerouslySetInnerHTML={{
@@ -590,20 +478,15 @@ function TableNode({ data }: NodeProps<TableNodeDefinition>) {
                     ) : null}
                     {policy.withCheck ? (
                       <div className="dv:flex dv:items-center dv:gap-2">
-                        <span className="dv:text-xs dv:text-muted-foreground">
-                          with check
-                        </span>
+                        <span className="dv:text-xs dv:text-muted-foreground">with check</span>
                         <pre
                           className="dv:text-sm"
                           dangerouslySetInnerHTML={{
                             __html:
-                              highlighter?.codeToHtml(
-                                String(policy.withCheck),
-                                {
-                                  theme: "tokyo-night",
-                                  lang: "sql",
-                                },
-                              ) || "",
+                              highlighter?.codeToHtml(String(policy.withCheck), {
+                                theme: "tokyo-night",
+                                lang: "sql",
+                              }) || "",
                           }}
                         />
                       </div>
@@ -618,17 +501,12 @@ function TableNode({ data }: NodeProps<TableNodeDefinition>) {
         {data.relations.length > 0 && <Separator className="dv:h-1" />}
         {data.relations.map((relation) => {
           return (
-            <div
-              key={relation.fieldName}
-              className="dv:relative dv:flex dv:text-sm"
-            >
+            <div key={relation.fieldName} className="dv:relative dv:flex dv:text-sm">
               <div className="dv:flex dv:w-full dv:items-center dv:justify-between dv:gap-2 dv:p-2">
                 <div className="dv:flex dv:items-center dv:gap-2">
                   <CableIcon className="dv:text-green dv:size-4" />
                   {relation.fieldName}
-                  <span className="dv:text-xs dv:text-muted-foreground">
-                    {relation.type}
-                  </span>
+                  <span className="dv:text-xs dv:text-muted-foreground">{relation.type}</span>
                 </div>
                 <span className="dv:flex dv:items-center dv:text-xs dv:text-muted-foreground">
                   {relation.referencedTableName}
@@ -658,8 +536,7 @@ function TableNode({ data }: NodeProps<TableNodeDefinition>) {
 
 function ViewNode({ data }: NodeProps<ViewNodeDefinition>) {
   const highlighter = useHighlighter();
-  const hiddenNodeConnector =
-    "dv:h-px! dv:w-px! dv:min-w-0! dv:min-h-0! dv:cursor-grab! dv:border-0! dv:opacity-0!";
+  const hiddenNodeConnector = "dv:h-px! dv:w-px! dv:min-w-0! dv:min-h-0! dv:cursor-grab! dv:border-0! dv:opacity-0!";
 
   return (
     <>
@@ -669,34 +546,19 @@ function ViewNode({ data }: NodeProps<ViewNodeDefinition>) {
             <div className="dv:flex dv:items-center dv:justify-between dv:gap-4 dv:text-base">
               <div className="dv:relative dv:flex dv:items-center dv:gap-2">
                 <EyeIcon className="dv:size-5" />
-                <span>
-                  {data.schema && data.schema !== "public"
-                    ? `${data.schema}.${data.name}`
-                    : data.name}
-                </span>
+                <span>{data.schema && data.schema !== "public" ? `${data.schema}.${data.name}` : data.name}</span>
               </div>
               <div className="dv:flex dv:items-center dv:gap-2">
                 {data.provider && (
-                  <Badge
-                    variant="outline"
-                    className="dv:items-center dv:gap-2"
-                    data-no-print
-                  >
-                    {!data.with?.securityInvoker && (
-                      <TriangleAlertIcon className="dv:text-orange-400 dv:size-4" />
-                    )}
+                  <Badge variant="outline" className="dv:items-center dv:gap-2" data-no-print>
+                    {!data.with?.securityInvoker && <TriangleAlertIcon className="dv:text-orange-400 dv:size-4" />}
                     RLS {data.with?.securityInvoker ? "enabled" : "disabled"}
                   </Badge>
                 )}
                 {data.definition && (
                   <Popover data-no-print>
                     <PopoverTrigger asChild>
-                      <Button
-                        data-no-print
-                        variant="ghost"
-                        size="sm"
-                        className="dv:h-6 dv:border-none"
-                      >
+                      <Button data-no-print variant="ghost" size="sm" className="dv:h-6 dv:border-none">
                         <span>Definition</span>
                       </Button>
                     </PopoverTrigger>
@@ -717,85 +579,54 @@ function ViewNode({ data }: NodeProps<ViewNodeDefinition>) {
                 )}
               </div>
             </div>
-            {data.withExplain && data.description && (
-              <Description description={data.description} />
-            )}
+            {data.withExplain && data.description && <Description description={data.description} />}
           </div>
         </div>
         <div className="dv:relative dv:cursor-default dv:divide-y dv:divide-border">
           {data.columns.map((column) => {
             return (
-              <div
-                key={column.name}
-                className="dv:relative dv:flex dv:flex-col dv:gap-4 dv:p-2 dv:text-sm"
-              >
+              <div key={column.name} className="dv:relative dv:flex dv:flex-col dv:gap-4 dv:p-2 dv:text-sm">
                 <div className="dv:flex dv:w-full dv:items-center dv:justify-between dv:gap-2">
                   <div className="dv:flex dv:items-center dv:gap-2">
-                    {column.isPrimaryKey && (
-                      <KeyRoundIcon className="dv:text-green dv:size-4" />
-                    )}
+                    {column.isPrimaryKey && <KeyRoundIcon className="dv:text-green dv:size-4" />}
                     {/* {column.isForeignKey && (
                       <Icon name="link" size="sm" className="text-green" />
                     )} */}
-                    {column.isUnique && (
-                      <BadgeCheckIcon className="dv:text-secondary-foreground dv:size-4" />
-                    )}
-                    <DiamondIcon
-                      className={cn(
-                        "dv:size-4",
-                        column.isNotNull && "dv:fill-secondary-foreground",
-                      )}
-                    />
+                    {column.isUnique && <BadgeCheckIcon className="dv:text-secondary-foreground dv:size-4" />}
+                    <DiamondIcon className={cn("dv:size-4", column.isNotNull && "dv:fill-secondary-foreground")} />
                     {column.name}
                   </div>
                   <span className="dv:px-2 dv:py-1 dv:text-xs dv:text-muted-foreground">
-                    {column.enumValues
-                      ? column.enumValues.join(" | ")
-                      : column.dataType}
+                    {column.enumValues ? column.enumValues.join(" | ") : column.dataType}
                     {!column.isNotNull && " | null"}
                   </span>
                   {(column.default || column.defaultFn) && (
                     <Popover data-no-print>
                       <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          size="custom"
-                          className="dv:absolute dv:right-1 dv:px-2 dv:py-1"
-                        >
+                        <Button variant="outline" size="custom" className="dv:absolute dv:right-1 dv:px-2 dv:py-1">
                           <span className="dv:text-xs dv:text-muted-foreground">
-                            {column.enumValues
-                              ? column.enumValues.join(" | ")
-                              : column.dataType}
+                            {column.enumValues ? column.enumValues.join(" | ") : column.dataType}
                             {!column.isNotNull && " | null"}
                           </span>
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent className="dv:flex dv:w-fit dv:flex-row dv:items-center dv:gap-2">
-                        <span className="dv:text-xs dv:text-muted-foreground">
-                          default:
-                        </span>
+                        <span className="dv:text-xs dv:text-muted-foreground">default:</span>
                         <pre
                           className="dv:text-sm"
                           dangerouslySetInnerHTML={{
                             __html:
-                              highlighter?.codeToHtml(
-                                String(
-                                  column.default || column.defaultFn || "",
-                                ),
-                                {
-                                  theme: "tokyo-night",
-                                  lang: column.default ? "sql" : "typescript",
-                                },
-                              ) || "",
+                              highlighter?.codeToHtml(String(column.default || column.defaultFn || ""), {
+                                theme: "tokyo-night",
+                                lang: column.default ? "sql" : "typescript",
+                              }) || "",
                           }}
                         />
                       </PopoverContent>
                     </Popover>
                   )}
                 </div>
-                {data.withExplain && column.description && (
-                  <Description description={column.description} />
-                )}
+                {data.withExplain && column.description && <Description description={column.description} />}
                 <Handle
                   type="target"
                   position={Position.Left}
@@ -830,10 +661,7 @@ function Description({ description }: { description: string }) {
       <span className="dv:left-1 dv:top-[-0.5rem] dv:flex dv:gap-1 dv:bg-background dv:pr-1">
         <BookTextIcon className="dv:size-4" />
       </span>
-      <span
-        className="dv:flex-wrap dv:text-inherit"
-        style={{ fontSize: "0.6rem" }}
-      >
+      <span className="dv:flex-wrap dv:text-inherit" style={{ fontSize: "0.6rem" }}>
         {description}
       </span>
     </div>
@@ -899,9 +727,7 @@ function InfoButton() {
         </div>
         <Separator className="my-2" /> */}
         <div className="dv:flex dv:flex-row dv:items-center dv:gap-1">
-          <span className="dv:text-sm dv:text-muted-foreground">
-            This diagram is powered by{" "}
-          </span>
+          <span className="dv:text-sm dv:text-muted-foreground">This diagram is powered by </span>
           <a
             href="https://reactflow.dev/"
             target="_blank"
@@ -922,12 +748,7 @@ function ExplainToggle(props: React.ComponentPropsWithoutRef<typeof Toggle>) {
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <Toggle
-            variant="outline"
-            size="icon:sm"
-            className="dv:bg-background"
-            {...props}
-          >
+          <Toggle variant="outline" size="icon:sm" className="dv:bg-background" {...props}>
             <Icon className="dv:size-4" />
           </Toggle>
         </TooltipTrigger>
@@ -971,21 +792,16 @@ export function DownloadSchemaButton() {
 
       // Calculate dimensions while maintaining aspect ratio
       const aspectRatio = nodesBounds.width / nodesBounds.height;
-      let imageWidth, imageHeight;
+      let imageWidth = 0;
+      let imageHeight = 0;
 
       if (aspectRatio > 1) {
         // Wider than tall
-        imageWidth = Math.min(
-          Math.max(nodesBounds.width, MIN_DIMENSION),
-          MAX_DIMENSION,
-        );
+        imageWidth = Math.min(Math.max(nodesBounds.width, MIN_DIMENSION), MAX_DIMENSION);
         imageHeight = imageWidth / aspectRatio;
       } else {
         // Taller than wide
-        imageHeight = Math.min(
-          Math.max(nodesBounds.height, MIN_DIMENSION),
-          MAX_DIMENSION,
-        );
+        imageHeight = Math.min(Math.max(nodesBounds.height, MIN_DIMENSION), MAX_DIMENSION);
         imageWidth = imageHeight * aspectRatio;
       }
 
@@ -1006,9 +822,7 @@ export function DownloadSchemaButton() {
       document.body.appendChild(hiddenContainer);
 
       // Clone the viewport into the hidden container
-      const viewport = document.querySelector(
-        ".react-flow__viewport",
-      ) as HTMLElement;
+      const viewport = document.querySelector(".react-flow__viewport") as HTMLElement;
 
       if (!viewport) {
         return;
@@ -1024,7 +838,7 @@ export function DownloadSchemaButton() {
         imageHeight,
         0.1, // Lower minZoom to handle spread out tables better
         1, // maxZoom
-        1.2, // Slightly increase padding factor
+        1.2 // Slightly increase padding factor
       );
 
       viewportClone.style.transform = `translate(${transform.x}px, ${transform.y}px) scale(${transform.zoom})`;
@@ -1056,15 +870,8 @@ export function DownloadSchemaButton() {
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <Button
-            variant="outline"
-            size="icon:sm"
-            onClick={onClick}
-            disabled={isGenerating}
-          >
-            <Icon
-              className={cn("dv:size-4", isGenerating && "dv:animate-spin")}
-            />
+          <Button variant="outline" size="icon:sm" onClick={onClick} disabled={isGenerating}>
+            <Icon className={cn("dv:size-4", isGenerating && "dv:animate-spin")} />
           </Button>
         </TooltipTrigger>
         <TooltipContent>

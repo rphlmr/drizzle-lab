@@ -23,15 +23,15 @@
     },
     "./style.css": "./dist/style.css"
   },
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "scripts": {
     "preinstall": "node preinstall.mjs",
     "postinstall": "patch-package",
     "dev": "vite",
-    "build": "tsc -b && vite build",
-    "lint": "eslint .",
+    "build": "vite build",
+    "lint": "biome check .",
+    "lint:fix": "biome check --fix .",
+    "typecheck": "tsc -b",
     "preview": "vite preview",
     "prerelease:publish": "npm version prerelease && npm publish --access=public --tag next",
     "patch:publish": "npm version patch && npm publish --access=public",
@@ -56,7 +56,6 @@
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
-    "@eslint/js": "^9.17.0",
     "@tailwindcss/postcss": "^4.0.14",
     "@tailwindcss/vite": "^4.0.14",
     "@types/node": "^22.13.10",
@@ -64,15 +63,9 @@
     "@types/react-dom": "^18.3.5",
     "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.21",
-    "eslint": "^9.17.0",
-    "eslint-plugin-react-hooks": "^5.0.0",
-    "eslint-plugin-react-refresh": "^0.4.16",
     "globals": "^15.14.0",
-    "patch-package": "^8.0.0",
     "postcss-import": "^16.1.0",
     "tailwindcss": "^4.0.14",
-    "typescript": "^5.8.2",
-    "typescript-eslint": "^8.18.2",
     "vite": "^6.2.2",
     "vite-plugin-dts": "^4.5.3",
     "vite-tsconfig-paths": "^5.1.4"
@@ -85,6 +78,5 @@
   "engines": {
     "node": ">=22.0.0"
   },
-  "packageManager": "npm@11.0.0",
-  "prettier": {}
+  "packageManager": "npm@11.0.0"
 }

@@ -1,6 +1,7 @@
 import * as React from "react";
+
 import { Slot } from "@radix-ui/react-slot";
-import { cva, type VariantProps } from "class-variance-authority";
+import { type VariantProps, cva } from "class-variance-authority";
 
 import { cn } from "~/lib/utils";
 import { useTheme } from "../theme";
@@ -10,16 +11,12 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default:
-          "dv:bg-primary dv:text-primary-foreground dv:shadow-sm dv:hover:bg-primary/90",
-        destructive:
-          "dv:bg-destructive dv:text-destructive-foreground dv:shadow-xs dv:hover:bg-destructive/90",
+        default: "dv:bg-primary dv:text-primary-foreground dv:shadow-sm dv:hover:bg-primary/90",
+        destructive: "dv:bg-destructive dv:text-destructive-foreground dv:shadow-xs dv:hover:bg-destructive/90",
         outline:
           "dv:border dv:border-input dv:bg-background dv:shadow-xs dv:hover:bg-accent dv:hover:text-accent-foreground",
-        secondary:
-          "dv:bg-secondary dv:text-secondary-foreground dv:shadow-xs dv:hover:bg-secondary/80",
-        ghost:
-          "dv:hover:bg-accent dv:hover:text-accent-foreground dv:bg-transparent",
+        secondary: "dv:bg-secondary dv:text-secondary-foreground dv:shadow-xs dv:hover:bg-secondary/80",
+        ghost: "dv:hover:bg-accent dv:hover:text-accent-foreground dv:bg-transparent",
         link: "dv:text-primary dv:underline-offset-4 dv:hover:underline",
       },
       size: {
@@ -28,14 +25,14 @@ const buttonVariants = cva(
         lg: "dv:h-10 dv:rounded-md dv:px-6 dv:has-[>svg]:dv:px-4",
         icon: "dv:size-9",
         custom: "",
-        ["icon:sm"]: "dv:size-8",
+        "icon:sm": "dv:size-8",
       },
     },
     defaultVariants: {
       variant: "default",
       size: "default",
     },
-  },
+  }
 );
 
 type ButtonProps = React.ComponentProps<"button"> &
@@ -58,7 +55,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         {...props}
       />
     );
-  },
+  }
 );
 
 export { Button, buttonVariants };

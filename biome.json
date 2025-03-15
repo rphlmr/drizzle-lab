@@ -1,7 +1,7 @@
 {
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
   "files": {
-    "include": ["apps/cli/**/*"]
+    "ignore": ["dist", "build", "styles.css"]
   },
   "vcs": {
     "enabled": true,
@@ -11,7 +11,7 @@
   },
   "formatter": {
     "enabled": true,
-    "formatWithErrors": true,
+    "formatWithErrors": false,
     "indentStyle": "space",
     "lineEnding": "lf",
     "lineWidth": 120
@@ -25,25 +25,30 @@
       "recommended": true,
       "suspicious": {
         "recommended": true,
-        "noExplicitAny": "off",
-        "noConfusingVoidType": "off"
+        "noExplicitAny": "off"
       },
       "style": {
         "recommended": true,
         "noParameterAssign": "info",
+        "noUnusedTemplateLiteral": "warn",
         "noNonNullAssertion": "warn"
       },
       "complexity": {
-        "recommended": true
+        "recommended": true,
+        "noForEach": "warn",
+        "useLiteralKeys": "warn"
       },
       "security": {
-        "recommended": true
+        "recommended": true,
+        "noDangerouslySetInnerHtml": "off"
       },
       "performance": {
         "recommended": true
       },
       "correctness": {
-        "recommended": true
+        "recommended": true,
+        "noUnusedImports": "warn",
+        "useExhaustiveDependencies": "warn"
       },
       "a11y": {
         "recommended": true

@@ -1,27 +1,17 @@
 "use client";
 
-import * as React from "react";
+import type * as React from "react";
+
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 
 import { cn } from "~/lib/utils";
 import { useTheme } from "../theme";
 
-function TooltipProvider({
-  delayDuration = 0,
-  ...props
-}: React.ComponentProps<typeof TooltipPrimitive.Provider>) {
-  return (
-    <TooltipPrimitive.Provider
-      data-slot="tooltip-provider"
-      delayDuration={delayDuration}
-      {...props}
-    />
-  );
+function TooltipProvider({ delayDuration = 0, ...props }: React.ComponentProps<typeof TooltipPrimitive.Provider>) {
+  return <TooltipPrimitive.Provider data-slot="tooltip-provider" delayDuration={delayDuration} {...props} />;
 }
 
-function Tooltip({
-  ...props
-}: React.ComponentProps<typeof TooltipPrimitive.Root>) {
+function Tooltip({ ...props }: React.ComponentProps<typeof TooltipPrimitive.Root>) {
   return (
     <TooltipProvider>
       <TooltipPrimitive.Root data-slot="tooltip" {...props} />
@@ -29,18 +19,11 @@ function Tooltip({
   );
 }
 
-function TooltipTrigger({
-  ...props
-}: React.ComponentProps<typeof TooltipPrimitive.Trigger>) {
+function TooltipTrigger({ ...props }: React.ComponentProps<typeof TooltipPrimitive.Trigger>) {
   const theme = useTheme();
 
   return (
-    <TooltipPrimitive.Trigger
-      data-app="drizzle-visualizer"
-      data-theme={theme}
-      data-slot="tooltip-trigger"
-      {...props}
-    />
+    <TooltipPrimitive.Trigger data-app="drizzle-visualizer" data-theme={theme} data-slot="tooltip-trigger" {...props} />
   );
 }
 
@@ -61,7 +44,7 @@ function TooltipContent({
         sideOffset={sideOffset}
         className={cn(
           "dv:bg-primary dv:text-primary-foreground dv:animate-in dv:fade-in-0 dv:zoom-in-95 dv:data-[state=closed]:animate-out dv:data-[state=closed]:fade-out-0 dv:data-[state=closed]:zoom-out-95 dv:data-[side=bottom]:slide-in-from-top-2 dv:data-[side=left]:slide-in-from-right-2 dv:data-[side=right]:slide-in-from-left-2 dv:data-[side=top]:slide-in-from-bottom-2 z-50 dv:max-w-sm dv:rounded-md dv:px-3 dv:py-1.5 dv:text-xs",
-          className,
+          className
         )}
         {...props}
       >
