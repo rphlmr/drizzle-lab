@@ -8,7 +8,7 @@ import { execSync } from "node:child_process";
 
 import tsConfig from "./tsconfig.json" with { type: "json" };
 
-const install = process.env.CI ? "npm ci" : "npm install";
+const install = process.env.CI ? "npm ci --include=dev" : "npm install";
 
 console.log(`\n⏳ Installing root dependencies with ${install}`);
 execSync(`cd ../.. && ${install}`, { stdio: "inherit" });
