@@ -39,7 +39,7 @@ function Badge({
   return (
     <Comp
       data-app="drizzle-visualizer"
-      data-theme-dv={theme}
+      data-theme={theme}
       data-slot="badge"
       className={cn(badgeVariants({ variant }), className)}
       {...props}

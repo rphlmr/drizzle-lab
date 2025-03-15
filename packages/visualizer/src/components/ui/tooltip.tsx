@@ -37,7 +37,7 @@ function TooltipTrigger({
   return (
     <TooltipPrimitive.Trigger
       data-app="drizzle-visualizer"
-      data-theme-dv={theme}
+      data-theme={theme}
       data-slot="tooltip-trigger"
       {...props}
     />
@@ -56,7 +56,7 @@ function TooltipContent({
     <TooltipPrimitive.Portal>
       <TooltipPrimitive.Content
         data-app="drizzle-visualizer"
-        data-theme-dv={theme}
+        data-theme={theme}
         data-slot="tooltip-content"
         sideOffset={sideOffset}
         className={cn(
@@ -68,7 +68,7 @@ function TooltipContent({
         {children}
         <TooltipPrimitive.Arrow
           data-app="drizzle-visualizer"
-          data-theme-dv={theme}
+          data-theme={theme}
           className="dv:bg-primary dv:fill-primary z-50 dv:size-2.5 dv:translate-y-[calc(-50%_-_2px)] dv:rotate-45 dv:rounded-[2px]"
         />
       </TooltipPrimitive.Content>

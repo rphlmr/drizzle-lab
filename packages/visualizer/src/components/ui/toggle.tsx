@@ -39,7 +39,7 @@ function Toggle({
   return (
     <TogglePrimitive.Root
       data-app="drizzle-visualizer"
-      data-theme-dv={theme}
+      data-theme={theme}
       data-slot="toggle"
       className={cn(toggleVariants({ variant, size, className }))}
       {...props}

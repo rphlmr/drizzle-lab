@@ -16,7 +16,7 @@ function Separator({
   return (
     <SeparatorPrimitive.Root
       data-app="drizzle-visualizer"
-      data-theme-dv={theme}
+      data-theme={theme}
       data-slot="separator-root"
       decorative={decorative}
       orientation={orientation}

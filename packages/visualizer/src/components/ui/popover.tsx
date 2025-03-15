@@ -27,7 +27,7 @@ function PopoverContent({
     <PopoverPrimitive.Portal>
       <PopoverPrimitive.Content
         data-app="drizzle-visualizer"
-        data-theme-dv={theme}
+        data-theme={theme}
         data-slot="popover-content"
         align={align}
         sideOffset={sideOffset}
@@ -47,7 +47,7 @@ function PopoverAnchor({
   return (
     <PopoverPrimitive.Anchor
       data-app="drizzle-visualizer"
-      data-theme-dv="dark"
+      data-theme="dark"
       data-slot="popover-anchor"
       {...props}
     />

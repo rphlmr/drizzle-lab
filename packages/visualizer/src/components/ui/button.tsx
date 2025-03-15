@@ -51,7 +51,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     return (
       <Comp
         data-app="drizzle-visualizer"
-        data-theme-dv={theme}
+        data-theme={theme}
         ref={ref}
         data-slot="button"
         className={cn(buttonVariants({ variant, size, className }))}

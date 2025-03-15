@@ -3,9 +3,9 @@
 
 @plugin "tailwindcss-animate";
 
-@custom-variant dark (&:where([data-theme-dv=dark], [data-theme-dv=dark] *));
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
-[data-theme-dv="light"] {
+[data-theme="light"] {
   --dv-background: hsl(0 0% 100%);
   --dv-foreground: hsl(240 10% 3.9%);
 
@@ -50,7 +50,7 @@
   --dv-chart-5: hsl(27 87% 67%);
 }
 
-[data-theme-dv="dark"] {
+[data-theme="dark"] {
   --dv-background: hsl(240 10% 3.9%);
   --dv-foreground: hsl(0 0% 98%);
 
@@ -157,12 +157,4 @@
   /* * {
       @apply dv:border-border dv:outline-ring/50;
     } */
-}
-
-.container {
-  @apply dv:flex dv:flex-col;
-}
-
-.container_title {
-  @apply dv:text-5xl dv:font-bold dv:text-red-400;
 }

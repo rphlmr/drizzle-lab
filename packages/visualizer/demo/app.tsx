@@ -13,8 +13,8 @@ export default function App() {
         height: "100%",
       }}
     >
-      <DrizzleVisualizer dialect="postgresql" schema={schema} theme="light" />
-      <DrizzleVisualizerLegend theme="light" />
+      <DrizzleVisualizer dialect="postgresql" schema={schema} theme="dark" />
+      <DrizzleVisualizerLegend theme="dark" />
     </div>
   );
 }

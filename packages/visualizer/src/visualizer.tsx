@@ -72,7 +72,7 @@ import {
   ImageDownIcon,
   LoaderPinwheelIcon,
 } from "lucide-react";
-import { ThemeProvider } from "./components/theme";
+import { ThemeProvider, useTheme } from "./components/theme";
 
 function storageKey(key: string) {
   return `${key}.nodes.positions`;
@@ -249,7 +249,7 @@ export function DrizzleVisualizer({
     <ThemeProvider value={theme}>
       <div
         data-app="drizzle-visualizer"
-        data-theme-dv={theme}
+        data-theme={theme}
         className={cn("dv:size-full", className)}
       >
         <ReactFlow
@@ -259,7 +259,7 @@ export function DrizzleVisualizer({
           }
           zoomOnScroll={false}
           nodeTypes={nodeTypes}
-          colorMode={theme}
+          colorMode={theme || "dark"}
           nodes={nodes}
           edges={edges}
           onNodesChange={onNodesChange}
@@ -952,6 +952,7 @@ const MIN_DIMENSION = 1024; // Minimum dimension to ensure quality
 const MAX_DIMENSION = 4096; // Maximum dimension to prevent excessive file size
 
 export function DownloadSchemaButton() {
+  const theme = useTheme();
   const { getNodes } = useReactFlow();
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -994,6 +995,10 @@ export function DownloadSchemaButton() {
 
       // Create a hidden container - Prevents UI flickering while generating
       const hiddenContainer = document.createElement("div");
+      hiddenContainer.dataset.app = "drizzle-visualizer";
+      hiddenContainer.dataset.theme = theme;
+      hiddenContainer.classList.add("react-flow");
+      hiddenContainer.classList.add(theme);
       hiddenContainer.style.position = "absolute";
       hiddenContainer.style.left = "-99999px";
       hiddenContainer.style.width = `${imageWidth}px`;
@@ -1029,7 +1034,7 @@ export function DownloadSchemaButton() {
           width: imageWidth,
           height: imageHeight,
           skipFonts: true,
-          backgroundColor: "#0f0f14",
+          backgroundColor: theme === "dark" ? "#0f0f14" : "#fff",
           filter: (node) => {
             return !node.dataset?.noPrint;
           },

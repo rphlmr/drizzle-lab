@@ -19,7 +19,7 @@ export function DrizzleVisualizerLegend({
   return (
     <div
       data-app="drizzle-visualizer"
-      data-theme-dv={theme}
+      data-theme={theme}
       className={cn(
         "dv:flex dv:w-full dv:flex-wrap dv:items-center dv:justify-center dv:gap-2 dv:dark:bg-[#0f0f14] dv:px-2 dv:py-1",
         className,
