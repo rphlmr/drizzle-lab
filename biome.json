@@ -21,6 +21,7 @@
   },
   "linter": {
     "enabled": true,
+    "ignore": ["package.json"],
     "rules": {
       "recommended": true,
       "suspicious": {
