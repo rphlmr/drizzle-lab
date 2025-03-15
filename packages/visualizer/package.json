@@ -23,7 +23,9 @@
     },
     "./style.css": "./dist/style.css"
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "preinstall": "node preinstall.mjs",
     "postinstall": "patch-package",
@@ -47,6 +49,7 @@
     "@xyflow/react": "^12.4.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "help": "^3.0.2",
     "html-to-image": "1.11.11",
     "lucide-react": "^0.475.0",
     "react": "^18.0.0 || ^19.0.0",

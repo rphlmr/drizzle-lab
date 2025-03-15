@@ -40,8 +40,10 @@ jobs:
           node-version-file: "package.json"
           cache: "npm"
 
-      - name: 📥 Install dependencies
-        run: npm ci --include=dev
+      - name: 📥 Download deps
+        uses: bahmutov/npm-install@v1
+        with:
+          useLockFile: false
 
       - name: 🔎 Type check
         run: npm run typecheck
@@ -61,8 +63,10 @@ jobs:
           node-version-file: "package.json"
           cache: "npm"
 
-      - name: 📥 Install dependencies
-        run: npm ci --include=dev
+      - name: 📥 Download deps
+        uses: bahmutov/npm-install@v1
+        with:
+          useLockFile: false
 
       - name: 🏗️ Build
         run: npm run build
