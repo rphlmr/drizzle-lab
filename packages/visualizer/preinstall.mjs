@@ -8,10 +8,8 @@ import { execSync } from "node:child_process";
 
 import tsConfig from "./tsconfig.json" with { type: "json" };
 
-const install = process.env.CI ? "npm ci --include=dev" : "npm install";
-
-console.log(`\n⏳ Installing root dependencies with ${install}`);
-execSync(`cd ../.. && ${install}`, { stdio: "inherit" });
+console.log("\n⏳ Installing root dependencies");
+execSync("cd ../.. && npm install", { stdio: "inherit" });
 console.log("\n✅ Finished installing root dependencies");
 
 const internalDependenciesRoot = Object.entries(tsConfig.compilerOptions.paths)
@@ -19,7 +17,7 @@ const internalDependenciesRoot = Object.entries(tsConfig.compilerOptions.paths)
   .flatMap(([, value]) => value[0].split("/src")[0]);
 
 for (const dependency of internalDependenciesRoot) {
-  console.log(`\n⏳ Installing dependencies for ${dependency} with ${install}`);
-  execSync(`cd ${dependency} && ${install}`, { stdio: "inherit" });
+  console.log(`\n⏳ Installing dependencies for ${dependency}`);
+  execSync(`cd ${dependency} && npm install`, { stdio: "inherit" });
   console.log(`\n✅ Finished installing dependencies for ${dependency}`);
 }
