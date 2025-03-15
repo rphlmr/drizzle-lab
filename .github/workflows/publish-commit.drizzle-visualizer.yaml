@@ -42,6 +42,7 @@ jobs:
       - name: 📥 Download deps
         uses: bahmutov/npm-install@v1
         with:
+          install-command: npm install
           useLockFile: true
 
       - name: 🔎 Type check
@@ -63,6 +64,7 @@ jobs:
       - name: 📥 Download deps
         uses: bahmutov/npm-install@v1
         with:
+          install-command: npm install
           useLockFile: true
 
       - name: 🏗️ Build
