@@ -20,7 +20,6 @@ export default defineConfig({
   build: {
     lib: {
       entry: resolve(__dirname, "src/index.ts"),
-      // the proper extensions will be added
       fileName: "index",
       formats: ["es"],
       cssFileName: "style",
@@ -29,7 +28,6 @@ export default defineConfig({
     minify: false,
     rollupOptions: {
       // make sure to externalize deps that shouldn't be bundled
-      // into your library
       external: ["react", "react/jsx-runtime", "drizzle-orm"],
     },
   },
