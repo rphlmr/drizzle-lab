@@ -38,12 +38,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version-file: "package.json"
+          cache: "npm"
 
-      - name: 📥 Download deps
-        uses: bahmutov/npm-install@v1
-        with:
-          install-command: npm install
-          useLockFile: true
+      - name: 📥 Install dependencies
+        run: npm install
 
       - name: 🔎 Type check
         run: npm run typecheck
@@ -51,6 +49,7 @@ jobs:
   build:
     name: 🏗️ Build
     runs-on: ubuntu-latest
+    needs: [lint, typecheck]
 
     steps:
       - name: ⬇️ Checkout repo
@@ -60,12 +59,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version-file: "package.json"
+          cache: "npm"
 
-      - name: 📥 Download deps
-        uses: bahmutov/npm-install@v1
-        with:
-          install-command: npm install
-          useLockFile: true
+      - name: 📥 Install dependencies
+        run: npm install
 
       - name: 🏗️ Build
         run: npm run build
