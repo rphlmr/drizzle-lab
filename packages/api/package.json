@@ -13,9 +13,7 @@
   "bugs": {
     "url": "https://github.com/rphlmr/drizzle-lab/issues"
   },
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "scripts": {
     "build": "tsup --config tsup.config.ts",
     "postbuild": "npm run check:exports",
@@ -190,58 +188,19 @@
   },
   "typesVersions": {
     "*": {
-      "config/node": [
-        "./dist/config/index.node.d.ts",
-        "./dist/config/index.node.d.cts"
-      ],
-      "extensions": [
-        "./dist/extensions/index.d.ts",
-        "./dist/extensions/index.d.cts"
-      ],
-      "pg": [
-        "./dist/pg/index.d.ts",
-        "./dist/pg/index.d.cts"
-      ],
-      "pg/node": [
-        "./dist/pg/index.node.d.ts",
-        "./dist/pg/index.node.d.cts"
-      ],
-      "pg/web": [
-        "./dist/pg/index.web.d.ts",
-        "./dist/pg/index.web.d.cts"
-      ],
-      "sqlite": [
-        "./dist/sqlite/index.d.ts",
-        "./dist/sqlite/index.d.cts"
-      ],
-      "sqlite/node": [
-        "./dist/sqlite/index.node.d.ts",
-        "./dist/sqlite/index.node.d.cts"
-      ],
-      "sqlite/web": [
-        "./dist/sqlite/index.web.d.ts",
-        "./dist/sqlite/index.web.d.cts"
-      ],
-      "mysql": [
-        "./dist/mysql/index.d.ts",
-        "./dist/mysql/index.d.cts"
-      ],
-      "mysql/node": [
-        "./dist/mysql/index.node.d.ts",
-        "./dist/mysql/index.node.d.cts"
-      ],
-      "mysql/web": [
-        "./dist/mysql/index.web.d.ts",
-        "./dist/mysql/index.web.d.cts"
-      ],
-      "relations": [
-        "./dist/relations/index.d.ts",
-        "./dist/relations/index.d.cts"
-      ],
-      "sql": [
-        "./dist/sql/index.d.ts",
-        "./dist/sql/index.d.cts"
-      ]
+      "config/node": ["./dist/config/index.node.d.ts", "./dist/config/index.node.d.cts"],
+      "extensions": ["./dist/extensions/index.d.ts", "./dist/extensions/index.d.cts"],
+      "pg": ["./dist/pg/index.d.ts", "./dist/pg/index.d.cts"],
+      "pg/node": ["./dist/pg/index.node.d.ts", "./dist/pg/index.node.d.cts"],
+      "pg/web": ["./dist/pg/index.web.d.ts", "./dist/pg/index.web.d.cts"],
+      "sqlite": ["./dist/sqlite/index.d.ts", "./dist/sqlite/index.d.cts"],
+      "sqlite/node": ["./dist/sqlite/index.node.d.ts", "./dist/sqlite/index.node.d.cts"],
+      "sqlite/web": ["./dist/sqlite/index.web.d.ts", "./dist/sqlite/index.web.d.cts"],
+      "mysql": ["./dist/mysql/index.d.ts", "./dist/mysql/index.d.cts"],
+      "mysql/node": ["./dist/mysql/index.node.d.ts", "./dist/mysql/index.node.d.cts"],
+      "mysql/web": ["./dist/mysql/index.web.d.ts", "./dist/mysql/index.web.d.cts"],
+      "relations": ["./dist/relations/index.d.ts", "./dist/relations/index.d.cts"],
+      "sql": ["./dist/sql/index.d.ts", "./dist/sql/index.d.cts"]
     }
   },
   "dependencies": {
@@ -261,12 +220,15 @@
   "peerDependencies": {
     "@electric-sql/pglite": ">=0.2.0",
     "@libsql/client-wasm": ">=0.9.0",
+    "@rollup/rollup-linux-x64-musl": "^4.25.0",
     "drizzle-kit": ">=0.26",
     "drizzle-orm": ">=0.36",
     "mysql2": ">=3.0.0"
   },
-  "optionalDependencies": {
-    "@rollup/rollup-linux-x64-musl": "^4.25.0"
+  "peerDependenciesMeta": {
+    "@rollup/rollup-linux-x64-musl": {
+      "optional": true
+    }
   },
   "prettier": {}
 }
