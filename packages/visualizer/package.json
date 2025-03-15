@@ -23,9 +23,7 @@
     },
     "./style.css": "./dist/style.css"
   },
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "scripts": {
     "preinstall": "node preinstall.mjs",
     "postinstall": "patch-package",
