@@ -5,7 +5,7 @@
     "dev": "TZ=UTC turbo dev --log-prefix=none",
     "build": "turbo build",
     "lint": "turbo lint",
-    "clean-node-modules": "rm -rf {node_modules,package-lock.json} **/*/{node_modules,package-lock.json}",
+    "clean-node-modules": "rm -rf {node_modules,package-lock.json,pnpm-lock.yaml} **/*/{node_modules,package-lock.json,pnpm-lock.yaml}",
     "clean-turbo-cache": "rm -rf ./**/.turbo",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "drizzle-lab:release:publish": "npm run -w drizzle-lab release:publish",
@@ -16,16 +16,14 @@
     "drizzle-run:start:local": "npm run -w drizzle-run start:local",
     "drizzle-run:start": "npm run -w drizzle-run start",
     "prod:drizzle-run:deploy": "fly deploy -c apps/drizzle-run/fly.toml --dockerfile apps/drizzle-run/Dockerfile --ignorefile .dockerignore --remote-only",
-    "postinstall": "patch-package",
     "package:api:install": "cd packages/api && npm install",
     "package:visualizer:install": "cd packages/visualizer && npm install"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
-    "patch-package": "^8.0.0",
     "typescript": "^5.8.2"
   },
-  "packageManager": "npm@11.1.0",
+  "packageManager": "pnpm@10.6.3+sha512.bb45e34d50a9a76e858a95837301bfb6bd6d35aea2c5d52094fa497a467c43f5c440103ce2511e9e0a2f89c3d6071baac3358fc68ac6fb75e2ceb3d2736065e6",
   "engines": {
     "node": ">=22"
   },

@@ -6,13 +6,7 @@
 
 import { execSync } from "node:child_process";
 
-import tsConfig from "./tsconfig.json" with { type: "json" };
-
-const install = "npm install --no-package-lock";
-
-console.log("\n⏳ Installing root dependencies");
-execSync(`cd ../.. && ${install}`, { stdio: "inherit" });
-console.log("\n✅ Finished installing root dependencies");
+import tsConfig from "../tsconfig.json" with { type: "json" };
 
 const internalDependenciesRoot = Object.entries(tsConfig.compilerOptions.paths)
   .filter(([key]) => key.startsWith("@"))
@@ -20,6 +14,6 @@ const internalDependenciesRoot = Object.entries(tsConfig.compilerOptions.paths)
 
 for (const dependency of internalDependenciesRoot) {
   console.log(`\n⏳ Installing dependencies for ${dependency}`);
-  execSync(`cd ${dependency} && ${install}`, { stdio: "inherit" });
+  execSync(`cd ${dependency} && pnpm install`, { stdio: "inherit" });
   console.log(`\n✅ Finished installing dependencies for ${dependency}`);
 }

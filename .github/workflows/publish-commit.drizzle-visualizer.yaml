@@ -34,27 +34,23 @@ jobs:
       - name: ⬇️ Checkout repo
         uses: actions/checkout@v4
 
+      - uses: 👷 pnpm/action-setup@v4
+        name: Install pnpm
+
       - name: ⎔ Setup node
         uses: actions/setup-node@v4
         with:
           node-version-file: "package.json"
-          cache: "npm"
+          cache: "pnpm"
+          cache-dependency-path: |
+            packages/visualizer/pnpm-lock.yaml
+            packages/cli/pnpm-lock.yaml
 
-      - name: � Cache node_modules
-        uses: actions/cache@v4
-        id: cache-node-modules
-        with:
-          path: "**/node_modules"
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-modules-
-
-      - name: �📥 Install dependencies
-        if: steps.cache-node-modules.outputs.cache-hit != 'true'
-        run: npm install --no-package-lock
+      - name: 📥 Install dependencies
+        run: pnpm install
 
       - name: 🔎 Type check
-        run: npm run typecheck
+        run: pnpm typecheck
 
   build:
     name: 🏗️ Build
@@ -65,30 +61,26 @@ jobs:
       - name: ⬇️ Checkout repo
         uses: actions/checkout@v4
 
+      - uses: 👷 pnpm/action-setup@v4
+        name: Install pnpm
+
       - name: ⎔ Setup node
         uses: actions/setup-node@v4
         with:
           node-version-file: "package.json"
-          cache: "npm"
+          cache: "pnpm"
+          cache-dependency-path: |
+            packages/visualizer/pnpm-lock.yaml
+            packages/cli/pnpm-lock.yaml
 
-      - name: � Cache node_modules
-        uses: actions/cache@v4
-        id: cache-node-modules
-        with:
-          path: "**/node_modules"
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-modules-
-
-      - name: �📥 Install dependencies
-        if: steps.cache-node-modules.outputs.cache-hit != 'true'
-        run: npm install --no-package-lock
+      - name: 📥 Install dependencies
+        run: pnpm install
 
       - name: 🏗️ Build
-        run: npm run build
+        run: pnpm build
 
       - name: 📦 Prepare package
-        run: npm run prepublishOnly
+        run: pnpm prepublishOnly
 
       - name: 📦 Publish
-        run: npx pkg-pr-new publish
+        run: pnpm dlx pkg-pr-new publish
