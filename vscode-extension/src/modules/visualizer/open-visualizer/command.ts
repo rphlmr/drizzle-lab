@@ -1,39 +1,56 @@
-import { render, toastError } from "../../../utils";
+import type { Config } from "drizzle-kit";
+import * as vscode from "vscode";
+
+import { findProjectWorkingDir } from "../../../context";
+import { importModule } from "../../../import-module";
+import { createLogger, toastError } from "../../../utils";
 import { createDrizzleVisualizerPanel } from "../panel";
-import { startVisualizer } from "../server";
 
 export const OpenVisualizerCommand = "drizzle.visualizer:open";
+const OutputKey = "[Visualizer]";
+const logger = createLogger("visualizer");
 
 export async function OpenVisualizer(...args: any[]) {
-  const OutputKey = `[${OpenVisualizerCommand}]`;
-  const configPath = args[0];
+  const drizzleConfigPath = args[0];
   const envFilePath = args[1];
 
-  if (!configPath || typeof configPath !== "string") {
+  if (!drizzleConfigPath || typeof drizzleConfigPath !== "string") {
     toastError(`${OutputKey} Expected config path to be a string`);
+    logger.error("Expected config path to be a string");
     return;
   }
 
+  logger.info("Opening Drizzle Visualizer");
+  logger.info(`Drizzle config path: ${drizzleConfigPath}`);
+  logger.info(`Env file path: ${envFilePath || "not provided"}`);
+
   try {
-    const { port } = await startVisualizer(configPath, envFilePath);
+    const pwd = await findProjectWorkingDir(drizzleConfigPath);
+
+    logger.info("Loading drizzle config");
+
+    const configModule = await importModule<Config>({ path: drizzleConfigPath, envFilePath }, pwd);
+
+    logger.info(`Drizzle config loaded. Schema path: ${configModule.default.schema}`);
+
+    // vscode.workspace.findFiles("");
+    // const { port } = await startVisualizer(configPath, envFilePath);
     const panel = createDrizzleVisualizerPanel();
 
-    panel.webview.html = render(`
-				<iframe 
-					src="http://127.0.0.1:${port}" 
-					width="100%" 
-					height="100%" 
-					frameborder="0"
-					style="border: none;"
-				/>`);
+    // panel.webview.html = render(`
+    // 		<iframe
+    // 			src="http://127.0.0.1:${port}"
+    // 			width="100%"
+    // 			height="100%"
+    // 			frameborder="0"
+    // 			style="border: none;"
+    // 		/>`);
 
     panel.reveal();
   } catch (error) {
-    toastError(
-      `${OutputKey} Failed to start Drizzle Visualizer: ${
-        error instanceof Error ? error.message : String(error)
-      }`,
-    );
+    const msg = `Failed to start Drizzle Visualizer: ${error instanceof Error ? error.message : String(error)}`;
+    toastError(msg);
+    logger.error(msg);
     return;
   }
 }

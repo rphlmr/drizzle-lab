@@ -7,10 +7,7 @@ let $lastSelectedEnv: string | undefined;
 
 export async function SelectEnv(configPath: string, executeCommand: string) {
   // Find .env files in the workspace
-  const envFiles = await vscode.workspace.findFiles(
-    "**/.env*",
-    "**/node_modules/**",
-  );
+  const envFiles = await vscode.workspace.findFiles("**/.env*", "**/node_modules/**");
 
   // Create quick pick items
   const items = envFiles.map((file) => ({
@@ -23,9 +20,7 @@ export async function SelectEnv(configPath: string, executeCommand: string) {
 
   // Move last selected item to top if it exists
   if ($lastSelectedEnv) {
-    const lastSelectedIndex = items.findIndex(
-      (item) => item.path === $lastSelectedEnv,
-    );
+    const lastSelectedIndex = items.findIndex((item) => item.path === $lastSelectedEnv);
     if (lastSelectedIndex > -1) {
       const [lastItem] = items.splice(lastSelectedIndex, 1);
       items.unshift(lastItem);
@@ -47,7 +42,7 @@ export async function SelectEnv(configPath: string, executeCommand: string) {
     await vscode.commands.executeCommand(
       executeCommand,
       configPath,
-      selected.label === "None" ? undefined : selected.path,
+      selected.label === "None" ? undefined : selected.path
     );
   }
 }

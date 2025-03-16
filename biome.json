@@ -1,7 +1,7 @@
 {
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
   "files": {
-    "ignore": ["dist", "build", "styles.css", ".pnpmfile.cjs"]
+    "ignore": ["dist", "build", "styles.css", ".pnpmfile.cjs", "node_modules"]
   },
   "vcs": {
     "enabled": true,
@@ -38,7 +38,8 @@
       "complexity": {
         "recommended": true,
         "noForEach": "warn",
-        "useLiteralKeys": "warn"
+        "useLiteralKeys": "warn",
+        "noUselessCatch": "warn"
       },
       "security": {
         "recommended": true,

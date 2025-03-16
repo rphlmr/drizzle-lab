@@ -1,4 +1,4 @@
-import { ChildProcessWithoutNullStreams, spawn } from "node:child_process";
+import { type ChildProcessWithoutNullStreams, spawn } from "node:child_process";
 import path from "node:path";
 
 import { findProjectWorkingDir } from "../../context";
@@ -21,22 +21,17 @@ interface ServerStartResult {
   port: string;
 }
 
-export async function startVisualizer(
-  configPath: string,
-  envFilePath?: string,
-) {
+export async function startVisualizer(configPath: string, envFilePath?: string) {
   console.log("envFilePath", envFilePath);
   outputChannel.appendLine(`${OutputKey} extension cwd: ${extensionCwd}`);
   outputChannel.appendLine(`${OutputKey} apps cwd: ${appsCwd}`);
-  outputChannel.appendLine(
-    `${OutputKey} Using drizzle visualizer from: ${binPath}`,
-  );
+  outputChannel.appendLine(`${OutputKey} Using drizzle visualizer from: ${binPath}`);
 
-  return new Promise<ServerStartResult>(async (resolve, reject) => {
+  return new Promise<ServerStartResult>((resolve, reject) => {
     // if config path has changed, restart the server
     if ($configPath && $configPath !== configPath) {
       outputChannel.appendLine(
-        `${OutputKey} Config path changed. Killing server and restarting on port ${$port} with new config path: ${configPath}`,
+        `${OutputKey} Config path changed. Killing server and restarting on port ${$port} with new config path: ${configPath}`
       );
       stopVisualizer();
     }
@@ -46,7 +41,7 @@ export async function startVisualizer(
     // if env path has changed, restart the server
     if ($envFilePath !== envFilePath) {
       outputChannel.appendLine(
-        `${OutputKey} Env file path changed. Killing server and restarting with new env file path: ${envFilePath}`,
+        `${OutputKey} Env file path changed. Killing server and restarting with new env file path: ${envFilePath}`
       );
       stopVisualizer();
     }
@@ -61,71 +56,80 @@ export async function startVisualizer(
     // if app is already running on the same config path, return the existing app
     if ($app) {
       outputChannel.appendLine(
-        `${OutputKey} Drizzle Visualizer server already running on port ${$port}. Reusing existing server with config path: ${$configPath}`,
+        `${OutputKey} Drizzle Visualizer server already running on port ${$port}. Reusing existing server with config path: ${configPath}`
       );
       return resolve({ port: $port });
     }
 
-    const cwd = await findProjectWorkingDir($configPath);
-    const drizzleEnvs = {
-      DRIZZLE_LAB_CONFIG_PATH: path.relative(cwd, $configPath),
-      DRIZZLE_LAB_SAVE_DIR: ".drizzle",
-      DRIZZLE_LAB_PROJECT_ID: "visualizer",
-      DRIZZLE_LAB_CWD: cwd,
-      DRIZZLE_LAB_DEBUG: "true",
-      PORT: $port,
-      NODE_ENV: "production",
-      TS_CONFIG_PATH: path.join(cwd, "tsconfig.json"),
-      DRIZZLE_LAB_ENV_FILE_PATH: envFilePath,
-    };
+    findProjectWorkingDir(configPath)
+      .then((pwd) => {
+        const drizzleEnvs = {
+          DRIZZLE_LAB_CONFIG_PATH: path.relative(pwd, configPath),
+          DRIZZLE_LAB_SAVE_DIR: ".drizzle",
+          DRIZZLE_LAB_PROJECT_ID: "visualizer",
+          DRIZZLE_LAB_CWD: pwd,
+          DRIZZLE_LAB_DEBUG: "true",
+          PORT: $port,
+          NODE_ENV: "production",
+          TS_CONFIG_PATH: path.join(pwd, "tsconfig.json"),
+          DRIZZLE_LAB_ENV_FILE_PATH: envFilePath || "",
+        };
 
-    $app = spawn(process.execPath, [binPath], {
-      stdio: "pipe",
-      detached: true,
-      shell: false,
-      cwd: appsCwd,
-      env: {
-        ...process.env,
-        ...drizzleEnvs,
-      },
-    });
+        $app = spawn(process.execPath, [binPath], {
+          stdio: "pipe",
+          detached: true,
+          shell: false,
+          cwd: appsCwd,
+          env: {
+            ...process.env,
+            ...drizzleEnvs,
+          },
+        });
 
-    outputChannel.appendLine(
-      `${OutputKey} Started Drizzle Visualizer server with envs:\n${JSON.stringify(drizzleEnvs, null, 2)}`,
-    );
+        if (!$app.pid) {
+          throw new Error("Failed to start Drizzle Visualizer server for unknown reason");
+        }
 
-    $processIds.push($app.pid!);
-    console.debug("processIds registered", $processIds);
+        outputChannel.appendLine(
+          `${OutputKey} Started Drizzle Visualizer server with envs:\n${JSON.stringify(drizzleEnvs, null, 2)}`
+        );
 
-    // output from the server
-    $app.stdout.on("data", (data) => {
-      const output = String(data).trim();
-      outputChannel.appendLine(`${OutputKey} [stdout] ${output}`);
+        $processIds.push($app.pid);
+        console.debug("processIds registered", $processIds);
 
-      if (output && output.includes("Drizzle Visualizer is up and running")) {
-        return resolve({ port: $port! });
-      }
-    });
+        // output from the server
+        $app.stdout.on("data", (data) => {
+          if (!$port) {
+            throw new Error("Server started but port is not defined");
+          }
 
-    // error from the server
-    $app.stderr.on("data", (error) => {
-      outputChannel.appendLine(`${OutputKey} [stderr] ${String(error)}`);
-      reject(error);
-    });
+          const output = String(data).trim();
+          outputChannel.appendLine(`${OutputKey} [stdout] ${output}`);
 
-    $app.on("error", (error) => {
-      console.error(`${OutputKey} process error`, error);
-    });
+          if (output?.includes("Drizzle Visualizer is up and running")) {
+            return resolve({ port: $port });
+          }
+        });
+
+        // error from the server
+        $app.stderr.on("data", (error) => {
+          outputChannel.appendLine(`${OutputKey} [stderr] ${String(error)}`);
+          reject(error);
+        });
+
+        $app.on("error", (error) => {
+          console.error(`${OutputKey} process error`, error);
+        });
+      })
+      .catch(reject);
   });
 }
 
 export function stopVisualizer() {
-  outputChannel.appendLine(
-    `${OutputKey} Stopping Drizzle Visualizer server...`,
-  );
+  outputChannel.appendLine(`${OutputKey} Stopping Drizzle Visualizer server...`);
   console.debug("killable processIds", $processIds);
 
-  $processIds.forEach((pid) => {
+  for (const pid of $processIds) {
     try {
       // On Windows, we need to kill the entire process tree
       if (process.platform === "win32") {
@@ -138,7 +142,7 @@ export function stopVisualizer() {
     } catch (error) {
       outputChannel.appendLine(`${OutputKey} Failed to kill server: ${error}`);
     }
-  });
+  }
 
   $app = undefined;
   $port = undefined;

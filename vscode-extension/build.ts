@@ -1,6 +1,4 @@
 import esbuild from "esbuild";
-import { execSync } from "node:child_process";
-import fs from "node:fs";
 
 const production = process.argv.includes("--production");
 const watch = process.argv.includes("--watch");
@@ -13,12 +11,11 @@ const esbuildProblemMatcherPlugin: esbuild.Plugin = {
       console.log("[watch] build started");
     });
     build.onEnd((result) => {
-      result.errors.forEach(({ text, location }: any) => {
+      for (const { text, location } of result.errors) {
         console.error(`✘ [ERROR] ${text}`);
-        console.error(
-          `    ${location.file}:${location.line}:${location.column}:`,
-        );
-      });
+        console.error(location ? `${location.file}:${location.line}:${location.column}:` : "No location");
+      }
+
       console.log("[watch] build finished");
     });
   },
@@ -26,20 +23,17 @@ const esbuildProblemMatcherPlugin: esbuild.Plugin = {
 
 async function main() {
   // build drizzle-lab
-  console.log("Building drizzle-lab...");
-  execSync("npm run -w drizzle-lab build-all", { cwd: "..", stdio: "inherit" });
+  // console.log("Building drizzle-lab...");
+  // execSync("npm run -w drizzle-lab build-all", { cwd: "..", stdio: "inherit" });
 
-  const visualizerDir = "apps/visualizer";
-  // copy bundled drizzle-lab visualizer to dist
-  if (fs.existsSync(visualizerDir)) {
-    fs.rmSync(visualizerDir, { recursive: true, force: true });
-  }
-  fs.mkdirSync(visualizerDir, { recursive: true });
-  fs.cpSync("../apps/cli/dist/visualizer", visualizerDir, { recursive: true });
-  fs.copyFileSync(
-    "../apps/cli/dist/package.json",
-    `${visualizerDir}/package.json`,
-  );
+  // const visualizerDir = "apps/visualizer";
+  // // copy bundled drizzle-lab visualizer to dist
+  // if (fs.existsSync(visualizerDir)) {
+  //   fs.rmSync(visualizerDir, { recursive: true, force: true });
+  // }
+  // fs.mkdirSync(visualizerDir, { recursive: true });
+  // fs.cpSync("../apps/cli/dist/visualizer", visualizerDir, { recursive: true });
+  // fs.copyFileSync("../apps/cli/dist/package.json", `${visualizerDir}/package.json`);
 
   const ctx = await esbuild.context({
     entryPoints: ["src/extension.ts"],

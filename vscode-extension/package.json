@@ -18,9 +18,7 @@
     "vscode": "^1.93.0",
     "node": ">=22.0.0"
   },
-  "categories": [
-    "Programming Languages"
-  ],
+  "categories": ["Programming Languages"],
   "homepage": "https://github.com/rphlmr/drizzle-lab",
   "repository": {
     "type": "git",
@@ -29,10 +27,7 @@
   "bugs": {
     "url": "https://github.com/rphlmr/drizzle-lab/issues"
   },
-  "activationEvents": [
-    "workspaceContains:**/*drizzle.config.ts",
-    "onLanguage:typescript"
-  ],
+  "activationEvents": ["workspaceContains:**/*drizzle.config.ts", "onLanguage:typescript"],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
@@ -47,9 +42,7 @@
     ],
     "codeLens": [
       {
-        "languages": [
-          "typescript"
-        ]
+        "languages": ["typescript"]
       }
     ],
     "configuration": {
@@ -71,25 +64,25 @@
     "watch:esbuild": "tsx build.ts --watch",
     "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
     "build": "tsx build.ts --production",
-    "check-types": "tsc --noEmit",
-    "lint": "eslint src",
+    "lint": "biome check .",
+    "lint:fix": "biome check --fix .",
+    "typecheck": "tsc --noEmit",
     "publish": "vsce publish",
     "patch:publish": "vsce publish patch",
     "minor:publish": "vsce publish minor"
   },
   "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
     "@types/mocha": "^10.0.9",
     "@types/node": "20.x",
     "@types/vscode": "^1.93.0",
-    "@typescript-eslint/eslint-plugin": "^8.10.0",
-    "@typescript-eslint/parser": "^8.7.0",
     "@vscode/test-cli": "^0.0.10",
     "@vscode/test-electron": "^2.4.1",
+    "drizzle-kit": "^0.30.5",
     "esbuild": "^0.24.0",
-    "eslint": "^9.13.0",
     "npm-run-all": "^4.1.5",
     "tsx": "^4.19.2",
-    "typescript": "^5.6.3"
+    "typescript": "^5.8.2"
   },
   "keywords": [
     "drizzle db",
@@ -108,5 +101,12 @@
     "sql",
     "visualizer",
     "love"
-  ]
+  ],
+  "pnpm": {
+    "onlyBuiltDependencies": ["@biomejs/biome", "esbuild"]
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "jiti": "^2.4.2"
+  }
 }
