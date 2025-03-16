@@ -1,7 +1,7 @@
 {
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
   "files": {
-    "ignore": ["dist", "build", "styles.css"]
+    "ignore": ["dist", "build", "styles.css", ".pnpmfile.cjs"]
   },
   "vcs": {
     "enabled": true,
@@ -26,7 +26,8 @@
       "recommended": true,
       "suspicious": {
         "recommended": true,
-        "noExplicitAny": "off"
+        "noExplicitAny": "off",
+        "useAwait": "error"
       },
       "style": {
         "recommended": true,

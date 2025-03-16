@@ -43,6 +43,7 @@
     "react-dom": "^18.0.0 || ^19.0.0"
   },
   "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
     "@dagrejs/dagre": "^1.1.4",
     "@radix-ui/react-popover": "^1.1.6",
     "@radix-ui/react-separator": "^1.1.2",
@@ -85,6 +86,6 @@
   },
   "packageManager": "pnpm@10.6.3+sha512.bb45e34d50a9a76e858a95837301bfb6bd6d35aea2c5d52094fa497a467c43f5c440103ce2511e9e0a2f89c3d6071baac3358fc68ac6fb75e2ceb3d2736065e6",
   "pnpm": {
-    "onlyBuiltDependencies": ["esbuild"]
+    "onlyBuiltDependencies": ["@biomejs/biome", "esbuild"]
   }
 }

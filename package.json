@@ -1,23 +1,19 @@
 {
   "name": "drizzle-lab-monorepo",
   "private": true,
+  "type": "module",
+  "license": "MIT",
+  "author": "@rphlmr",
+  "homepage": "https://github.com/rphlmr/drizzle-lab#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rphlmr/drizzle-lab.git"
+  },
+  "bugs": {
+    "url": "https://github.com/rphlmr/drizzle-lab/issues"
+  },
   "scripts": {
-    "dev": "TZ=UTC turbo dev --log-prefix=none",
-    "build": "turbo build",
-    "lint": "turbo lint",
-    "clean-node-modules": "rm -rf {node_modules,package-lock.json,pnpm-lock.yaml} **/*/{node_modules,package-lock.json,pnpm-lock.yaml}",
-    "clean-turbo-cache": "rm -rf ./**/.turbo",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "drizzle-lab:release:publish": "npm run -w drizzle-lab release:publish",
-    "drizzle-run:docker:build": "docker build -f apps/drizzle-run/Dockerfile -t drizzle-run .",
-    "drizzle-run:docker:run": "docker run --rm --name drizzle-run -p 3000:3000 --env-file apps/drizzle-run/.env --env-file apps/drizzle-run/.env.supabase drizzle-run",
-    "drizzle-run:start:docker": "run-s drizzle-run:docker:*",
-    "drizzle-run:start:local:prod": "npm run -w drizzle-run start:local:prod",
-    "drizzle-run:start:local": "npm run -w drizzle-run start:local",
-    "drizzle-run:start": "npm run -w drizzle-run start",
-    "prod:drizzle-run:deploy": "fly deploy -c apps/drizzle-run/fly.toml --dockerfile apps/drizzle-run/Dockerfile --ignorefile .dockerignore --remote-only",
-    "package:api:install": "cd packages/api && npm install",
-    "package:visualizer:install": "cd packages/visualizer && npm install"
+    "clean:node-modules": "rm -rf {node_modules,package-lock.json,pnpm-lock.yaml} **/*/{node_modules,package-lock.json,pnpm-lock.yaml}"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4"
@@ -26,5 +22,10 @@
   "engines": {
     "node": ">=22"
   },
-  "prettier": {}
+  "prettier": {},
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@biomejs/biome"
+    ]
+  }
 }
