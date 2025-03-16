@@ -1,16 +1,17 @@
 {
   "compilerOptions": {
-    "target": "ES2021",
-    "useDefineForClassFields": true,
-    "lib": ["ES2021", "DOM", "DOM.Iterable"],
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "types": ["vite/client"],
     "module": "ESNext",
     "skipLibCheck": true,
     "noImplicitAny": false,
 
     "moduleResolution": "bundler",
+    "resolveJsonModule": true,
     "allowImportingTsExtensions": true,
     "isolatedModules": true,
+    "esModuleInterop": true,
     "moduleDetection": "force",
     "noEmit": true,
     "jsx": "react-jsx",
@@ -20,6 +21,7 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
+    "verbatimModuleSyntax": true,
 
     "baseUrl": ".",
     "paths": {
@@ -28,5 +30,5 @@
     }
   },
   "include": ["demo", "src"],
-  "exclude": ["../api/*", "node_modules"]
+  "exclude": ["node_modules"]
 }

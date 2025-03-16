@@ -32,7 +32,7 @@
     "build": "vite build",
     "lint": "biome check .",
     "lint:fix": "biome check --fix .",
-    "typecheck": "tsc -b",
+    "typecheck": "tsc --noEmit",
     "preview": "vite preview",
     "prerelease:publish": "npm version prerelease && npm publish --access=public --tag next",
     "patch:publish": "npm version patch && npm publish --access=public",
@@ -70,6 +70,7 @@
     "tailwind-merge": "^3.0.2",
     "tailwindcss": "^4.0.14",
     "tailwindcss-animate": "^1.0.7",
+    "typescript": "^5.8.2",
     "vite": "^6.2.2",
     "vite-plugin-dts": "^4.5.3",
     "vite-tsconfig-paths": "^5.1.4"
