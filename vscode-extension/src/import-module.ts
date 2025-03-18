@@ -25,7 +25,7 @@ export async function importModule<T>({ path, envFilePath }: { path: string; env
       config({ path: envFilePath });
     }
 
-    logger.info(`${path} | cwd: ${cwd}`);
+    logger.info(`Module: ${path} | cwd: ${cwd}`);
 
     let module = await jiti.import<{ default: { default?: T } & T }>(pathToFileURL(path).href);
 

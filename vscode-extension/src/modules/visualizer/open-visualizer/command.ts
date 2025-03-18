@@ -1,3 +1,4 @@
+import path from "node:path";
 import type { Config } from "drizzle-kit";
 import * as vscode from "vscode";
 
@@ -25,13 +26,10 @@ export async function OpenVisualizer(...args: any[]) {
   logger.info(`Env file path: ${envFilePath || "not provided"}`);
 
   try {
-    const pwd = await findProjectWorkingDir(drizzleConfigPath);
+    const { tsSchema, schemaPaths } = await loadDrizzleTsSchema(drizzleConfigPath, envFilePath);
 
-    logger.info("Loading drizzle config");
-
-    const configModule = await importModule<Config>({ path: drizzleConfigPath, envFilePath }, pwd);
-
-    logger.info(`Drizzle config loaded. Schema path: ${configModule.default.schema}`);
+    console.debug("tsSchema   ", tsSchema);
+    console.debug("schemaPaths", schemaPaths);
 
     // vscode.workspace.findFiles("");
     // const { port } = await startVisualizer(configPath, envFilePath);
@@ -53,4 +51,67 @@ export async function OpenVisualizer(...args: any[]) {
     logger.error(msg);
     return;
   }
+}
+
+async function loadDrizzleTsSchema(drizzleConfigPath: string, envFilePath?: string) {
+  const pwd = await findProjectWorkingDir(drizzleConfigPath);
+
+  logger.info("Loading drizzle config");
+
+  const {
+    default: { schema },
+  } = await importModule<Config>({ path: drizzleConfigPath, envFilePath }, pwd);
+
+  if (!schema) {
+    throw new Error("Drizzle config does not have a schema");
+  }
+
+  const schemaPaths: Array<string> = [];
+
+  if (typeof schema === "string") {
+    schemaPaths.push(schema);
+  } else {
+    schemaPaths.push(...schema);
+  }
+
+  logger.info(`Drizzle config loaded. Schema paths: ${schemaPaths.join(", ")}`);
+
+  const schemaFilePaths = (
+    await Promise.all(
+      schemaPaths.map(async (schemaPath) => {
+        const pattern = path.relative(".", schemaPath);
+        const baseUri = vscode.Uri.file(pwd);
+
+        const filesUris = await vscode.workspace.findFiles({
+          baseUri,
+          pattern,
+          base: baseUri.fsPath,
+        });
+
+        return filesUris.map((u) => u.fsPath);
+      })
+    )
+  ).flat();
+
+  if (schemaFilePaths.length === 0) {
+    throw new Error("No schema files found");
+  }
+
+  logger.info(`Schema files paths: [${schemaFilePaths.join(", ")}]`);
+  logger.info("Loading Drizzle typescript schema");
+
+  const tsSchemas = await Promise.all(
+    schemaFilePaths.map(async (path) => {
+      return await importModule<Config>({ path, envFilePath }, pwd);
+    })
+  );
+
+  const tsSchema = tsSchemas.reduce((acc, schema) => Object.assign(acc, schema), {} as Record<string, unknown>);
+
+  logger.info("Drizzle typescript schema loaded");
+
+  return {
+    tsSchema,
+    schemaPaths,
+  };
 }
