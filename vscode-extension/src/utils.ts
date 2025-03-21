@@ -43,7 +43,17 @@ export function render(children: string) {
   return `
   <!DOCTYPE html>
   <html style="padding: 0; margin: 0; width: 100%; height: 100%;">
+    <script>
+      window.addEventListener("message", (event) => {
+        const message = event.data;
+        console.log(message);
+        if(message.type === "reload") {
+          console.log("reloading...")
+        }
+      });
+    </script>
     <body style="padding: 0; margin: 0; width: 100%; height: 100%;">
+      <h1>Drizzle Visualizer</h1>
       ${children}
     </body>
   </html>`;

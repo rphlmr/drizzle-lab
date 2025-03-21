@@ -10,8 +10,16 @@ import { createDrizzleVisualizerPanel } from "../panel";
 export const OpenVisualizerCommand = "drizzle.visualizer:open";
 const OutputKey = "[Visualizer]";
 const logger = createLogger("visualizer");
+const fileWatchers: Array<{ filePath: string; watcher: vscode.FileSystemWatcher }> = [];
 
 export async function OpenVisualizer(...args: any[]) {
+  for (const w of fileWatchers) {
+    w.watcher.dispose();
+    logger.info(`Disposed file watcher: ${w.filePath}`);
+  }
+
+  fileWatchers.length = 0;
+
   const drizzleConfigPath = args[0];
   const envFilePath = args[1];
 
@@ -26,14 +34,29 @@ export async function OpenVisualizer(...args: any[]) {
   logger.info(`Env file path: ${envFilePath || "not provided"}`);
 
   try {
-    const { tsSchema, schemaPaths } = await loadDrizzleTsSchema(drizzleConfigPath, envFilePath);
+    const { tsSchema, schemaFilePaths } = await loadDrizzleTsSchema(drizzleConfigPath, envFilePath);
 
     console.debug("tsSchema   ", tsSchema);
-    console.debug("schemaPaths", schemaPaths);
+    console.debug("schemaFilePaths", schemaFilePaths);
 
-    // vscode.workspace.findFiles("");
-    // const { port } = await startVisualizer(configPath, envFilePath);
     const panel = createDrizzleVisualizerPanel();
+
+    fileWatchers.push(
+      ...schemaFilePaths.map((filePath) => {
+        const watcher = vscode.workspace.createFileSystemWatcher(filePath);
+
+        watcher.onDidChange(async () => {
+          const { tsSchema, schemaFilePaths } = await loadDrizzleTsSchema(drizzleConfigPath, envFilePath);
+          panel.webview.postMessage({ type: "reload", tsSchema });
+        });
+
+        logger.info(`Watching for changes to the schema file: ${filePath}`);
+
+        return { filePath, watcher };
+      })
+    );
+
+    console.debug("fileWatchers", fileWatchers);
 
     // panel.webview.html = render(`
     // 		<iframe
@@ -112,6 +135,6 @@ async function loadDrizzleTsSchema(drizzleConfigPath: string, envFilePath?: stri
 
   return {
     tsSchema,
-    schemaPaths,
+    schemaFilePaths,
   };
 }
