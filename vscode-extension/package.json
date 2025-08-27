@@ -72,7 +72,6 @@
     "minor:publish": "vsce publish minor"
   },
   "devDependencies": {
-    "@biomejs/biome": "^1.9.4",
     "@types/mocha": "^10.0.9",
     "@types/node": "20.x",
     "@types/react": "^19.0.12",

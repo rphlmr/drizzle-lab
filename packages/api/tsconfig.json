@@ -1,9 +1,28 @@
 {
-  "extends": "../../shared/typescript-config/node-library.json",
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "Node Library",
+  "include": ["**/*.ts", "**/*.node.ts", "**/*.tsx"],
+  "exclude": ["node_modules", "dist"],
   "compilerOptions": {
+    "lib": ["ES2022"],
+    "moduleResolution": "Bundler",
+    "forceConsistentCasingInFileNames": true,
+    "esModuleInterop": true,
     "noImplicitAny": false,
-    "allowImportingTsExtensions": true
-  },
-  "include": ["src/**/*.ts", "../../shared/typescript-config/reset.d.ts"],
-  "exclude": ["node_modules", "dist"]
+    "allowImportingTsExtensions": true,
+    "skipLibCheck": true,
+    "target": "ESNext",
+    "allowJs": true,
+    "resolveJsonModule": true,
+    "moduleDetection": "force",
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+
+    "strict": true,
+    "noUncheckedIndexedAccess": false,
+    "noImplicitOverride": true,
+
+    "module": "ESNext",
+    "noEmit": true
+  }
 }

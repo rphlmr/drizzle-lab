@@ -44,12 +44,6 @@ importers:
       '@arethetypeswrong/cli':
         specifier: ^0.18.2
         version: 0.18.2
-      '@repo/eslint-config':
-        specifier: ../../shared/eslint-config
-        version: link:../../shared/eslint-config
-      '@repo/typescript-config':
-        specifier: ../../shared/typescript-config
-        version: link:../../shared/typescript-config
       '@types/node':
         specifier: ^24.3.0
         version: 24.3.0

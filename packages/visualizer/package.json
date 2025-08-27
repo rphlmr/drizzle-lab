@@ -30,8 +30,8 @@
     "prepublishOnly": "npm pkg delete scripts",
     "dev": "vite",
     "build": "vite build",
-    "lint": "biome check .",
-    "lint:fix": "biome check --fix .",
+    "check": "biome check .",
+    "check:fix": "biome check --fix .",
     "typecheck": "tsc --noEmit",
     "preview": "vite preview",
     "prerelease:publish": "npm version prerelease && npm publish --access=public --tag next",
@@ -43,7 +43,6 @@
     "react-dom": "^18.0.0 || ^19.0.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "^1.9.4",
     "@dagrejs/dagre": "^1.1.4",
     "@radix-ui/react-popover": "^1.1.6",
     "@radix-ui/react-separator": "^1.1.2",

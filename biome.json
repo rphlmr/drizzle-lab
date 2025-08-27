@@ -1,7 +1,7 @@
 {
-  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.2.2/schema.json",
   "files": {
-    "ignore": ["dist", "build", "style.css", ".pnpmfile.cjs", "node_modules"]
+    "includes": ["**", "!**/dist", "!**/build", "!**/style.css", "!**/node_modules"]
   },
   "vcs": {
     "enabled": true,
@@ -16,12 +16,10 @@
     "lineEnding": "lf",
     "lineWidth": 120
   },
-  "organizeImports": {
-    "enabled": true
-  },
+  "assist": { "actions": { "source": { "organizeImports": "on" } } },
   "linter": {
     "enabled": true,
-    "ignore": ["package.json", "apps/drizzle-run/app/registry"],
+    "includes": ["**", "!**/package.json", "!**/apps/drizzle-run/app/registry"],
     "rules": {
       "recommended": true,
       "suspicious": {

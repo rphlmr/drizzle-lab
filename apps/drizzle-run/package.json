@@ -103,7 +103,6 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
-    "@biomejs/biome": "^1.9.4",
     "@drizzle-lab/api": "file:../../packages/api",
     "@drizzle-lab/visualizer": "file:../../packages/visualizer",
     "@flydotio/dockerfile": "^0.7.10",

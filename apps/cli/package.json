@@ -60,7 +60,6 @@
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.15.4",
-    "@biomejs/biome": "^1.8.3",
     "@changesets/cli": "^2.27.7",
     "@remix-run/dev": "^2.14.0",
     "@repo/eslint-config": "*",

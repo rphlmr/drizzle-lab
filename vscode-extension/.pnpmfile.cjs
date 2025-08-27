@@ -1,1 +1,1 @@
-module.exports = require("../.pnpmfile.cjs");
+module.exports = require("../.cjs");
