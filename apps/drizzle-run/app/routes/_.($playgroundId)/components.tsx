@@ -1,5 +1,5 @@
 import { useState } from "react";
-
+import { AnonymousCTA } from "~/components/anonymous-cta";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,8 +24,6 @@ import { Icon } from "~/components/ui/icon";
 import { Input } from "~/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover";
 import { Tooltip, TooltipContent, TooltipTrigger } from "~/components/ui/tooltip";
-
-import { AnonymousCTA } from "~/components/anonymous-cta";
 import type { PlaygroundMetadata } from "~/modules/playground/machine.client";
 
 export function PlaygroundSelector({
@@ -136,8 +134,10 @@ export function PlaygroundSelector({
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction asChild variant="destructive">
-              <Button onClick={onDiscardChanges}>I am sure, discard changes</Button>
+            <AlertDialogAction asChild>
+              <Button onClick={onDiscardChanges} variant="destructive">
+                I am sure, discard changes
+              </Button>
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -157,8 +157,10 @@ export function PlaygroundSelector({
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction asChild variant="destructive">
-              <Button onClick={onDelete}>I am sure, delete this playground</Button>
+            <AlertDialogAction asChild>
+              <Button onClick={onDelete} variant="destructive">
+                I am sure, delete this playground
+              </Button>
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

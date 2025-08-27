@@ -1,3 +1,4 @@
+@import "@xyflow/react/dist/style.css";
 @import "tailwindcss/utilities.css" prefix(dv);
 @import "tailwindcss/theme.css" prefix(dv);
 

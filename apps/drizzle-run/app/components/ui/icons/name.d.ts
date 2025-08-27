@@ -63,5 +63,6 @@
 	| "user-round"
 	| "view"
 	| "wand-sparkles"
-	| "wrench";
+	| "wrench"
+	| "x";
   

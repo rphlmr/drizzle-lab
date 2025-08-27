@@ -12,6 +12,9 @@ export default defineConfig({
   server: {
     host: true,
     port: 3000,
+    fs: {
+      allow: ["/"], // allow to serve files from the monorepo
+    },
   },
   optimizeDeps: {
     exclude: ["@electric-sql/pglite", "@electric-sql/pglite-v1", "@libsql/client-wasm"],

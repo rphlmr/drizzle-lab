@@ -5,12 +5,12 @@
  */
 
 import { relations } from "drizzle-orm";
-import { integer, text, pgTable, timestamp, AnyPgColumn } from "drizzle-orm/pg-core";
+import { type AnyPgColumn, integer, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
-  id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
-  name: text("name").notNull(),
-  createdAt: timestamp("created_at", { precision: 3 }).notNull().defaultNow(),
+  id: integer().primaryKey().generatedByDefaultAsIdentity(),
+  name: text().notNull(),
+  createdAt: timestamp({ precision: 3 }).notNull().defaultNow(),
 });
 
 export const usersRelations = relations(users, ({ many }) => ({
@@ -18,12 +18,12 @@ export const usersRelations = relations(users, ({ many }) => ({
 }));
 
 export const posts = pgTable("posts", {
-  id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
-  content: text("content").notNull(),
-  authorId: integer("author_id")
+  id: integer().primaryKey().generatedByDefaultAsIdentity(),
+  content: text().notNull(),
+  authorId: integer()
     .notNull()
     .references((): AnyPgColumn => users.id),
-  createdAt: timestamp("created_at", { precision: 3 }).notNull().defaultNow(),
+  createdAt: timestamp({ precision: 3 }).notNull().defaultNow(),
 });
 
 export const postsRelations = relations(posts, ({ one }) => ({

@@ -126,7 +126,6 @@ type PlaygroundTools = {
 };
 
 declare global {
-  // eslint-disable-next-line no-var
   var $: PlaygroundTools;
 
   interface Window {

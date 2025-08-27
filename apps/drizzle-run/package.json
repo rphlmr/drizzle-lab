@@ -7,8 +7,9 @@
   "sideEffects": false,
   "scripts": {
     "build": "run-s build:*",
-    "build:remix": "NODE_ENV=production remix vite:build",
+    "build:icons": "icons build -i other/svg-icons -o app/components/ui/icons --optimize",
     "build:registry": "tsx app/registry/build.ts && pnpm run registry:validate:presets",
+    "build:rr": "NODE_ENV=production react-router build --mode build",
     "registry:validate:presets": "vitest run app/registry/presets.test.ts --teardownTimeout=500",
     "dev": "pnpm run build:registry && vite --host --force",
     "start": "NODE_ENV=production node ./build/server/index.js",
@@ -29,11 +30,11 @@
     "start:docker": "run-s docker:*",
     "docker:build": "docker build -t drizzle-run .",
     "docker:run": "docker run -d -p 3000:3000 --env-file .env --env-file .env.supabase drizzle-run",
-    "lint": "eslint --ignore-path ../../.gitignore --cache --cache-location ./node_modules/.cache/eslint .",
-    "typecheck": "tsc",
-    "prebuild": "pnpm run build:icons",
-    "build:icons": "icons build -i other/svg-icons -o app/components/ui/icons --optimize",
-    "add:icon": "sly add"
+    "add:icon": "sly add",
+    "format": "biome format --write",
+    "check": "biome check .",
+    "check:fix": "biome check --fix .",
+    "typecheck": "react-router typegen && tsc"
   },
   "dependencies": {
     "@conform-to/react": "^1.8.2",
@@ -103,6 +104,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
+    "@drizzle-lab/api": "file:../../packages/api",
     "@drizzle-lab/visualizer": "file:../../packages/visualizer",
     "@flydotio/dockerfile": "^0.7.10",
     "@react-router/dev": "^7.8.0",

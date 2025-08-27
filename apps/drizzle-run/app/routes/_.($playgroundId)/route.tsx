@@ -701,6 +701,7 @@ function Play() {
                 defaultPath={defaultFileName}
                 theme="tokyo-night"
                 options={editorOptions}
+                className="**:outline-none!"
                 onChange={(content) => {
                   send({ type: "editor.file.change", content });
                 }}
@@ -721,7 +722,7 @@ function Play() {
               <TabsList>
                 <Tooltip>
                   <TabsTrigger value="output" asChild>
-                    <TooltipTrigger>
+                    <TooltipTrigger className="cursor-pointer">
                       <Icon name="square-terminal" size="md" className={cn("group-data-[state=active]:text-green")} />
                     </TooltipTrigger>
                   </TabsTrigger>
@@ -729,7 +730,7 @@ function Play() {
                 </Tooltip>
                 <Tooltip>
                   <TabsTrigger value="visualizer" asChild>
-                    <TooltipTrigger>
+                    <TooltipTrigger className="cursor-pointer">
                       <Icon name="camera" size="md" className={cn("group-data-[state=active]:text-green")} />
                     </TooltipTrigger>
                   </TabsTrigger>
@@ -886,8 +887,8 @@ function Play() {
             <TabsContent value="visualizer" asChild className="mt-0">
               {snapshot && (
                 <div className="flex flex-col bg-muted/50 rounded-xl h-full">
-                  <DrizzleVisualizer snapshot={snapshot} loading={!isReady} showMiniMap={false} />
-                  <DrizzleVisualizerLegend />
+                  <DrizzleVisualizer snapshot={snapshot} loading={!isReady} showMiniMap={false} theme="dark" />
+                  <DrizzleVisualizerLegend theme="dark" />
                 </div>
               )}
             </TabsContent>

@@ -5,8 +5,8 @@ import { shikiToMonaco } from "@shikijs/monaco";
 import { createSkyInspector } from "@statelyai/inspect";
 import { eq } from "drizzle-orm";
 import type { IDisposable, editor as MonacoEditor } from "monaco-editor";
-import * as prettierEstreePlugin from "prettier/parser-espree";
 import * as typescriptParser from "prettier/parser-typescript";
+import prettierEstreePlugin from "prettier/plugins/estree";
 import * as prettier from "prettier/standalone";
 import {
   type ActorRefFrom,

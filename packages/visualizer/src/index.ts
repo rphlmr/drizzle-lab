@@ -1,6 +1,6 @@
 "use client";
 
-import "./styles.css";
+import "./style.css";
 
 export * from "./visualizer";
 export * from "./legend";

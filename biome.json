@@ -1,7 +1,7 @@
 {
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
   "files": {
-    "ignore": ["dist", "build", "styles.css", ".pnpmfile.cjs", "node_modules"]
+    "ignore": ["dist", "build", "style.css", ".pnpmfile.cjs", "node_modules"]
   },
   "vcs": {
     "enabled": true,
@@ -21,7 +21,7 @@
   },
   "linter": {
     "enabled": true,
-    "ignore": ["package.json"],
+    "ignore": ["package.json", "apps/drizzle-run/app/registry"],
     "rules": {
       "recommended": true,
       "suspicious": {
