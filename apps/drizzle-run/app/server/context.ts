@@ -1,19 +1,14 @@
-import type { HonoServerOptions } from "react-router-hono-server/node";
+import { createGetLoadContext } from "react-router-hono-server/node";
 import { getSession } from "remix-hono/session";
 
 import { AppError } from "~/utils/error";
 
-import {
-  authSessionKey,
-  codeVerifierKey,
-  type FlashData,
-  type SessionData,
-} from "./session";
+import { type FlashData, type SessionData, authSessionKey, codeVerifierKey } from "./session";
 
 /**
  * Declare our loaders and actions context type
  */
-declare module "@remix-run/node" {
+declare module "react-router" {
   interface AppLoadContext {
     /**
      * The app version from the build assets
@@ -60,11 +55,8 @@ declare module "@remix-run/node" {
   }
 }
 
-export const getLoadContext: HonoServerOptions["getLoadContext"] = (
-  c,
-  { build },
-) => {
-  const session = getSession<SessionData, FlashData>(c);
+export const getLoadContext = createGetLoadContext((c, { build }) => {
+  const session = getSession<SessionData, FlashData>(c as any);
 
   return {
     appVersion: build.assets.version,
@@ -109,4 +101,4 @@ export const getLoadContext: HonoServerOptions["getLoadContext"] = (
     },
     errorMessage: session.get("errorMessage") || null,
   };
-};
+});

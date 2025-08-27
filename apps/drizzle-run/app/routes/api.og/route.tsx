@@ -1,22 +1,17 @@
-import {
-  cachified,
-  type CacheEntry,
-  type Cache,
-  totalTtl,
-} from "@epic-web/cachified";
+import { type Cache, type CacheEntry, cachified, totalTtl } from "@epic-web/cachified";
 import { ImageResponse } from "@vercel/og";
 import { LRUCache } from "lru-cache";
-
 import { serverDb } from "~/database/.server/db";
 import type { PlaygroundId } from "~/database/types";
 import { env } from "~/utils/env";
+import type { Route } from "./+types/route";
 
 const lruInstance = new LRUCache<string, CacheEntry>({ max: 1000 });
 const lru: Cache = {
   set(key, value) {
     const ttl = totalTtl(value?.metadata);
     return lruInstance.set(key, value, {
-      ttl: ttl === Infinity ? undefined : ttl,
+      ttl: ttl === Number.POSITIVE_INFINITY ? undefined : ttl,
       start: value?.metadata?.createdTime,
     });
   },
@@ -28,16 +23,11 @@ const lru: Cache = {
   },
 };
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
   const url = new URL(request.url);
   const playgroundId = url.searchParams.get("playgroundId");
   const updatedAt = url.searchParams.get("updatedAt");
-  const origin =
-    (url.searchParams.get("o") as
-      | "visualizer"
-      | "index"
-      | "converter"
-      | "explore") || "index";
+  const origin = (url.searchParams.get("o") as "visualizer" | "index" | "converter" | "explore") || "index";
 
   const [interMedium, interRegular] = await Promise.all([
     cachified({
@@ -85,132 +75,123 @@ export async function loader({ request }: LoaderFunctionArgs) {
                   },
                 },
               },
-              where: (Playground, { eq }) =>
-                eq(Playground.id, playgroundId as PlaygroundId),
+              where: (Playground, { eq }) => eq(Playground.id, playgroundId as PlaygroundId),
             })
             .catch(() => null)
         : null;
 
       let title = playground?.name || "Play with Drizzle";
       title = title.length > 50 ? `${title.slice(0, 50)}...` : title;
-      let description =
-        playground?.description || "Your journey begins here 🚀";
+      let description = playground?.description || "Your journey begins here 🚀";
 
       if (origin === "visualizer") {
-        title = `Visualizer`;
+        title = "Visualizer";
         description = "An other view of your schema";
       }
 
       if (origin === "converter") {
-        title = `Converter`;
+        title = "Converter";
         description = "From Drizzle to SQL and SQL to Drizzle";
       }
 
       if (origin === "explore") {
-        title = `Explore`;
+        title = "Explore";
         description = "Explore all Drizzle playgrounds";
       }
 
       if (description) {
-        description =
-          description.length > 50
-            ? `${description.slice(0, 50)}...`
-            : description;
+        description = description.length > 50 ? `${description.slice(0, 50)}...` : description;
       }
 
       return new ImageResponse(
-        (
+        <div
+          style={{
+            display: "flex",
+            fontSize: 40,
+            fontFamily: "Inter",
+            color: "white",
+            background: "black",
+            width: "100%",
+            height: "100%",
+            padding: "60px",
+            flexDirection: "column",
+          }}
+        >
           <div
             style={{
               display: "flex",
-              fontSize: 40,
-              fontFamily: "Inter",
-              color: "white",
-              background: "black",
-              width: "100%",
-              height: "100%",
-              padding: "60px",
               flexDirection: "column",
+              flex: 1,
+              justifyContent: "center",
+              height: "100%",
             }}
           >
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                flex: 1,
-                justifyContent: "center",
-                height: "100%",
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center" }}>
-                <Drizzle />
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <Drizzle />
+              <span
+                style={{
+                  color: "#C5F74F",
+                  marginLeft: 5,
+                  fontSize: 30,
+                  marginTop: 6,
+                }}
+              >
+                Run
+              </span>
+              {playground?.dialect && (
                 <span
                   style={{
-                    color: "#C5F74F",
+                    color: "darkgray",
                     marginLeft: 5,
                     fontSize: 30,
                     marginTop: 6,
                   }}
                 >
-                  Run
-                </span>
-                {playground?.dialect && (
-                  <span
-                    style={{
-                      color: "darkgray",
-                      marginLeft: 5,
-                      fontSize: 30,
-                      marginTop: 6,
-                    }}
-                  >
-                    • {playground.dialect}
-                  </span>
-                )}
-              </div>
-              <h1
-                style={{
-                  marginTop: 10,
-                  marginBottom: 0,
-                  lineHeight: 1,
-                  fontWeight: 300,
-                }}
-              >
-                {title}
-              </h1>
-              <h2
-                style={{
-                  marginTop: 15,
-                  fontSize: 40,
-                  color: "darkgray",
-                  fontWeight: 300,
-                }}
-              >
-                {description}
-              </h2>
-            </div>
-            <div style={{ display: "flex", alignItems: "center" }}>
-              {playground?.creator?.avatarUrl && (
-                <img
-                  alt="avatar"
-                  style={{
-                    width: 50,
-                    height: 50,
-                    borderRadius: 50,
-                    marginTop: 20,
-                    marginBottom: 20,
-                    marginRight: 10,
-                  }}
-                  src={playground.creator.avatarUrl}
-                />
-              )}
-              {playground?.creator?.username && (
-                <span style={{ color: "darkgray", fontSize: 30 }}>
-                  @{playground?.creator.username}
+                  • {playground.dialect}
                 </span>
               )}
             </div>
+            <h1
+              style={{
+                marginTop: 10,
+                marginBottom: 0,
+                lineHeight: 1,
+                fontWeight: 300,
+              }}
+            >
+              {title}
+            </h1>
+            <h2
+              style={{
+                marginTop: 15,
+                fontSize: 40,
+                color: "darkgray",
+                fontWeight: 300,
+              }}
+            >
+              {description}
+            </h2>
           </div>
-        ),
+          <div style={{ display: "flex", alignItems: "center" }}>
+            {playground?.creator?.avatarUrl && (
+              <img
+                alt="avatar"
+                style={{
+                  width: 50,
+                  height: 50,
+                  borderRadius: 50,
+                  marginTop: 20,
+                  marginBottom: 20,
+                  marginRight: 10,
+                }}
+                src={playground.creator.avatarUrl}
+              />
+            )}
+            {playground?.creator?.username && (
+              <span style={{ color: "darkgray", fontSize: 30 }}>@{playground?.creator.username}</span>
+            )}
+          </div>
+        </div>,
         {
           width: 1200,
           height: 630,
@@ -228,7 +209,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
               style: "normal",
             },
           ],
-        },
+        }
       );
     },
     ttl: updatedAt ? undefined : 1 * 60 * 1000, // 1 minute
@@ -240,6 +221,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 function Drizzle() {
   return (
     <svg viewBox="0 0 202 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <title>Drizzle</title>
       <rect
         width="5.25365"
         height="22.2834"

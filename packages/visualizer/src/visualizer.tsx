@@ -72,7 +72,7 @@ function getSavedNodesPositions(projectId: string) {
 
 type DrizzleSchema = Record<string, unknown>;
 
-function getSnapshot(schema: DrizzleSchema, dialect: "postgresql" | "mysql" | "sqlite" | "turso") {
+export function getSnapshot(schema: DrizzleSchema, dialect: "postgresql" | "mysql" | "sqlite" | "turso") {
   switch (dialect) {
     case "postgresql": {
       return pgSchemaToSnapshot(schema);
@@ -228,7 +228,7 @@ export function DrizzleVisualizer({
           proOptions={{ hideAttribution: true }}
         >
           {loading && (
-            <div className="dv:absolute dv:flex dv:size-full dv:items-center dv:justify-center">loading...</div>
+            <div className="dv:absolute dv:flex dv:justify-center dv:items-center dv:size-full">loading...</div>
           )}
           <Panel position="top-right">
             <div className="dv:flex dv:items-center dv:gap-4">
@@ -283,7 +283,7 @@ export function DrizzleVisualizer({
               zoomable
               bgColor="transparent"
               maskColor="transparent"
-              className="dv:rounded-md dv:border-2 dv:border-muted-foreground/10"
+              className="dv:border-2 dv:border-muted-foreground/10 dv:rounded-md"
               nodeColor={theme === "dark" ? "#ffffff10" : undefined}
             />
           )}
@@ -298,17 +298,17 @@ function TableNode({ data }: NodeProps<TableNodeDefinition>) {
   const hiddenNodeConnector = "dv:h-px! dv:w-px! dv:min-w-0! dv:min-h-0! dv:cursor-grab! dv:border-0! dv:opacity-0!";
 
   return (
-    <div className="dv:flex dv:min-w-64 dv:flex-col dv:divide-y dv:divide-border dv:rounded-lg dv:border-2 dv:border-border dv:bg-background dv:text-foreground dv:shadow-md">
+    <div className="dv:flex dv:flex-col dv:bg-background dv:shadow-md dv:border-2 dv:border-border dv:rounded-lg dv:divide-y dv:divide-border dv:min-w-64 dv:text-foreground">
       <div className="dv:flex dv:p-2 dv:text-base">
         <div className="dv:flex dv:flex-col dv:gap-4">
-          <div className="dv:flex dv:items-center dv:justify-between dv:gap-4 dv:text-base">
+          <div className="dv:flex dv:justify-between dv:items-center dv:gap-4 dv:text-base">
             <div className="relative dv:flex dv:items-center dv:gap-2">
               <SheetIcon className="dv:size-5" />
               <span>{data.schema ? `${data.schema}.${data.name}` : data.name}</span>
             </div>
             {data.provider && (
               <Badge variant="outline" className="dv:items-center dv:gap-2" data-no-print>
-                {!data.isRLSEnabled && <TriangleAlertIcon className="dv:text-orange-400 dv:size-4" />}
+                {!data.isRLSEnabled && <TriangleAlertIcon className="dv:size-4 dv:text-orange-400" />}
                 RLS {data.isRLSEnabled ? "enabled" : "disabled"}
               </Badge>
             )}
@@ -316,53 +316,53 @@ function TableNode({ data }: NodeProps<TableNodeDefinition>) {
           {data.withExplain && data.description && <Description description={data.description} />}
         </div>
       </div>
-      <div className="dv:relative dv:cursor-default dv:divide-y dv:divide-border">
+      <div className="dv:relative dv:divide-y dv:divide-border dv:cursor-default">
         {data.columns.map((column) => {
           return (
             <div key={column.name} className="dv:relative dv:flex dv:flex-col dv:gap-4 dv:p-2 dv:text-sm">
-              <div className="dv:flex dv:w-full dv:items-center dv:justify-between dv:gap-2">
+              <div className="dv:flex dv:justify-between dv:items-center dv:gap-2 dv:w-full">
                 <div className="dv:relative dv:flex dv:items-center dv:gap-2">
-                  {column.isPrimaryKey && <KeyRoundIcon className="dv:text-green dv:size-4" />}
+                  {column.isPrimaryKey && <KeyRoundIcon className="dv:size-4 dv:text-green" />}
                   {column.isForeignKey && (
                     <>
                       <span className="dv:mr-1 dv:size-4" />
                       <Popover data-no-print>
                         <PopoverTrigger asChild>
-                          <Button variant="outline" size="custom" className="dv:absolute dv:-left-1 dv:p-1">
-                            <LinkIcon className="dv:text-green dv:size-4" />
+                          <Button variant="outline" size="custom" className="dv:-left-1 dv:absolute dv:p-1">
+                            <LinkIcon className="dv:size-4 dv:text-green" />
                           </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-fit">
                           <div className="dv:flex dv:gap-2 dv:p-2">
-                            <span className="dv:text-xs dv:text-muted-foreground">on delete:</span>
+                            <span className="dv:text-muted-foreground dv:text-xs">on delete:</span>
                             <span className="dv:text-xs">{column.onDelete}</span>
-                            <span className="dv:text-xs dv:text-muted-foreground">on update:</span>
+                            <span className="dv:text-muted-foreground dv:text-xs">on update:</span>
                             <span className="dv:text-xs">{column.onUpdate}</span>
                           </div>
                         </PopoverContent>
                       </Popover>
                     </>
                   )}
-                  {column.isUnique && <BadgeCheckIcon className="dv:text-secondary-foreground dv:size-4" />}
+                  {column.isUnique && <BadgeCheckIcon className="dv:size-4 dv:text-secondary-foreground" />}
                   <DiamondIcon className={cn("dv:size-4", column.isNotNull && "dv:fill-secondary-foreground")} />
                   {column.name}
                 </div>
-                <span className="dv:px-2 dv:py-1 dv:text-xs dv:text-muted-foreground">
+                <span className="dv:px-2 dv:py-1 dv:text-muted-foreground dv:text-xs">
                   {column.enumValues ? column.enumValues.join(" | ") : column.dataType}
                   {!column.isNotNull && " | null"}
                 </span>
                 {(column.default || column.defaultFn || column.jsonShape) && (
                   <Popover data-no-print>
                     <PopoverTrigger asChild>
-                      <Button variant="outline" size="custom" className="dv:absolute dv:right-1 dv:px-2 dv:py-1">
-                        <span className="dv:text-xs dv:text-muted-foreground">
+                      <Button variant="outline" size="custom" className="dv:right-1 dv:absolute dv:px-2 dv:py-1">
+                        <span className="dv:text-muted-foreground dv:text-xs">
                           {column.enumValues ? column.enumValues.join(" | ") : column.dataType}
                           {!column.isNotNull && " | null"}
                         </span>
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="dv:flex dv:w-fit dv:flex-row dv:items-center dv:gap-2">
-                      <span className="dv:text-xs dv:text-muted-foreground">
+                    <PopoverContent className="dv:flex dv:flex-row dv:items-center dv:gap-2 dv:w-fit">
+                      <span className="dv:text-muted-foreground dv:text-xs">
                         {column.jsonShape ? "shape" : "default"}:
                       </span>
                       <pre
@@ -404,13 +404,13 @@ function TableNode({ data }: NodeProps<TableNodeDefinition>) {
         {data.checks.map((check) => {
           return (
             <div key={check.name} className="dv:relative dv:flex dv:text-sm">
-              <div className="dv:relative dv:flex dv:w-full dv:items-center dv:justify-between dv:gap-2 dv:p-2">
+              <div className="dv:relative dv:flex dv:justify-between dv:items-center dv:gap-2 dv:p-2 dv:w-full">
                 <div className="dv:relative dv:flex dv:items-center dv:gap-2">
                   <span className="dv:mr-1 dv:size-4" />
                   <Popover data-no-print>
                     <PopoverTrigger asChild>
-                      <Button variant="outline" size="custom" className="dv:absolute dv:-left-1 dv:p-1">
-                        <ShieldCheckIcon className="dv:text-green dv:size-4" />
+                      <Button variant="outline" size="custom" className="dv:-left-1 dv:absolute dv:p-1">
+                        <ShieldCheckIcon className="dv:size-4 dv:text-green" />
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="dv:w-fit">
@@ -437,9 +437,9 @@ function TableNode({ data }: NodeProps<TableNodeDefinition>) {
         {data.policies.map((policy) => {
           return (
             <div key={policy.name} className="dv:relative dv:flex dv:text-sm">
-              <div className="dv:flex dv:w-full dv:items-center dv:justify-between dv:gap-2 dv:p-2">
+              <div className="dv:flex dv:justify-between dv:items-center dv:gap-2 dv:p-2 dv:w-full">
                 <div className="dv:flex dv:items-center dv:gap-2">
-                  <LockIcon className="dv:text-green dv:size-4" />
+                  <LockIcon className="dv:size-4 dv:text-green" />
                   {policy.name}
                 </div>
                 <Popover data-no-print>
@@ -450,20 +450,20 @@ function TableNode({ data }: NodeProps<TableNodeDefinition>) {
                   </PopoverTrigger>
                   <PopoverContent className="dv:w-fit">
                     <div className="dv:flex dv:items-center dv:gap-2">
-                      <span className="dv:text-xs dv:text-muted-foreground">as</span>
+                      <span className="dv:text-muted-foreground dv:text-xs">as</span>
                       <span>{policy.as}</span>
                     </div>
                     <div className="dv:flex dv:items-center dv:gap-2">
-                      <span className="dv:text-xs dv:text-muted-foreground">to</span>
+                      <span className="dv:text-muted-foreground dv:text-xs">to</span>
                       <span>{policy.to ? policy.to.join(", ") : "public"}</span>
                     </div>
                     <div className="dv:flex dv:items-center dv:gap-2">
-                      <span className="dv:text-xs dv:text-muted-foreground">for</span>
+                      <span className="dv:text-muted-foreground dv:text-xs">for</span>
                       <span>{policy.for}</span>
                     </div>
                     {policy.using ? (
                       <div className="dv:flex dv:items-center dv:gap-2">
-                        <span className="dv:text-xs dv:text-muted-foreground">using</span>
+                        <span className="dv:text-muted-foreground dv:text-xs">using</span>
                         <pre
                           className="dv:text-sm"
                           dangerouslySetInnerHTML={{
@@ -478,7 +478,7 @@ function TableNode({ data }: NodeProps<TableNodeDefinition>) {
                     ) : null}
                     {policy.withCheck ? (
                       <div className="dv:flex dv:items-center dv:gap-2">
-                        <span className="dv:text-xs dv:text-muted-foreground">with check</span>
+                        <span className="dv:text-muted-foreground dv:text-xs">with check</span>
                         <pre
                           className="dv:text-sm"
                           dangerouslySetInnerHTML={{
@@ -502,13 +502,13 @@ function TableNode({ data }: NodeProps<TableNodeDefinition>) {
         {data.relations.map((relation) => {
           return (
             <div key={relation.fieldName} className="dv:relative dv:flex dv:text-sm">
-              <div className="dv:flex dv:w-full dv:items-center dv:justify-between dv:gap-2 dv:p-2">
+              <div className="dv:flex dv:justify-between dv:items-center dv:gap-2 dv:p-2 dv:w-full">
                 <div className="dv:flex dv:items-center dv:gap-2">
-                  <CableIcon className="dv:text-green dv:size-4" />
+                  <CableIcon className="dv:size-4 dv:text-green" />
                   {relation.fieldName}
-                  <span className="dv:text-xs dv:text-muted-foreground">{relation.type}</span>
+                  <span className="dv:text-muted-foreground dv:text-xs">{relation.type}</span>
                 </div>
-                <span className="dv:flex dv:items-center dv:text-xs dv:text-muted-foreground">
+                <span className="dv:flex dv:items-center dv:text-muted-foreground dv:text-xs">
                   {relation.referencedTableName}
                   {relation.type === "one" ? " | null" : "[]"}
                 </span>
@@ -540,10 +540,10 @@ function ViewNode({ data }: NodeProps<ViewNodeDefinition>) {
 
   return (
     <>
-      <div className="dv:flex dv:min-w-64 dv:flex-col dv:divide-y dv:divide-border dv:rounded-lg dv:border-2 dv:border-border dv:bg-background dv:text-foreground dv:shadow-md">
+      <div className="dv:flex dv:flex-col dv:bg-background dv:shadow-md dv:border-2 dv:border-border dv:rounded-lg dv:divide-y dv:divide-border dv:min-w-64 dv:text-foreground">
         <div className="dv:flex dv:p-2 dv:text-base">
-          <div className="dv:flex dv:w-full dv:flex-col dv:gap-4">
-            <div className="dv:flex dv:items-center dv:justify-between dv:gap-4 dv:text-base">
+          <div className="dv:flex dv:flex-col dv:gap-4 dv:w-full">
+            <div className="dv:flex dv:justify-between dv:items-center dv:gap-4 dv:text-base">
               <div className="dv:relative dv:flex dv:items-center dv:gap-2">
                 <EyeIcon className="dv:size-5" />
                 <span>{data.schema && data.schema !== "public" ? `${data.schema}.${data.name}` : data.name}</span>
@@ -551,14 +551,14 @@ function ViewNode({ data }: NodeProps<ViewNodeDefinition>) {
               <div className="dv:flex dv:items-center dv:gap-2">
                 {data.provider && (
                   <Badge variant="outline" className="dv:items-center dv:gap-2" data-no-print>
-                    {!data.with?.securityInvoker && <TriangleAlertIcon className="dv:text-orange-400 dv:size-4" />}
+                    {!data.with?.securityInvoker && <TriangleAlertIcon className="dv:size-4 dv:text-orange-400" />}
                     RLS {data.with?.securityInvoker ? "enabled" : "disabled"}
                   </Badge>
                 )}
                 {data.definition && (
                   <Popover data-no-print>
                     <PopoverTrigger asChild>
-                      <Button data-no-print variant="ghost" size="sm" className="dv:h-6 dv:border-none">
+                      <Button data-no-print variant="ghost" size="sm" className="dv:border-none dv:h-6">
                         <span>Definition</span>
                       </Button>
                     </PopoverTrigger>
@@ -582,36 +582,36 @@ function ViewNode({ data }: NodeProps<ViewNodeDefinition>) {
             {data.withExplain && data.description && <Description description={data.description} />}
           </div>
         </div>
-        <div className="dv:relative dv:cursor-default dv:divide-y dv:divide-border">
+        <div className="dv:relative dv:divide-y dv:divide-border dv:cursor-default">
           {data.columns.map((column) => {
             return (
               <div key={column.name} className="dv:relative dv:flex dv:flex-col dv:gap-4 dv:p-2 dv:text-sm">
-                <div className="dv:flex dv:w-full dv:items-center dv:justify-between dv:gap-2">
+                <div className="dv:flex dv:justify-between dv:items-center dv:gap-2 dv:w-full">
                   <div className="dv:flex dv:items-center dv:gap-2">
-                    {column.isPrimaryKey && <KeyRoundIcon className="dv:text-green dv:size-4" />}
+                    {column.isPrimaryKey && <KeyRoundIcon className="dv:size-4 dv:text-green" />}
                     {/* {column.isForeignKey && (
                       <Icon name="link" size="sm" className="text-green" />
                     )} */}
-                    {column.isUnique && <BadgeCheckIcon className="dv:text-secondary-foreground dv:size-4" />}
+                    {column.isUnique && <BadgeCheckIcon className="dv:size-4 dv:text-secondary-foreground" />}
                     <DiamondIcon className={cn("dv:size-4", column.isNotNull && "dv:fill-secondary-foreground")} />
                     {column.name}
                   </div>
-                  <span className="dv:px-2 dv:py-1 dv:text-xs dv:text-muted-foreground">
+                  <span className="dv:px-2 dv:py-1 dv:text-muted-foreground dv:text-xs">
                     {column.enumValues ? column.enumValues.join(" | ") : column.dataType}
                     {!column.isNotNull && " | null"}
                   </span>
                   {(column.default || column.defaultFn) && (
                     <Popover data-no-print>
                       <PopoverTrigger asChild>
-                        <Button variant="outline" size="custom" className="dv:absolute dv:right-1 dv:px-2 dv:py-1">
-                          <span className="dv:text-xs dv:text-muted-foreground">
+                        <Button variant="outline" size="custom" className="dv:right-1 dv:absolute dv:px-2 dv:py-1">
+                          <span className="dv:text-muted-foreground dv:text-xs">
                             {column.enumValues ? column.enumValues.join(" | ") : column.dataType}
                             {!column.isNotNull && " | null"}
                           </span>
                         </Button>
                       </PopoverTrigger>
-                      <PopoverContent className="dv:flex dv:w-fit dv:flex-row dv:items-center dv:gap-2">
-                        <span className="dv:text-xs dv:text-muted-foreground">default:</span>
+                      <PopoverContent className="dv:flex dv:flex-row dv:items-center dv:gap-2 dv:w-fit">
+                        <span className="dv:text-muted-foreground dv:text-xs">default:</span>
                         <pre
                           className="dv:text-sm"
                           dangerouslySetInnerHTML={{
@@ -657,8 +657,8 @@ function ViewNode({ data }: NodeProps<ViewNodeDefinition>) {
 
 function Description({ description }: { description: string }) {
   return (
-    <div className="dv:relative dv:flex dv:rounded-md dv:border dv:border-muted/80 dv:px-2 dv:py-0.5 dv:text-foreground/60">
-      <span className="dv:left-1 dv:top-[-0.5rem] dv:flex dv:gap-1 dv:bg-background dv:pr-1">
+    <div className="dv:relative dv:flex dv:px-2 dv:py-0.5 dv:border dv:border-muted/80 dv:rounded-md dv:text-foreground/60">
+      <span className="dv:top-[-0.5rem] dv:left-1 dv:flex dv:gap-1 dv:bg-background dv:pr-1">
         <BookTextIcon className="dv:size-4" />
       </span>
       <span className="dv:flex-wrap dv:text-inherit" style={{ fontSize: "0.6rem" }}>
@@ -717,7 +717,7 @@ function InfoButton() {
             href="https://github.com/rphlmr/drizzle-lab/tree/main/packages/api#extensions"
             target="_blank"
             rel="noopener noreferrer"
-            className="dv:text-sm dv:font-semibold dv:text-blue"
+            className="dv:font-semibold dv:text-blue dv:text-sm"
           >
             Check how
           </a>
@@ -727,12 +727,12 @@ function InfoButton() {
         </div>
         <Separator className="my-2" /> */}
         <div className="dv:flex dv:flex-row dv:items-center dv:gap-1">
-          <span className="dv:text-sm dv:text-muted-foreground">This diagram is powered by </span>
+          <span className="dv:text-muted-foreground dv:text-sm">This diagram is powered by </span>
           <a
             href="https://reactflow.dev/"
             target="_blank"
             rel="noopener noreferrer"
-            className="dv:text-sm dv:font-semibold dv:text-blue"
+            className="dv:font-semibold dv:text-blue dv:text-sm"
           >
             React Flow
           </a>

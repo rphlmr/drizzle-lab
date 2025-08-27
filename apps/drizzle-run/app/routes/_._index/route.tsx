@@ -1,11 +1,11 @@
 import type React from "react";
 
-import { Link, type MetaFunction } from "@remix-run/react";
-import { Badge } from "@repo/ui/components/badge";
-import { buttonVariants } from "@repo/ui/components/button";
-import { Icon } from "@repo/ui/components/icon";
-import { Typography } from "@repo/ui/components/typography";
-import { cn } from "@repo/ui/utils/cn";
+import { Link, type MetaFunction } from "react-router";
+import { Badge } from "~/components/ui/badge";
+import { buttonVariants } from "~/components/ui/button";
+import { Icon } from "~/components/ui/icon";
+import { Typography } from "~/components/ui/typography";
+import { cn } from "~/utils/cn";
 
 import { CatchError } from "~/components/catch-error";
 import { DrizzleLogo } from "~/components/logo";
@@ -68,16 +68,16 @@ export function ErrorBoundary() {
   );
 }
 
-export default function Route() {
+export default function View() {
   const { playgrounds, isAuthenticated } = usePlaygrounds();
 
   return (
     <Layout>
-      <div className="flex w-fit flex-col items-center">
+      <div className="flex flex-col items-center w-fit">
         <div className="flex items-center gap-1">
           <DrizzleLogo className="h-20" />
 
-          <Typography as="span" className="pt-2 text-3xl text-green">
+          <Typography as="span" className="pt-2 text-green text-3xl">
             Run
           </Typography>
         </div>
@@ -87,13 +87,8 @@ export default function Route() {
       </div>
 
       <div className="flex flex-col items-center gap-4">
-        <Typography>
-          Would you like to see what the community has shared?
-        </Typography>
-        <Link
-          to="/explore"
-          className={buttonVariants({ variant: "outline", size: "lg" })}
-        >
+        <Typography>Would you like to see what the community has shared?</Typography>
+        <Link to="/explore" className={buttonVariants({ variant: "outline", size: "lg" })}>
           <Icon name="telescope" size="md">
             Explore shared playgrounds
           </Icon>
@@ -105,7 +100,7 @@ export default function Route() {
       </NewPlaygroundWizard>
 
       {!isAuthenticated && (
-        <div className="flex flex-col items-center justify-center gap-4">
+        <div className="flex flex-col justify-center items-center gap-4">
           <Link
             to={path("/auth/sign-in", {
               [QUERY_KEY.redirectTo]: location.pathname,
@@ -129,10 +124,8 @@ export default function Route() {
 
 function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex h-full flex-col items-center">
-      <div className="flex size-full flex-col items-center justify-center gap-20">
-        {children}
-      </div>
+    <div className="flex flex-col items-center h-full">
+      <div className="flex flex-col justify-center items-center gap-20 size-full">{children}</div>
     </div>
   );
 }
@@ -144,9 +137,7 @@ function RecentPlaygrounds() {
     <>
       <Typography variant="largeText">Recent playgrounds</Typography>
       {playgrounds.length === 0 ? (
-        <Typography variant="mutedText">
-          You don't have any playgrounds yet
-        </Typography>
+        <Typography variant="mutedText">You don't have any playgrounds yet</Typography>
       ) : (
         <div className="flex flex-col gap-2 overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-primary">
           {playgrounds.map((playground) => (
@@ -158,7 +149,7 @@ function RecentPlaygrounds() {
                   variant: "outline",
                   className: "justify-start",
                 }),
-                "w-full shrink-0 gap-2 overflow-hidden px-2",
+                "w-full shrink-0 gap-2 overflow-hidden px-2"
               )}
             >
               <Badge variant="outline">{playground.dialect}</Badge>

@@ -1,17 +1,12 @@
-import { NavLink, Outlet, type MetaFunction } from "@remix-run/react";
-import { Badge } from "@repo/ui/components/badge";
-import { Button, buttonVariants } from "@repo/ui/components/button";
-import { Icon } from "@repo/ui/components/icon";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@repo/ui/components/popover";
-import { Separator } from "@repo/ui/components/separator";
-import { Typography } from "@repo/ui/components/typography";
-import { cn } from "@repo/ui/utils/cn";
-
+import { type MetaFunction, NavLink, Outlet } from "react-router";
 import { Toolbar } from "~/components/toolbar";
+import { Badge } from "~/components/ui/badge";
+import { Button, buttonVariants } from "~/components/ui/button";
+import { Icon } from "~/components/ui/icon";
+import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover";
+import { Separator } from "~/components/ui/separator";
+import { Typography } from "~/components/ui/typography";
+import { cn } from "~/utils/cn";
 import { env } from "~/utils/env";
 import { path } from "~/utils/http";
 import { robot } from "~/utils/robot";
@@ -61,17 +56,17 @@ export const meta: MetaFunction = ({ location }) => {
   ];
 };
 
-export default function Route() {
+export default function View() {
   return (
     <>
       <Toolbar>
         <HowTo />
       </Toolbar>
-      <div className="flex size-full flex-col">
-        <Badge className="mt-2 w-fit self-center bg-amber-950 text-amber-500">
+      <div className="flex flex-col size-full">
+        <Badge className="self-center bg-amber-950 mt-2 w-fit text-amber-500">
           Experimental features. No guarantees it will work or be kept.
         </Badge>
-        <div className="relative flex items-center justify-center gap-2 self-center py-2">
+        <div className="relative flex justify-center items-center self-center gap-2 py-2">
           <NavLink
             to={path("/converter")}
             end
@@ -114,9 +109,7 @@ function HowTo() {
       </PopoverTrigger>
       <PopoverContent>
         <div className="flex flex-col gap-2">
-          <Typography variant="largeText">
-            How to use Drizzle schema converter
-          </Typography>
+          <Typography variant="largeText">How to use Drizzle schema converter</Typography>
           <Typography variant="smallText">
             Write your schema in TypeScript as usual in the editor on the left
           </Typography>
@@ -124,8 +117,8 @@ function HowTo() {
             Imports are required, and so is the export statement for your tables
           </Typography>
           <Typography variant="mutedText">
-            Everything runs in your browser, the schema is only persisted in
-            session storage to prevent loss on unexpected refreshes.
+            Everything runs in your browser, the schema is only persisted in session storage to prevent loss on
+            unexpected refreshes.
           </Typography>
           <Typography variant="smallText" className="text-red">
             SQL to Drizzle does not support MySQL

@@ -75,6 +75,8 @@
     "@biomejs/biome": "^1.9.4",
     "@types/mocha": "^10.0.9",
     "@types/node": "20.x",
+    "@types/react": "^19.0.12",
+    "@types/react-dom": "^19.0.4",
     "@types/vscode": "^1.93.0",
     "@vscode/test-cli": "^0.0.10",
     "@vscode/test-electron": "^2.4.1",
@@ -107,6 +109,8 @@
   },
   "dependencies": {
     "dotenv": "^16.4.7",
-    "jiti": "^2.4.2"
+    "jiti": "^2.4.2",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   }
 }

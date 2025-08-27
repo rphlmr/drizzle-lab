@@ -1,14 +1,9 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@repo/ui/components/dialog";
-import { Label } from "@repo/ui/components/label";
-import { Switch } from "@repo/ui/components/switch";
 import { createStore } from "@xstate/store";
 import { useSelector } from "@xstate/store/react";
 import type { editor as MonacoEditor } from "monaco-editor";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "~/components/ui/dialog";
+import { Label } from "~/components/ui/label";
+import { Switch } from "~/components/ui/switch";
 
 import type { Closable } from "~/utils/use-dialog";
 
@@ -19,7 +14,7 @@ const defaultUserOptions: MonacoEditor.IStandaloneEditorConstructionOptions = {
 const storageKey = "editor-options";
 
 const userOptions = JSON.parse(
-  localStorage.getItem(storageKey) || JSON.stringify(defaultUserOptions),
+  localStorage.getItem(storageKey) || JSON.stringify(defaultUserOptions)
 ) as MonacoEditor.IStandaloneEditorConstructionOptions;
 
 const baseOptions: MonacoEditor.IStandaloneEditorConstructionOptions = {
@@ -52,9 +47,9 @@ const store = createStore({
   context: userOptions,
   // Transitions
   on: {
-    line_numbers_toggle: {
-      lineNumbers: (_, event: { value: "on" | "off" }) => event.value,
-    },
+    line_numbers_toggle: (_, event: { value: "on" | "off" }) => ({
+      lineNumbers: event.value,
+    }),
   },
 });
 

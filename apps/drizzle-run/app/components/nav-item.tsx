@@ -1,11 +1,6 @@
-import { Button } from "@repo/ui/components/button";
-import { Icon } from "@repo/ui/components/icon";
-import type { IconName } from "@repo/ui/components/icon";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@repo/ui/components/tooltip";
+import { Button } from "./ui/button";
+import { Icon, type IconName } from "./ui/icon";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 export function NavItem({
   tooltip,
@@ -19,13 +14,7 @@ export function NavItem({
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="rounded-lg"
-          aria-label={tooltip}
-          onClick={onClick}
-        >
+        <Button variant="ghost" size="icon" className="rounded-lg" aria-label={tooltip} onClick={onClick}>
           <Icon name={icon} size="md" />
         </Button>
       </TooltipTrigger>

@@ -2,6 +2,7 @@ import path from "node:path";
 import type { Config } from "drizzle-kit";
 import * as vscode from "vscode";
 
+import { getSnapshot } from "@drizzle-lab/visualizer";
 import { findProjectWorkingDir } from "../../../context";
 import { importModule } from "../../../import-module";
 import { createLogger, toastError } from "../../../utils";
@@ -9,6 +10,11 @@ import { createDrizzleVisualizerPanel } from "../panel";
 
 export const OpenVisualizerCommand = "drizzle.visualizer:open";
 const OutputKey = "[Visualizer]";
+const extensionCwd = path.dirname(__dirname);
+const extensionUri = vscode.Uri.file(extensionCwd);
+console.log("extensionCwd", extensionCwd);
+console.log("extensionUri", extensionUri);
+console.log("extension __dirname", __dirname);
 const logger = createLogger("visualizer");
 const fileWatchers: Array<{ filePath: string; watcher: vscode.FileSystemWatcher }> = [];
 
@@ -34,7 +40,7 @@ export async function OpenVisualizer(...args: any[]) {
   logger.info(`Env file path: ${envFilePath || "not provided"}`);
 
   try {
-    const { tsSchema, schemaFilePaths } = await loadDrizzleTsSchema(drizzleConfigPath, envFilePath);
+    const { tsSchema, dialect, schemaFilePaths } = await loadDrizzleTsSchema(drizzleConfigPath, envFilePath);
 
     console.debug("tsSchema   ", tsSchema);
     console.debug("schemaFilePaths", schemaFilePaths);
@@ -57,6 +63,22 @@ export async function OpenVisualizer(...args: any[]) {
     );
 
     console.debug("fileWatchers", fileWatchers);
+
+    const viewPath = path.join("dist", "views");
+    const scriptUri = panel.webview.asWebviewUri(vscode.Uri.joinPath(extensionUri, viewPath, "index.js"));
+
+    console.log("scriptUri", scriptUri);
+
+    // @ts-expect-error unhandled for now
+    const snapshot = await getSnapshot(tsSchema, dialect);
+    console.log("snapshot", snapshot);
+
+    panel.webview.html = `
+    <body>
+      <div id="root"></div>
+      <script src="${scriptUri}"></script>
+    </body>
+    `;
 
     // panel.webview.html = render(`
     // 		<iframe
@@ -82,7 +104,7 @@ async function loadDrizzleTsSchema(drizzleConfigPath: string, envFilePath?: stri
   logger.info("Loading drizzle config");
 
   const {
-    default: { schema },
+    default: { schema, dialect },
   } = await importModule<Config>({ path: drizzleConfigPath, envFilePath }, pwd);
 
   if (!schema) {
@@ -135,6 +157,7 @@ async function loadDrizzleTsSchema(drizzleConfigPath: string, envFilePath?: stri
 
   return {
     tsSchema,
+    dialect,
     schemaFilePaths,
   };
 }

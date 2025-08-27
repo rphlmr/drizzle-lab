@@ -12,3 +12,6 @@ container
 .drizzle/
 *.vsix
 *.tgz
+
+# React Router
+**/.react-router/

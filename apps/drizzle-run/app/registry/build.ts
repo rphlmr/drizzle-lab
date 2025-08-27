@@ -6,7 +6,7 @@ import type { PackageJson } from "pkg-types";
 import type { TypeFile } from "~/registry";
 
 const registryRoot = "app/registry";
-const appDir = "../../";
+const appDir = process.cwd();
 const distDir = "dist";
 const manifestFileName = "manifest.json";
 const typesToBundle = [
@@ -28,9 +28,9 @@ await fs.rm(`${registryRoot}/${distDir}`, { recursive: true, force: true });
 // build types
 await fs.mkdir(`${registryRoot}/${distDir}`, { recursive: true });
 const { version } = JSON.parse(
-  await fs.readFile(`${appDir}node_modules/drizzle-orm/package.json`, {
+  await fs.readFile(`${appDir}/node_modules/drizzle-orm/package.json`, {
     encoding: "utf-8",
-  }),
+  })
 ) as PackageJson;
 
 if (!version) {
@@ -45,11 +45,11 @@ await fs.writeFile(
       types: await bundleTypes(appDir),
     },
     null,
-    0,
+    0
   ),
   {
     flag: "w",
-  },
+  }
 );
 
 console.log("Registry built");
@@ -77,10 +77,10 @@ async function bundleTypes(cwd: string) {
                 filePath,
                 content,
               } satisfies TypeFile;
-            }),
+            })
           )
         ).flat();
-      }),
+      })
     )
   )
     .flat()

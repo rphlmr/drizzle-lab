@@ -1,12 +1,12 @@
 import type { PartialConfig } from "@drizzle-lab/api/config/loader.node";
-import { loader, type Monaco } from "@monaco-editor/react";
+import { type Monaco, loader } from "@monaco-editor/react";
 import { createId } from "@paralleldrive/cuid2";
 import { shikiToMonaco } from "@shikijs/monaco";
 import { createSkyInspector } from "@statelyai/inspect";
 import { eq } from "drizzle-orm";
 import type { IDisposable, editor as MonacoEditor } from "monaco-editor";
+import * as prettierEstreePlugin from "prettier/parser-espree";
 import * as typescriptParser from "prettier/parser-typescript";
-import * as prettierEstreePlugin from "prettier/plugins/estree";
 import * as prettier from "prettier/standalone";
 import {
   type ActorRefFrom,
@@ -26,24 +26,19 @@ import { localDb } from "~/database/.client/db";
 import { anonymousCreatorId } from "~/database/shared";
 import type { Playground, PlaygroundId, UserId } from "~/database/types";
 import {
+  type Dialect,
+  type PlaygroundFileName,
+  type PlaygroundFileTree,
+  type TypeFile,
+  type UserPlaygroundFileName,
   getCoreFiles,
   getRegistryManifest,
   playgroundFileNames,
-  type UserPlaygroundFileName,
-  type PlaygroundFileName,
-  type PlaygroundFileTree,
-  type Dialect,
-  type TypeFile,
 } from "~/registry";
 import { PlaygroundTools } from "~/registry/tools";
 import { isQueryLog } from "~/registry/utils/query-logger";
 import { assertNonNull } from "~/utils/assert";
-import {
-  type InvokeFailure,
-  type SenderRef,
-  actorNotProvided,
-  makeInvokeFailure,
-} from "~/utils/machine";
+import { type InvokeFailure, type SenderRef, actorNotProvided, makeInvokeFailure } from "~/utils/machine";
 
 import { highlighter } from "./highlighter";
 
@@ -189,8 +184,8 @@ function triggerDiagnostic(file: EditorFile) {
           },
         },
       ],
-      true,
-    ),
+      true
+    )
   );
 }
 
@@ -217,11 +212,7 @@ function loadFile(fileName: string, content: string) {
     return;
   }
 
-  monaco.editor.createModel(
-    content,
-    "typescript",
-    monaco.Uri.parse(`file:///${fileName}`),
-  );
+  monaco.editor.createModel(content, "typescript", monaco.Uri.parse(`file:///${fileName}`));
 }
 
 type EditorAsset = {
@@ -255,10 +246,7 @@ export const EditorMachine = setup({
         current: UserPlaygroundFileName;
         previous: UserPlaygroundFileName | null;
       };
-      viewStates: Record<
-        UserPlaygroundFileName,
-        MonacoEditor.ICodeEditorViewState | null
-      >;
+      viewStates: Record<UserPlaygroundFileName, MonacoEditor.ICodeEditorViewState | null>;
       setupError: InvokeFailure | null;
       error: InvokeFailure | null;
     },
@@ -293,25 +281,23 @@ export const EditorMachine = setup({
 
       monaco.languages.typescript.typescriptDefaults.setExtraLibs(types);
     }),
-    fetchCoreFiles: fromPromise(
-      async ({ input }: { input: { dialect: Dialect } }) => {
-        const { dialect } = input;
-        editorAsset.coreFiles = await getCoreFiles(dialect);
-      },
-    ),
-    loadPlaygroundFiles: fromPromise(
-      async ({ input }: { input: { fileTree: Playground["content"] } }) => {
-        assertNonNull(editorAsset.coreFiles);
+    fetchCoreFiles: fromPromise(async ({ input }: { input: { dialect: Dialect } }) => {
+      const { dialect } = input;
+      editorAsset.coreFiles = await getCoreFiles(dialect);
+    }),
+    loadPlaygroundFiles: fromPromise(({ input }: { input: { fileTree: Playground["content"] } }) => {
+      assertNonNull(editorAsset.coreFiles);
 
-        const content = { ...editorAsset.coreFiles, ...input.fileTree };
+      const content = { ...editorAsset.coreFiles, ...input.fileTree };
 
-        for (const fileName in content) {
-          loadFile(fileName, content[fileName as keyof typeof content]);
-        }
-      },
-    ),
+      for (const fileName in content) {
+        loadFile(fileName, content[fileName as keyof typeof content]);
+      }
+
+      return Promise.resolve();
+    }),
     openFile: fromPromise(
-      async ({
+      ({
         input,
       }: {
         input: {
@@ -327,12 +313,14 @@ export const EditorMachine = setup({
         editor.setModel(file);
         editor.restoreViewState(viewState);
 
-        return previousTabViewState;
-      },
+        return Promise.resolve(previousTabViewState);
+      }
     ),
-    formatFile: fromPromise(async () => {
+    formatFile: fromPromise(() => {
       const editor = getEditor();
       editor.getAction("editor.action.formatDocument")?.run();
+
+      return Promise.resolve();
     }),
     peekViewWatcher: fromCallback(() => {
       const monaco = getMonacoInstance();
@@ -373,19 +361,14 @@ export const EditorMachine = setup({
         error: null,
       });
     }),
-    setAssetLoaded: enqueueActions(
-      (
-        { context, enqueue },
-        params: { asset: keyof typeof context.assetStatus },
-      ) => {
-        enqueue.assign({
-          assetStatus: {
-            ...context.assetStatus,
-            [params.asset]: "loaded",
-          },
-        });
-      },
-    ),
+    setAssetLoaded: enqueueActions(({ context, enqueue }, params: { asset: keyof typeof context.assetStatus }) => {
+      enqueue.assign({
+        assetStatus: {
+          ...context.assetStatus,
+          [params.asset]: "loaded",
+        },
+      });
+    }),
     openFile: enqueueActions(({ enqueue, event, context }) => {
       assertEvent(event, "editor.file.open");
       enqueue.assign({
@@ -417,8 +400,7 @@ export const EditorMachine = setup({
     }),
   },
   guards: {
-    areAssetsLoaded: ({ context }) =>
-      Object.values(context.assetStatus).every((status) => status === "loaded"),
+    areAssetsLoaded: ({ context }) => Object.values(context.assetStatus).every((status) => status === "loaded"),
     hasSetupError: ({ context }) => context.setupError !== null,
   },
 }).createMachine({
@@ -602,9 +584,7 @@ export const EditorMachine = setup({
                     enqueue.assign({
                       viewStates: {
                         ...context.viewStates,
-                        ...(context.tab.previous
-                          ? { [context.tab.previous]: event.output }
-                          : {}),
+                        ...(context.tab.previous ? { [context.tab.previous]: event.output } : {}),
                       },
                     });
                   }),
@@ -653,12 +633,8 @@ function extractNodeModulesImports(file: string): string[] {
   const excludeList = ["drizzle-orm/logger"];
 
   return [
-    ...new Set(
-      matches
-        .map((match) => match[1])
-        .filter((module) => !excludeList.includes(module)),
-    ),
-  ];
+    ...new Set(matches.map((match) => match[1]).filter((module) => !module || !excludeList.includes(module))),
+  ].filter(Boolean);
 }
 
 function autoDetectDialect(nodeModulesImports: string[]) {
@@ -678,10 +654,7 @@ function autoDetectDialect(nodeModulesImports: string[]) {
 }
 type NodeModules = Record<string, unknown>;
 
-async function fetchNodeModules(
-  nodeModulesImports: string[],
-  dialect = autoDetectDialect(nodeModulesImports),
-) {
+async function fetchNodeModules(nodeModulesImports: string[], dialect = autoDetectDialect(nodeModulesImports)) {
   if (!dialect) {
     throw new Error(`Unsupported dialect ${dialect}`);
   }
@@ -717,10 +690,7 @@ async function fetchNodeModules(
       imports.set("drizzle-orm/pg-core", import("drizzle-orm/pg-core"));
       imports.set("drizzle-orm/pglite", import("drizzle-orm/pglite"));
       imports.set("@electric-sql/pglite", import("@electric-sql/pglite"));
-      imports.set(
-        "@electric-sql/pglite/vector",
-        import("@electric-sql/pglite/vector"),
-      );
+      imports.set("@electric-sql/pglite/vector", import("@electric-sql/pglite/vector"));
       imports.set("drizzle-orm/supabase", import("drizzle-orm/supabase"));
       break;
     }
@@ -736,16 +706,17 @@ async function fetchNodeModules(
     }
   }
 
-  const modules = await Promise.all(
-    [...imports.entries()].map(async ([name, module]) => [name, await module]),
-  );
+  const modules = await Promise.all([...imports.entries()].map(async ([name, module]) => [name, await module]));
 
   return Object.fromEntries(modules) as NodeModules;
 }
 
-function removeEsModuleProperty(content: string): string {
-  const esModuleRegex =
-    /Object\.defineProperty\(exports,\s*"__esModule",\s*\{\s*value:\s*true\s*\}\);/;
+function removeEsModuleProperty(content: string | undefined): string {
+  if (!content) {
+    return "";
+  }
+
+  const esModuleRegex = /Object\.defineProperty\(exports,\s*"__esModule",\s*\{\s*value:\s*true\s*\}\);/;
   return content.replace(esModuleRegex, "").trim();
 }
 
@@ -754,8 +725,7 @@ function makeRequireAsync(content: string): string {
 }
 
 type TsFileName = `${string}.ts`;
-type TsToJS<T extends TsFileName> =
-  `${T extends `${infer Base}.ts` ? Base : never}.js`;
+type TsToJS<T extends TsFileName> = `${T extends `${infer Base}.ts` ? Base : never}.js`;
 
 async function transformTsFile<T extends TsFileName>(fileName: T) {
   const monaco = getMonacoInstance();
@@ -763,7 +733,7 @@ async function transformTsFile<T extends TsFileName>(fileName: T) {
   const file = getFileOrThrow(fileName);
   const client = await worker(file.uri);
   const result = await client.getEmitOutput(file.uri.toString());
-  let content = result.outputFiles[0].text;
+  let content = result.outputFiles[0]?.text;
 
   content = removeEsModuleProperty(content);
   content = makeRequireAsync(content);
@@ -779,11 +749,8 @@ async function getPlaygroundFiles() {
   const allFiles = await Promise.all(
     playgroundFileNames.map(async (fileName) => {
       const file = await transformTsFile(fileName);
-      return [
-        file.fileName,
-        { content: file.content, imports: file.imports },
-      ] as const;
-    }),
+      return [file.fileName, { content: file.content, imports: file.imports }] as const;
+    })
   );
 
   const files = Object.fromEntries(allFiles) as Record<
@@ -809,8 +776,7 @@ const isFileImport = (module: string): module is FileImport => {
   return module.startsWith("./");
 };
 
-type FileToImport<T extends string> =
-  `./${T extends `${infer Base}.${string}` ? Base : never}`;
+type FileToImport<T extends string> = `./${T extends `${infer Base}.${string}` ? Base : never}`;
 
 declare global {
   interface Window {
@@ -818,10 +784,10 @@ declare global {
   }
 }
 
-async function createModuleSystem<
-  T extends JsFileSystem,
-  K extends string = FileToImport<string & keyof T>,
->(files: T, nodeModules: NodeModules) {
+async function createModuleSystem<T extends JsFileSystem, K extends string = FileToImport<string & keyof T>>(
+  files: T,
+  nodeModules: NodeModules
+) {
   const cache: Map<K, unknown> = new Map();
 
   // Initialize a module stack.
@@ -830,10 +796,7 @@ async function createModuleSystem<
     window.moduleStack = [];
   }
 
-  async function $require(
-    module: K,
-    args: Record<string, unknown> = {},
-  ): Promise<unknown> {
+  async function $require(module: K, args: Record<string, unknown> = {}): Promise<unknown> {
     if (cache.has(module)) {
       return cache.get(module);
     }
@@ -863,7 +826,7 @@ async function createModuleSystem<
         return (async function Module() {
           ${content}
         })();
-      `,
+      `
     )((module: K) => $require(module, args), exports, ...Object.values(args));
 
     // Pop the module from the stack after execution
@@ -882,7 +845,7 @@ async function createModuleSystem<
       return (async function run() {
           return await require();
         })();
-      `,
+      `
     )(() => $require(fileName, args)) as Promise<{
       default?: unknown;
       [key: string]: unknown;
@@ -903,22 +866,12 @@ export type SnapshotOutput = {
 };
 
 function isPromise(value: unknown): value is Promise<unknown> {
-  return (
-    value != null &&
-    typeof value === "object" &&
-    "then" in value &&
-    typeof value.then === "function"
-  );
+  return value != null && typeof value === "object" && "then" in value && typeof value.then === "function";
 }
 
-type BaseFileName<T extends string> = T extends `${infer Base}.${string}`
-  ? Base
-  : never;
+type BaseFileName<T extends string> = T extends `${infer Base}.${string}` ? Base : never;
 
-function parseOutputs(
-  fileName: BaseFileName<UserPlaygroundFileName> | undefined,
-  ...outputs: unknown[]
-) {
+function parseOutputs(fileName: BaseFileName<UserPlaygroundFileName> | undefined, ...outputs: unknown[]) {
   if (outputs.length === 0) {
     return [];
   }
@@ -931,7 +884,7 @@ function parseOutputs(
 
       let lang = "typescript";
       let type: SnapshotOutput["type"] = "string";
-      let isDebug: boolean = false;
+      let isDebug = false;
 
       if (isPromise(output)) {
         output = String(output);
@@ -966,7 +919,7 @@ function parseOutputs(
               return "NULL";
             }
             return param.toString();
-          },
+          }
         );
       }
 
@@ -980,13 +933,11 @@ function parseOutputs(
       }
 
       const html = highlighter.codeToHtml(
-        ["string", "error"].includes(type)
-          ? String(output)
-          : JSON.stringify(output, null, 2),
+        ["string", "error"].includes(type) ? String(output) : JSON.stringify(output, null, 2),
         {
           theme: "tokyo-night",
           lang,
-        },
+        }
       );
 
       return {
@@ -1051,9 +1002,7 @@ export const PlaygroundRunnerMachine = setup({
         // intercept console.* calls
         function intercept(...args: unknown[]) {
           // Get the current module from the top of the stack
-          const fileName = window.moduleStack.at(-1)?.slice(2) as
-            | BaseFileName<UserPlaygroundFileName>
-            | undefined;
+          const fileName = window.moduleStack.at(-1)?.slice(2) as BaseFileName<UserPlaygroundFileName> | undefined;
           sender.send({
             type: "playgroundRunner.outputs.push",
             outputs: parseOutputs(fileName, ...args),
@@ -1062,10 +1011,7 @@ export const PlaygroundRunnerMachine = setup({
 
         try {
           const { files, imports } = await getPlaygroundFiles();
-          const run = await createModuleSystem(
-            files,
-            await fetchNodeModules(imports, dialect),
-          );
+          const run = await createModuleSystem(files, await fetchNodeModules(imports, dialect));
 
           const runArgs = {
             $: PlaygroundTools,
@@ -1085,7 +1031,7 @@ export const PlaygroundRunnerMachine = setup({
         } catch (cause) {
           intercept(cause);
         }
-      },
+      }
     ),
   },
   actions: {
@@ -1110,10 +1056,7 @@ export const PlaygroundRunnerMachine = setup({
     }),
     updateHistory: enqueueActions(({ context, enqueue }) => {
       enqueue.assign({
-        history:
-          context.outputs.length > 0
-            ? [context.outputs, ...context.history]
-            : [],
+        history: context.outputs.length > 0 ? [context.outputs, ...context.history] : [],
       });
     }),
     clearOutputs: enqueueActions(({ enqueue }) => {
@@ -1226,10 +1169,7 @@ export async function extractSchema() {
   try {
     const { files } = await getPlaygroundFiles();
     const schemaFile = files["schema.js"];
-    const run = await createModuleSystem(
-      { "schema.js": schemaFile },
-      await fetchNodeModules(schemaFile.imports),
-    );
+    const run = await createModuleSystem({ "schema.js": schemaFile }, await fetchNodeModules(schemaFile.imports));
     const dialect = autoDetectDialect(schemaFile.imports);
 
     if (!dialect) {
@@ -1270,10 +1210,7 @@ export async function schemaToSql() {
   try {
     const { files } = await getPlaygroundFiles();
     const schemaFile = files["schema.js"];
-    const run = await createModuleSystem(
-      { "schema.js": schemaFile },
-      await fetchNodeModules(schemaFile.imports),
-    );
+    const run = await createModuleSystem({ "schema.js": schemaFile }, await fetchNodeModules(schemaFile.imports));
     const dialect = autoDetectDialect(schemaFile.imports);
 
     if (!dialect) {
@@ -1344,62 +1281,60 @@ export async function sqlToSchema(sqlDump: string, dialect: Dialect) {
 const appShortcuts = ["d", "f", "1", "2", "3", "4"] as const;
 type AppShortcut = (typeof appShortcuts)[number];
 
-const shortcutWatcher = fromCallback(
-  ({ sendBack }: { sendBack: (event: PlaygroundEvent) => void }) => {
-    const handler = (e: KeyboardEvent) => {
-      const meta = e.ctrlKey || e.metaKey;
-      const shift = e.shiftKey;
-      const alt = e.altKey;
-      const key = e.key.toLowerCase();
+const shortcutWatcher = fromCallback(({ sendBack }: { sendBack: (event: PlaygroundEvent) => void }) => {
+  const handler = (e: KeyboardEvent) => {
+    const meta = e.ctrlKey || e.metaKey;
+    const shift = e.shiftKey;
+    const alt = e.altKey;
+    const key = e.key.toLowerCase();
 
-      if (!meta) {
-        return;
+    if (!meta) {
+      return;
+    }
+
+    if (appShortcuts.includes(key)) {
+      e.preventDefault(); // Prevent the browser from capturing the shortcut
+    }
+
+    switch (key as AppShortcut) {
+      case "d": {
+        if (shift) {
+          sendBack({ type: "run" });
+        }
+
+        break;
       }
-
-      if (appShortcuts.includes(key)) {
-        e.preventDefault(); // Prevent the browser from capturing the shortcut
+      case "f": {
+        if (alt) {
+          sendBack({ type: "editor.file.format" });
+        }
+        break;
       }
-
-      switch (key as AppShortcut) {
-        case "d": {
-          if (shift) {
-            sendBack({ type: "run" });
-          }
-
-          break;
-        }
-        case "f": {
-          if (alt) {
-            sendBack({ type: "editor.file.format" });
-          }
-          break;
-        }
-        case "1": {
-          sendBack({ type: "editor.file.open", fileName: "index.ts" });
-          break;
-        }
-        case "2": {
-          sendBack({ type: "editor.file.open", fileName: "schema.ts" });
-          break;
-        }
-        case "3": {
-          sendBack({ type: "editor.file.open", fileName: "utils.ts" });
-          break;
-        }
-        case "4": {
-          sendBack({ type: "editor.file.open", fileName: "seed.ts" });
-          break;
-        }
+      case "1": {
+        sendBack({ type: "editor.file.open", fileName: "index.ts" });
+        break;
       }
-    };
+      case "2": {
+        sendBack({ type: "editor.file.open", fileName: "schema.ts" });
+        break;
+      }
+      case "3": {
+        sendBack({ type: "editor.file.open", fileName: "utils.ts" });
+        break;
+      }
+      case "4": {
+        sendBack({ type: "editor.file.open", fileName: "seed.ts" });
+        break;
+      }
+    }
+  };
 
-    document.addEventListener("keydown", handler);
+  document.addEventListener("keydown", handler);
 
-    return () => {
-      document.removeEventListener("keydown", handler);
-    };
-  },
-);
+  return () => {
+    document.removeEventListener("keydown", handler);
+  };
+});
 
 /* -------------------------------------------------------------------------- */
 /*                                 Playground;                                */
@@ -1428,46 +1363,34 @@ type PlaygroundEvent =
   | { type: "localSave.save" }
   | { type: "localSave.discard"; serverPlayground: Playground }
   | EditorEvent
-  | ExtractEvent<
-      PlaygroundRunnerEvent,
-      "playgroundRunner.outputs.history.load"
-    >;
+  | ExtractEvent<PlaygroundRunnerEvent, "playgroundRunner.outputs.history.load">;
 
 const serviceId = {
   editor: "editor",
   playgroundRunner: "playgroundRunner",
 } as const;
 
-const enableRemoteSync = fromPromise<
-  NonNullable<Playground["creatorId"]>,
-  Playground
->(async () => {
+const enableRemoteSync = fromPromise<NonNullable<Playground["creatorId"]>, Playground>(() => {
   throw actorNotProvided();
 });
 export type EnableRemoteSyncActor = typeof enableRemoteSync;
 
-const disableRemoteSync = fromPromise<void>(async () => {
+const disableRemoteSync = fromPromise<void>(() => {
   throw actorNotProvided();
 });
 export type DisableRemoteSyncActor = typeof disableRemoteSync;
 
-const pushRemoteChanges = fromPromise<void, Playground>(async () => {
+const pushRemoteChanges = fromPromise<void, Playground>(() => {
   throw actorNotProvided();
 });
 export type PushRemoteChangesActor = typeof pushRemoteChanges;
 
-const forkPlayground = fromPromise<
-  void,
-  { playground: Playground; userId: UserId }
->(async () => {
+const forkPlayground = fromPromise<void, { playground: Playground; userId: UserId }>(() => {
   throw actorNotProvided();
 });
 export type ForkPlaygroundActor = typeof forkPlayground;
 
-const deletePlayground = fromPromise<
-  void,
-  { playgroundId: PlaygroundId; isRemotelySynced: boolean }
->(async () => {
+const deletePlayground = fromPromise<void, { playgroundId: PlaygroundId; isRemotelySynced: boolean }>(() => {
   throw actorNotProvided();
 });
 export type DeletePlaygroundActor = typeof deletePlayground;
@@ -1510,19 +1433,17 @@ const PlaygroundMachine = setup({
     pushRemoteChanges,
     forkPlayground,
     deletePlayground,
-    discardChanges: fromPromise(
-      async ({ input }: { input: { playground: Playground } }) => {
-        const { playground } = input;
+    discardChanges: fromPromise(async ({ input }: { input: { playground: Playground } }) => {
+      const { playground } = input;
 
-        await localDb
-          .update(localDb.schema.playground)
-          .set(playground)
-          .where(eq(localDb.schema.playground.id, playground.id));
+      await localDb
+        .update(localDb.schema.playground)
+        .set(playground)
+        .where(eq(localDb.schema.playground.id, playground.id));
 
-        const { content, ...metadata } = playground;
-        return { content, metadata };
-      },
-    ),
+      const { content, ...metadata } = playground;
+      return { content, metadata };
+    }),
     savePlayground: fromPromise(
       async ({
         input,
@@ -1531,7 +1452,7 @@ const PlaygroundMachine = setup({
       }) => {
         const { playground, overwrite } = input;
 
-        const [result] = await localDb
+        const results = await localDb
           .insert(localDb.schema.playground)
           .values(playground)
           .onConflictDoUpdate({
@@ -1543,8 +1464,10 @@ const PlaygroundMachine = setup({
           })
           .returning();
 
+        const result = results.at(0)!;
+
         return result;
-      },
+      }
     ),
   },
   actions: {
@@ -1588,17 +1511,15 @@ const PlaygroundMachine = setup({
         },
       });
     }),
-    setPlaygroundCreatorId: enqueueActions(
-      ({ context, enqueue }, params: Playground["creatorId"]) => {
-        enqueue.assign({
-          metadata: {
-            ...context.metadata,
-            // Since a playground can be created anonymously before being logged in, we need to update the creatorId
-            creatorId: params,
-          },
-        });
-      },
-    ),
+    setPlaygroundCreatorId: enqueueActions(({ context, enqueue }, params: Playground["creatorId"]) => {
+      enqueue.assign({
+        metadata: {
+          ...context.metadata,
+          // Since a playground can be created anonymously before being logged in, we need to update the creatorId
+          creatorId: params,
+        },
+      });
+    }),
     setRemoteSynced: enqueueActions(({ context, enqueue }) => {
       enqueue.assign({
         remoteSync: {
@@ -1633,26 +1554,21 @@ const PlaygroundMachine = setup({
         },
       });
     }),
-    setMetadata: enqueueActions(
-      ({ context, enqueue }, params: Partial<PlaygroundMetadata>) => {
-        enqueue.assign({
-          metadata: {
-            ...context.metadata,
-            ...params,
-          },
-        });
-      },
-    ),
+    setMetadata: enqueueActions(({ context, enqueue }, params: Partial<PlaygroundMetadata>) => {
+      enqueue.assign({
+        metadata: {
+          ...context.metadata,
+          ...params,
+        },
+      });
+    }),
     runPlayground: enqueueActions(({ enqueue, context }) => {
       enqueue.sendTo(context.module.playgroundRunner, {
         type: "playgroundRunner.command.play",
       });
     }),
     init: enqueueActions(({ context, enqueue }) => {
-      if (
-        context.remoteSync.enabled &&
-        context.remoteSync.status === "synced"
-      ) {
+      if (context.remoteSync.enabled && context.remoteSync.status === "synced") {
         enqueue.raise({ type: "localSave.overwrite" });
       }
     }),
@@ -1662,7 +1578,7 @@ const PlaygroundMachine = setup({
         params: {
           content: Playground["content"];
           metadata: PlaygroundMetadata;
-        },
+        }
       ) => {
         const { content, metadata } = params;
         enqueue.stopChild(serviceId.editor);
@@ -1683,20 +1599,18 @@ const PlaygroundMachine = setup({
             }),
           },
         }));
-      },
+      }
     ),
   },
   guards: {
     isCurrentUserPlayground: ({ context }) =>
-      context.metadata.creatorId === context.currentUserId ||
-      context.metadata.creatorId === anonymousCreatorId,
+      context.metadata.creatorId === context.currentUserId || context.metadata.creatorId === anonymousCreatorId,
   },
 }).createMachine({
   /** @xstate-layout N4IgpgJg5mDOIC5QAcA2BDAnlATgewFcA7CAOgHUwAjAAgGM8iAXdASyLBwGJJWm8cpAGatUYUnQAW6IjADaABgC6iFHlh9WjVSAAeiAOwAmACykTJgKxGDATgAcANkcnbjowBoQmRPYCMfqQGfvaWBsYAzH6WJo5+AL7xXmhYuIQkFNT0jCzsnFwA7tQAwjlsHIIAVIoqSCDI6pradfoIBi6kRpYR9uH+fqYKEV4+bdGdjjF+btZhEQaJyRjY+MRklLQMzOX5KZg1Og0aTFpEOq3hCuZ+dkZR0RGOBsPeiHH2pP53EbauJvZGPyORb1ZZpNakACiED4Ah4MP4VQOdSOTTOLUMQ1I01s0UsCgGTiBI0QfgUWJuNwsAx6lkcERBe3BGQAMng6OhUDRYOgAG5gLiodmcgDKfPEeH5OAKOD4YGRamOp3Ohk8rwQJmepEsoXssXaRlxJgUwKSoNSq1Zwq5PP58NhghEYgk0lk8uUh0aJ2aoAuatGNginSGClsDh69JMRkZYMtZDZHJt4tIABVZVAYDhueKuLpYCwmOJ0EJCzgABT4hQASi4TLjpATnOz-NT6czzfdtUVaJVCCelk+RgUXRHuL8ERMJIQNjMBiG48s4fCdwWZrr6Xj1o7pDFvPYUC4EEY4nYvLwAGtxLawAAFWMbhX1L3KjEIAKWQJdckRE22CIRIxHHsKcjFMUhyXJKkdSHHoYwtDcGy3a8dz5fceBwfBBBSJghAEABbUhrzveC1kfVFvXRX1SWiT9Kx-Rw-wAoCpwnMxjXcIFnnJFwLDglYEMbJMWwAeSlGVNFkQ9j1IU8LyvcViP40iPRRZ8fT0aiP06Ojf3-QDgPVbpAiiO5eh-AwrAYvjmU3RNt1EzhxJOSTOEw0hsNwnACKI+9lK7J8lXU1p31o79dKYgzRhMeZPkXH8hxCdoFGeaz6wAMQEc9SAASQgMQuE888yLUyiNLfOdtQg8dbAMIl-gMKc-GND5kvsUMP3pGr6VShCMpwLLcvy3hEWEURxCkGR5BU7sKN7G4rkrAkflquJ6saiIwm1WrkpNJx-zpHqIT6rLjrQo8OBkogz0vYRMsUmzisC0qLjpT4NocXbgn-SLSUeQIwn8Xaok1R5DoyY7SFOlyMIEdyMBw-Dbv6+640entX1Asx7AcaxNQsgECQa9UBg6AZXGSrqTGmMGyAAJTAPC8ELblMCIOgcrygUcAZpmwBFVn2cYNHZtfbojAmOkbFsQE8dsECINICcelDR5DW6EwadIenGeZ2ABY5-LuZ1vn9bwIQhGFl8qIQborhVriozCHVHEaukWtqgJnAJJw3E17XeZZtmDa5nnC35oPkAIWBJEtoLEDDYyngCAYFBiH5J2JgEzEmZ53BsL9sb90OwED9nISIdAqFQM7pNkm6wArquwH9sOBdj57EE1MxLBiIDscBKIwkalbzD1R4w0XWwDrXXyMhbku9aD8vK+r6G3I8xGG5X5vi-Duh297LvtV7+x+-HaIidGRLbFIP8DDF5wHGMewi+N0vSAAEVYHkq5ri66-EDCH+Yh557wPq+I+PdYin2lufIexN3hbX8FTCmH4hivwDovdmX9gFoVcrDDeXlSBAO3qAtu00Aro2tpAk+Z9B6X1JM4Rw4Ftp-kAkBe+GDdb6xvFHSQf8TxXTku5Ph89iiuhgLAcB1sE6KyTgEIcadfjD3CNiMIXRcY2CGKuJYJE57F3frw6OeCYZYXhp5Aikdo5iIkXAaRZUwziznD+XEtVLKgUapMZh99Qy1RiG4UCq4zREDwBAOAhxZ4QE9E9XsABaUwU54kaxnno9YWQti5AqNEqhZVT7gQCMYIEoYnD4ksFOX42dgjBDcLEQEPdNbQgdNkkW1smpXCps1MkbUXAu2JuOZhZNT6TFpBozWgkOzNKtmVBJxNHiVXJEOVwdgPzRhSUpK0dlkKDTAJMuOb5HgfBgnU38TD-SIHmFcZ4M4p72H2t1NZNlEKbOTGmVgGZOATNUjEiBi5zCOFDE1OkdgQhlPVF+YMJlgjXKiAyB59ZxnIV3PuXZHcED9FihfEyChT5+BAviCFAwoUWT-OOMZSFkwOWlLKZyUAUW9nRaETFKccVTisAtXUvcalPFsJrY6dKMYZyvjcZh7hXABAJHEZwyTdHrLIBDbZ-LrbGEaoaNi7R-gAQCG4YwvLMqQ0ysir5OTWhRgGZLCpvxWoMP2WBVqu1Fwfh6C-OFvU9XHUgIqhxvyow1RcaED8oKr7vUVkYQG+Jbk7WdTKx589S6etaDMq+-wFoe2mC4IENwuEL31gqo1LSyrGAHM4H4thsUdXmGc8qqjap3Bqti+kvQs3v2Xr-WQ8bDAGG1D8Yc8xcSnysNa6YMVgin0giafGqzo31ljVgz+38V6GpmlMv0niNq3xNICAkIQfhNtnUY-hba83LtJHccW3a0GhkBHcYeAFSA5wAhtYFF9EiJCAA */
   id: "playground",
   context: ({ input, spawn }) => {
-    const { remoteSyncEnabled, remoteSyncState, playground, currentUserId } =
-      input;
+    const { remoteSyncEnabled, remoteSyncState, playground, currentUserId } = input;
     const { content, ...metadata } = playground;
     return {
       module: {

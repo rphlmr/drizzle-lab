@@ -1,5 +1,5 @@
-import { Separator } from "@repo/ui/components/separator";
 import { createPortal } from "react-dom";
+import { Separator } from "./ui/separator";
 
 const id = "toolbar";
 
@@ -15,7 +15,7 @@ export function Toolbar({ children }: { children: React.ReactNode }) {
       {children}
       <Separator orientation="vertical" className="mx-2 h-6" />
     </>,
-    outlet,
+    outlet
   );
 }
 

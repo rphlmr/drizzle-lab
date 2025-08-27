@@ -1,18 +1,27 @@
 {
   "compilerOptions": {
-    "module": "Node16",
     "target": "ES2022",
-    "outDir": "dist",
-    "lib": ["ES2022"],
-    "sourceMap": true,
-    "rootDir": ".",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
     "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "moduleDetection": "force",
+    "verbatimModuleSyntax": true,
+    "noEmit": true,
+    "outDir": "dist",
+    "jsx": "react-jsx",
+    "sourceMap": true,
     "strict": true /* enable all strict type-checking options */,
-    "resolveJsonModule": true
-    /* Additional Checks */
-    // "noImplicitReturns": true, /* Report error when not all code paths in function return a value. */
-    // "noFallthroughCasesInSwitch": true, /* Report errors for fallthrough cases in switch statement. */
-    // "noUnusedParameters": true,  /* Report errors on unused parameters. */
+    "resolveJsonModule": true,
+
+    "baseUrl": ".",
+    "paths": {
+      "@drizzle-lab/visualizer": ["../packages/visualizer/dist"]
+    }
   },
-  "include": ["src", "build.ts", "visualizer"]
+  "include": ["./src", "build.ts"],
+  "exclude": ["node_modules", "dist"]
 }

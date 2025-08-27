@@ -28,9 +28,9 @@ ___
 1. Start Supabase locally with `supabase start` and wait until it's done.
 2. Create a `.env` file with the required variables by running `cp .env.example .env`. It already contains all the required environment variables and their values.
    * NB: `DATABASE_URL_MIGRATE`, on production, it should point to the port `5432` of your db instance.
-3. `npm install`
+3. `pnpm install`
 4. `cd apps/drizzle-run`
-5. Apply Drizzle migrations `npm run db:server:migration:deploy`
-6. Run `npm run dev` to start the development server
+5. Apply Drizzle migrations `pnpm run db:server:migration:deploy`
+6. Run `pnpm run dev` to start the development server
 
-It's a npm workspace monorepo, everything is linked together so if you make changes to `packages/*`, they will be reflected in the app.
+It's a pnpm workspace monorepo, everything is linked together so if you make changes to `packages/*`, they will be reflected in the app.

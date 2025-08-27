@@ -1,18 +1,17 @@
-import { redirect } from "@remix-run/node";
-import type { MetaFunction } from "@remix-run/react";
-
+import { type MetaFunction, redirect } from "react-router";
 import { robot } from "~/utils/robot";
+import type { Route } from "./+types/route";
 
 export const meta: MetaFunction = () => {
   return robot.private;
 };
 
-export async function action({ context }: ActionFunctionArgs) {
+export function action({ context }: Route.ActionArgs) {
   context.destroyAuthSession();
 
   throw redirect("/");
 }
 
-export default function SignOut() {
+export default function View() {
   return null;
 }

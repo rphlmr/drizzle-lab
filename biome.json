@@ -27,7 +27,8 @@
       "suspicious": {
         "recommended": true,
         "noExplicitAny": "off",
-        "useAwait": "error"
+        "useAwait": "error",
+        "noArrayIndexKey": "off"
       },
       "style": {
         "recommended": true,
@@ -39,7 +40,8 @@
         "recommended": true,
         "noForEach": "warn",
         "useLiteralKeys": "warn",
-        "noUselessCatch": "warn"
+        "noUselessCatch": "warn",
+        "noBannedTypes": "warn"
       },
       "security": {
         "recommended": true,

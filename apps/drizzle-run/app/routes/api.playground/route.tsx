@@ -1,35 +1,28 @@
+import { getInputProps } from "@conform-to/react";
 import type React from "react";
 import { useMemo, useState } from "react";
-
-import { getInputProps } from "@conform-to/react";
-import { type ClientActionFunctionArgs, useFetcher } from "@remix-run/react";
-import { Button } from "@repo/ui/components/button";
-import { Input } from "@repo/ui/components/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@repo/ui/components/select";
-import { Separator } from "@repo/ui/components/separator";
-import { ToggleGroup, ToggleGroupItem } from "@repo/ui/components/toggle-group";
-import { Typography } from "@repo/ui/components/typography";
-import { cn } from "@repo/ui/utils/cn";
+import { useFetcher } from "react-router";
 import { z } from "zod";
-
 import { Form, useForm } from "~/components/form";
+import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
+import { Separator } from "~/components/ui/separator";
+import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group";
+import { Typography } from "~/components/ui/typography";
 import { localDb } from "~/database/.client/db";
 import {
-  asDialect,
   type Dialect,
   DialectSchema,
+  type PresetManifest,
+  asDialect,
   getPresetFiles,
   getPresetsManifest,
-  type PresetManifest,
 } from "~/registry";
+import { cn } from "~/utils/cn";
 import { AppError, handleError } from "~/utils/error";
-import { clientRedirect, error, parsePayload } from "~/utils/http";
+import { clientRedirect, failure, parsePayload } from "~/utils/http";
+import type { Route } from "./+types/route";
 
 const actionType = {
   newPlayground: "new-playground",
@@ -49,13 +42,13 @@ const NewPlaygroundSchema = z.object({
 
 const Schema = z.discriminatedUnion("actionType", [NewPlaygroundSchema]);
 
-export async function clientAction({ request }: ClientActionFunctionArgs) {
+export async function clientAction({ request }: Route.ClientActionArgs) {
   try {
     const payload = parsePayload(await request.formData(), Schema);
 
     switch (payload.actionType) {
       case "new-playground": {
-        const [{ id }] = await localDb
+        const results = await localDb
           .insert(localDb.schema.playground)
           .values({
             dialect: payload.dialect,
@@ -63,6 +56,8 @@ export async function clientAction({ request }: ClientActionFunctionArgs) {
             content: await getPresetFiles(payload.dialect, payload.presetId),
           })
           .returning({ id: localDb.schema.playground.id });
+
+        const { id } = results.at(0)!;
 
         throw clientRedirect(`/${id}`);
       }
@@ -77,7 +72,7 @@ export async function clientAction({ request }: ClientActionFunctionArgs) {
     }
   } catch (cause) {
     const reason = handleError(cause);
-    return error(reason);
+    return failure(reason);
   }
 }
 
@@ -93,17 +88,12 @@ export function NewPlaygroundWizard(props: NewPlaygroundWizardProps) {
   const preset = manifest[dialect].find((preset) => preset.id === presetId);
 
   return (
-    <div
-      className={cn("flex size-full max-h-80 overflow-hidden", props.className)}
-    >
+    <div className={cn("flex max-h-80 size-full overflow-hidden", props.className)}>
       <WizardContent>
         <div className="flex flex-col gap-4">
           <Typography variant="largeText">Start</Typography>
 
-          <Select
-            defaultValue={dialect}
-            onValueChange={(dialect: Dialect) => setDialect(dialect)}
-          >
+          <Select defaultValue={dialect} onValueChange={(dialect: Dialect) => setDialect(dialect)}>
             <SelectTrigger>
               <SelectValue placeholder="Select a dialect" />
             </SelectTrigger>
@@ -117,18 +107,9 @@ export function NewPlaygroundWizard(props: NewPlaygroundWizardProps) {
             </SelectContent>
           </Select>
           <Typography variant="smallText">Presets</Typography>
-          <ToggleGroup
-            type="single"
-            className="flex flex-col gap-2"
-            onValueChange={(preset) => setPresetId(preset)}
-          >
+          <ToggleGroup type="single" className="flex flex-col gap-2" onValueChange={(preset) => setPresetId(preset)}>
             {manifest[dialect].map((preset) => (
-              <ToggleGroupItem
-                key={preset.id}
-                value={preset.id}
-                variant="outline"
-                className="w-full justify-start"
-              >
+              <ToggleGroupItem key={preset.id} value={preset.id} variant="outline" className="justify-start w-full">
                 <Typography variant="smallText" className="truncate">
                   {preset.name}
                 </Typography>
@@ -140,11 +121,7 @@ export function NewPlaygroundWizard(props: NewPlaygroundWizardProps) {
       <Separator orientation="vertical" className="mx-4" />
       <WizardContent>
         {preset ? (
-          <NewPlaygroundForm
-            key={preset.id}
-            preset={preset}
-            dialect={dialect}
-          />
+          <NewPlaygroundForm key={preset.id} preset={preset} dialect={dialect} />
         ) : (
           props.children || <NoPresetSelected />
         )}
@@ -159,7 +136,7 @@ interface NewPlaygroundFormProps {
 }
 
 function NewPlaygroundForm({ preset, dialect }: NewPlaygroundFormProps) {
-  const fetcher = useFetcher<typeof clientAction>();
+  const fetcher = useFetcher<Route.ComponentProps["actionData"]>();
   const [form, fields] = useForm({
     lastResult: fetcher.data,
     schema: NewPlaygroundSchema,
@@ -172,7 +149,7 @@ function NewPlaygroundForm({ preset, dialect }: NewPlaygroundFormProps) {
   });
 
   return (
-    <div className="flex w-full flex-1 flex-col gap-4">
+    <div className="flex flex-col flex-1 gap-4 w-full">
       <Typography variant="largeText">{preset.name}</Typography>
       <Typography variant="smallText">{preset.description}</Typography>
       <Form
@@ -193,14 +170,12 @@ function NewPlaygroundForm({ preset, dialect }: NewPlaygroundFormProps) {
           })}
           placeholder="Playground name"
         />
-        <Button className="w-fit self-end" size="sm" type="submit">
+        <Button className="self-end w-fit" size="sm" type="submit">
           Create
         </Button>
       </Form>
       <div className="flex flex-col gap-1">
-        <Typography variant="mutedText">
-          Do not put any sensitive data in your playground
-        </Typography>
+        <Typography variant="mutedText">Do not put any sensitive data in your playground</Typography>
         <Typography variant="mutedText">All playgrounds are public</Typography>
       </div>
     </div>
@@ -209,10 +184,8 @@ function NewPlaygroundForm({ preset, dialect }: NewPlaygroundFormProps) {
 
 function NoPresetSelected() {
   return (
-    <div className="flex size-full flex-1 flex-col items-center justify-center">
-      <Typography variant="largeText">
-        👈 Select a preset to continue
-      </Typography>
+    <div className="flex flex-col flex-1 justify-center items-center size-full">
+      <Typography variant="largeText">👈 Select a preset to continue</Typography>
     </div>
   );
 }
@@ -224,14 +197,5 @@ function WizardContent({
   children: React.ReactNode;
   className?: string;
 }) {
-  return (
-    <div
-      className={cn(
-        "flex w-full flex-1 flex-col gap-4 overflow-hidden px-4",
-        className,
-      )}
-    >
-      {children}
-    </div>
-  );
+  return <div className={cn("flex flex-col flex-1 gap-4 px-4 w-full overflow-hidden", className)}>{children}</div>;
 }

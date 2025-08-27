@@ -10,28 +10,20 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@repo/ui/components/alert-dialog";
-import { Badge } from "@repo/ui/components/badge";
-import { Button } from "@repo/ui/components/button";
+} from "~/components/ui/alert-dialog";
+import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@repo/ui/components/dropdown-menu";
-import { Icon } from "@repo/ui/components/icon";
-import { Input } from "@repo/ui/components/input";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@repo/ui/components/popover";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@repo/ui/components/tooltip";
+} from "~/components/ui/dropdown-menu";
+import { Icon } from "~/components/ui/icon";
+import { Input } from "~/components/ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover";
+import { Tooltip, TooltipContent, TooltipTrigger } from "~/components/ui/tooltip";
 
 import { AnonymousCTA } from "~/components/anonymous-cta";
 import type { PlaygroundMetadata } from "~/modules/playground/machine.client";
@@ -59,7 +51,7 @@ export function PlaygroundSelector({
     <AlertDialog>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" className="w-fit max-w-[260px] gap-2 px-2">
+          <Button variant="outline" className="gap-2 px-2 w-fit max-w-[260px]">
             <Badge variant="outline">{metadata.dialect}</Badge>
             <span className="truncate">{metadata.name}</span>
           </Button>
@@ -72,11 +64,7 @@ export function PlaygroundSelector({
                 setType("edit");
               }}
             >
-              <Icon
-                name="file-pen-line"
-                size="md"
-                className="mr-2 text-center"
-              />
+              <Icon name="file-pen-line" size="md" className="mr-2 text-center" />
               <span>Edit</span>
             </DropdownMenuItem>
           </AlertDialogTrigger>
@@ -91,11 +79,7 @@ export function PlaygroundSelector({
                 setType("discard");
               }}
             >
-              <Icon
-                name="list-restart"
-                size="md"
-                className="mr-2 text-center"
-              />
+              <Icon name="list-restart" size="md" className="mr-2 text-center" />
               <span>Discard changes</span>
             </DropdownMenuItem>
           </AlertDialogTrigger>
@@ -118,18 +102,14 @@ export function PlaygroundSelector({
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogDescription className="text-foreground">
-              <Input
-                placeholder="Playground name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
+              <Input placeholder="Playground name" value={name} onChange={(e) => setName(e.target.value)} />
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction asChild>
               <Button
-                className="w-fit self-end"
+                className="self-end w-fit"
                 size="sm"
                 type="submit"
                 onClick={() => {
@@ -151,16 +131,13 @@ export function PlaygroundSelector({
               </Icon>
             </AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. All changes will be reverted to the
-              last saved server version.
+              This action cannot be undone. All changes will be reverted to the last saved server version.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction asChild variant="destructive">
-              <Button onClick={onDiscardChanges}>
-                I am sure, discard changes
-              </Button>
+              <Button onClick={onDiscardChanges}>I am sure, discard changes</Button>
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -174,16 +151,14 @@ export function PlaygroundSelector({
               </Icon>
             </AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This playground will no longer be
-              accessible by you or others you have shared it with.
+              This action cannot be undone. This playground will no longer be accessible by you or others you have
+              shared it with.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction asChild variant="destructive">
-              <Button onClick={onDelete}>
-                I am sure, delete this playground
-              </Button>
+              <Button onClick={onDelete}>I am sure, delete this playground</Button>
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

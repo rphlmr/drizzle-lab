@@ -43,20 +43,20 @@ const random = {
    * Generates a random string of lorem ipsum words
    * @param wordCount The number of words to generate (default: 5)
    */
-  lorem(wordCount: number = 5): string {
+  lorem(wordCount = 5): string {
     return Array.from({ length: wordCount }, () => loremWords[Math.floor(Math.random() * loremWords.length)]).join(" ");
   },
   /**
    * Generates a random first name
    */
   firstName(): string {
-    return firstNames[Math.floor(Math.random() * firstNames.length)];
+    return firstNames[Math.floor(Math.random() * firstNames.length)] || "John";
   },
   /**
    * Generates a random last name
    */
   lastName(): string {
-    return lastNames[Math.floor(Math.random() * lastNames.length)];
+    return lastNames[Math.floor(Math.random() * lastNames.length)] || "Doe";
   },
   /**
    * Generates a random full name

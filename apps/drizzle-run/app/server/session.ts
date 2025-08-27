@@ -1,5 +1,4 @@
-import { createCookieSessionStorage } from "@remix-run/node";
-
+import { createCookieSessionStorage } from "react-router";
 import type { AuthSession } from "~/modules/auth/service.server";
 import { env } from "~/utils/env";
 
