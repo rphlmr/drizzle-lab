@@ -39,6 +39,8 @@
   "dependencies": {
     "@conform-to/react": "^1.8.2",
     "@conform-to/zod": "^1.8.2",
+    "@drizzle-lab/api": "workspace:*",
+    "@drizzle-lab/visualizer": "workspace:*",
     "@electric-sql/pglite": "^0.3.7",
     "@electric-sql/pglite-v1": "npm:@electric-sql/pglite@0.1.5",
     "@epic-web/cachified": "^5.6.0",
@@ -103,8 +105,6 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
-    "@drizzle-lab/api": "file:../../packages/api",
-    "@drizzle-lab/visualizer": "file:../../packages/visualizer",
     "@flydotio/dockerfile": "^0.7.10",
     "@react-router/dev": "^7.8.0",
     "@shikijs/monaco": "^3.9.2",
@@ -130,8 +130,5 @@
   },
   "engines": {
     "node": ">=22.0.0"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": ["@drizzle-lab/visualizer", "core-js", "esbuild", "workerd"]
   }
 }

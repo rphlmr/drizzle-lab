@@ -13,7 +13,9 @@
   "bugs": {
     "url": "https://github.com/rphlmr/drizzle-lab/issues"
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsup --config tsup.config.ts",
     "postbuild": "pnpm run check-exports",
@@ -189,19 +191,58 @@
   },
   "typesVersions": {
     "*": {
-      "config/node": ["./dist/config/index.node.d.ts", "./dist/config/index.node.d.cts"],
-      "extensions": ["./dist/extensions/index.d.ts", "./dist/extensions/index.d.cts"],
-      "pg": ["./dist/pg/index.d.ts", "./dist/pg/index.d.cts"],
-      "pg/node": ["./dist/pg/index.node.d.ts", "./dist/pg/index.node.d.cts"],
-      "pg/web": ["./dist/pg/index.web.d.ts", "./dist/pg/index.web.d.cts"],
-      "sqlite": ["./dist/sqlite/index.d.ts", "./dist/sqlite/index.d.cts"],
-      "sqlite/node": ["./dist/sqlite/index.node.d.ts", "./dist/sqlite/index.node.d.cts"],
-      "sqlite/web": ["./dist/sqlite/index.web.d.ts", "./dist/sqlite/index.web.d.cts"],
-      "mysql": ["./dist/mysql/index.d.ts", "./dist/mysql/index.d.cts"],
-      "mysql/node": ["./dist/mysql/index.node.d.ts", "./dist/mysql/index.node.d.cts"],
-      "mysql/web": ["./dist/mysql/index.web.d.ts", "./dist/mysql/index.web.d.cts"],
-      "relations": ["./dist/relations/index.d.ts", "./dist/relations/index.d.cts"],
-      "sql": ["./dist/sql/index.d.ts", "./dist/sql/index.d.cts"]
+      "config/node": [
+        "./dist/config/index.node.d.ts",
+        "./dist/config/index.node.d.cts"
+      ],
+      "extensions": [
+        "./dist/extensions/index.d.ts",
+        "./dist/extensions/index.d.cts"
+      ],
+      "pg": [
+        "./dist/pg/index.d.ts",
+        "./dist/pg/index.d.cts"
+      ],
+      "pg/node": [
+        "./dist/pg/index.node.d.ts",
+        "./dist/pg/index.node.d.cts"
+      ],
+      "pg/web": [
+        "./dist/pg/index.web.d.ts",
+        "./dist/pg/index.web.d.cts"
+      ],
+      "sqlite": [
+        "./dist/sqlite/index.d.ts",
+        "./dist/sqlite/index.d.cts"
+      ],
+      "sqlite/node": [
+        "./dist/sqlite/index.node.d.ts",
+        "./dist/sqlite/index.node.d.cts"
+      ],
+      "sqlite/web": [
+        "./dist/sqlite/index.web.d.ts",
+        "./dist/sqlite/index.web.d.cts"
+      ],
+      "mysql": [
+        "./dist/mysql/index.d.ts",
+        "./dist/mysql/index.d.cts"
+      ],
+      "mysql/node": [
+        "./dist/mysql/index.node.d.ts",
+        "./dist/mysql/index.node.d.cts"
+      ],
+      "mysql/web": [
+        "./dist/mysql/index.web.d.ts",
+        "./dist/mysql/index.web.d.cts"
+      ],
+      "relations": [
+        "./dist/relations/index.d.ts",
+        "./dist/relations/index.d.cts"
+      ],
+      "sql": [
+        "./dist/sql/index.d.ts",
+        "./dist/sql/index.d.cts"
+      ]
     }
   },
   "dependencies": {
@@ -224,10 +265,5 @@
     "drizzle-kit": ">=0.26",
     "drizzle-orm": ">=0.36",
     "mysql2": ">=3.0.0"
-  },
-  "prettier": {},
-  "pnpm": {
-    "onlyBuiltDependencies": ["esbuild"]
-  },
-  "packageManager": "pnpm@10.6.5+sha512.cdf928fca20832cd59ec53826492b7dc25dc524d4370b6b4adbf65803d32efaa6c1c88147c0ae4e8d579a6c9eec715757b50d4fa35eea179d868eada4ed043af"
+  }
 }

@@ -13,7 +13,7 @@
     "url": "https://github.com/rphlmr/drizzle-lab/issues"
   },
   "scripts": {
-    "clean:node-modules": "rm -rf {node_modules,package-lock.json,pnpm-lock.yaml} **/*/{node_modules,package-lock.json,pnpm-lock.yaml}",
+    "clear:all": "rm -rf node_modules pnpm-lock.yaml .turbo && find . \\( -name 'node_modules' -o -name 'pnpm-lock.yaml' -o -name '.turbo' -o -name 'build' -o -name 'dist' \\) -print0 | xargs -0 rm -rf --",
     "drizzle-run:docker:build": "docker build -f apps/drizzle-run/Dockerfile -t drizzle-run ."
   },
   "devDependencies": {
@@ -23,8 +23,11 @@
   "engines": {
     "node": ">=22"
   },
-  "prettier": {},
   "pnpm": {
-    "onlyBuiltDependencies": ["@biomejs/biome"]
+    "onlyBuiltDependencies": [
+      "@biomejs/biome",
+      "@tailwindcss/oxide",
+      "esbuild"
+    ]
   }
 }

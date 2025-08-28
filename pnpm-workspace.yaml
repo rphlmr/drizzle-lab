@@ -1,0 +1,4 @@
+packages:
+  - "apps/drizzle-run"
+  - "packages/*"
+  - "vscode-extension"

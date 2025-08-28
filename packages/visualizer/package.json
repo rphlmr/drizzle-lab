@@ -23,11 +23,10 @@
     },
     "./style.css": "./dist/style.css"
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "pnpm:devPreinstall": "node scripts/preinstall.mjs",
-    "postinstall": "patch-package",
-    "prepublishOnly": "npm pkg delete scripts",
     "dev": "vite",
     "build": "vite build",
     "check": "biome check .",
@@ -39,6 +38,7 @@
     "minor:publish": "npm version minor && npm publish --access=public"
   },
   "dependencies": {
+    "@drizzle-lab/api": "workspace:*",
     "react": "^18.0.0 || ^19.0.0",
     "react-dom": "^18.0.0 || ^19.0.0"
   },
@@ -82,9 +82,5 @@
   },
   "engines": {
     "node": ">=22.0.0"
-  },
-  "packageManager": "pnpm@10.6.5+sha512.cdf928fca20832cd59ec53826492b7dc25dc524d4370b6b4adbf65803d32efaa6c1c88147c0ae4e8d579a6c9eec715757b50d4fa35eea179d868eada4ed043af",
-  "pnpm": {
-    "onlyBuiltDependencies": ["@biomejs/biome", "esbuild"]
   }
 }
