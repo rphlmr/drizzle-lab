@@ -1,10 +1,40 @@
+// In your React component file
+
+import { DrizzleVisualizer } from "@drizzle-lab/visualizer";
+import "@drizzle-lab/visualizer/style.css";
+import React from "react";
 import { createRoot } from "react-dom/client";
 
-const container = document.getElementById("root");
-
-if (!container) {
-  throw new Error("Root container missing in index.html");
+declare global {
+	interface Window {
+		vscode: any;
+		initialData: {
+			snapshot: any;
+		};
+	}
 }
 
-const root = createRoot(container);
-root.render(<div>Hello, world!</div>);
+function App() {
+	const [data, setData] = React.useState(window.initialData);
+
+	React.useEffect(() => {
+		const handleMessage = (event: MessageEvent) => {
+			const message = event.data;
+			if (message.type === "reload") {
+				setData((prev) => ({
+					...prev,
+					snapshot: message.snapshot,
+				}));
+			}
+		};
+
+		window.addEventListener("message", handleMessage);
+		return () => window.removeEventListener("message", handleMessage);
+	}, []);
+
+	return <DrizzleVisualizer snapshot={data.snapshot} />;
+}
+
+const container = document.getElementById("root");
+const root = createRoot(container!);
+root.render(<App />);

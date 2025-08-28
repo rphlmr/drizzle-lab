@@ -6,130 +6,156 @@ import { findProjectWorkingDir, getWorkspaceRootFolder } from "../../context";
 import { outputChannel } from "../../utils";
 
 /* Local state */
-let $app: ChildProcessWithoutNullStreams | undefined = undefined;
+let $app: ChildProcessWithoutNullStreams | undefined;
 let $processIds: number[] = [];
-let $configPath: string | undefined = undefined;
-let $envFilePath: string | undefined = undefined;
+let $configPath: string | undefined;
+let $envFilePath: string | undefined;
 
 /* Constants */
 const OutputKey = "[Studio]";
 
 export async function startStudio(configPath: string, envFilePath?: string) {
-  return new Promise<void>((resolve, reject) => {
-    // if config path has changed, restart the server
-    if ($configPath && $configPath !== configPath) {
-      outputChannel.appendLine(
-        `${OutputKey} Config path changed. Killing server and restarting with new config path: ${configPath}`
-      );
-      stopStudio();
-    }
+	return new Promise<void>((resolve, reject) => {
+		// if config path has changed, restart the server
+		if ($configPath && $configPath !== configPath) {
+			outputChannel.appendLine(
+				`${OutputKey} Config path changed. Killing server and restarting with new config path: ${configPath}`,
+			);
+			stopStudio();
+		}
 
-    $configPath = configPath;
+		$configPath = configPath;
 
-    // if env path has changed, restart the server
-    if ($envFilePath !== envFilePath) {
-      outputChannel.appendLine(
-        `${OutputKey} Env file path changed. Killing server and restarting with new env file path: ${envFilePath}`
-      );
-      stopStudio();
-    }
+		// if env path has changed, restart the server
+		if ($envFilePath !== envFilePath) {
+			outputChannel.appendLine(
+				`${OutputKey} Env file path changed. Killing server and restarting with new env file path: ${envFilePath}`,
+			);
+			stopStudio();
+		}
 
-    $envFilePath = envFilePath;
+		$envFilePath = envFilePath;
 
-    // if app is already running on the same config path, return the existing app
-    if ($app) {
-      outputChannel.appendLine(
-        `${OutputKey} Drizzle Studio server already running. Reusing existing server with config path: ${configPath}`
-      );
-      return resolve();
-    }
+		// if app is already running on the same config path, return the existing app
+		if ($app) {
+			outputChannel.appendLine(
+				`${OutputKey} Drizzle Studio server already running. Reusing existing server with config path: ${configPath}`,
+			);
+			return resolve();
+		}
 
-    const envFileArg = envFilePath ? ["--env-file", envFilePath] : [];
+		const envFileArg = envFilePath ? ["--env-file", envFilePath] : [];
 
-    outputChannel.appendLine(`${OutputKey} Using env file: ${envFilePath ? envFilePath : "none"}`);
+		outputChannel.appendLine(
+			`${OutputKey} Using env file: ${envFilePath ? envFilePath : "none"}`,
+		);
 
-    const drizzleKitPath = findDrizzleKitPath(configPath);
+		const drizzleKitPath = findDrizzleKitPath(configPath);
 
-    if (!drizzleKitPath) {
-      return reject(new Error(`${OutputKey} Drizzle Kit not found. Please install it first.`));
-    }
+		if (!drizzleKitPath) {
+			return reject(
+				new Error(
+					`${OutputKey} Drizzle Kit not found. Please install it first.`,
+				),
+			);
+		}
 
-    outputChannel.appendLine(`${OutputKey} Drizzle Kit found at: ${drizzleKitPath}`);
+		outputChannel.appendLine(
+			`${OutputKey} Drizzle Kit found at: ${drizzleKitPath}`,
+		);
 
-    findProjectWorkingDir(configPath)
-      .then((cwd) => {
-        $app = spawn(process.execPath, [...envFileArg, drizzleKitPath, "studio", "--config", configPath, "--verbose"], {
-          stdio: "pipe",
-          detached: true,
-          shell: false,
-          cwd,
-          env: {
-            ...process.env,
-            NODE_ENV: "production",
-          },
-        });
+		findProjectWorkingDir(configPath)
+			.then((cwd) => {
+				$app = spawn(
+					process.execPath,
+					[
+						...envFileArg,
+						drizzleKitPath,
+						"studio",
+						"--config",
+						configPath,
+						"--verbose",
+					],
+					{
+						stdio: "pipe",
+						detached: true,
+						shell: false,
+						cwd,
+						env: {
+							...process.env,
+							NODE_ENV: "production",
+						},
+					},
+				);
 
-        if (!$app.pid) {
-          throw new Error("Failed to start Drizzle Studio server for unknown reason");
-        }
+				if (!$app.pid) {
+					throw new Error(
+						"Failed to start Drizzle Studio server for unknown reason",
+					);
+				}
 
-        $processIds.push($app.pid);
-        console.debug("processIds registered", $processIds);
+				$processIds.push($app.pid);
+				console.debug("processIds registered", $processIds);
 
-        // output from the server
-        $app.stdout.on("data", (data) => {
-          const output = String(data).trim();
-          outputChannel.appendLine(`${OutputKey} [stdout] ${output}`);
-          return resolve();
-        });
+				// output from the server
+				$app.stdout.on("data", (data) => {
+					const output = String(data).trim();
+					outputChannel.appendLine(`${OutputKey} [stdout] ${output}`);
+					return resolve();
+				});
 
-        // error from the server
-        $app.stderr.on("data", (error) => {
-          outputChannel.appendLine(`${OutputKey} [stderr] ${String(error)}`);
-          reject(error);
-        });
+				// error from the server
+				$app.stderr.on("data", (error) => {
+					outputChannel.appendLine(`${OutputKey} [stderr] ${String(error)}`);
+					reject(error);
+				});
 
-        $app.on("error", (error) => {
-          console.error(`${OutputKey} process error`, error);
-        });
-      })
-      .catch(reject);
-  });
+				$app.on("error", (error) => {
+					console.error(`${OutputKey} process error`, error);
+				});
+			})
+			.catch(reject);
+	});
 }
 
 export function stopStudio() {
-  outputChannel.appendLine(`${OutputKey} Stopping Drizzle Studio server...`);
-  console.debug("killable processIds", $processIds);
+	outputChannel.appendLine(`${OutputKey} Stopping Drizzle Studio server...`);
+	console.debug("killable processIds", $processIds);
 
-  for (const pid of $processIds) {
-    try {
-      // On Windows, we need to kill the entire process tree
-      if (process.platform === "win32") {
-        spawn("taskkill", ["/pid", pid.toString(), "/F", "/T"]);
-      } else {
-        console.debug("Killing process", pid);
-        // On Unix-like systems, negative pid kills the process group
-        process.kill(-pid, "SIGINT");
-      }
-    } catch (error) {
-      outputChannel.appendLine(`${OutputKey} Failed to kill server: ${error}`);
-    }
-  }
+	for (const pid of $processIds) {
+		try {
+			// On Windows, we need to kill the entire process tree
+			if (process.platform === "win32") {
+				spawn("taskkill", ["/pid", pid.toString(), "/F", "/T"]);
+			} else {
+				console.debug("Killing process", pid);
+				// On Unix-like systems, negative pid kills the process group
+				process.kill(-pid, "SIGINT");
+			}
+		} catch (error) {
+			outputChannel.appendLine(`${OutputKey} Failed to kill server: ${error}`);
+		}
+	}
 
-  $app = undefined;
-  $processIds = [];
+	$app = undefined;
+	$processIds = [];
 
-  outputChannel.appendLine(`${OutputKey} Drizzle Studio stopped`);
+	outputChannel.appendLine(`${OutputKey} Drizzle Studio stopped`);
 }
 
 export function findDrizzleKitPath(configPath: string) {
-  const cwd = getWorkspaceRootFolder(configPath);
+	const cwd = getWorkspaceRootFolder(configPath);
 
-  const drizzleKitPath = path.join(cwd, "node_modules", "drizzle-kit", "bin.cjs");
+	const drizzleKitPath = path.join(
+		cwd,
+		"node_modules",
+		"drizzle-kit",
+		"bin.cjs",
+	);
 
-  if (!fs.existsSync(drizzleKitPath)) {
-    return null;
-  }
+	if (!fs.existsSync(drizzleKitPath)) {
+		return null;
+	}
 
-  return drizzleKitPath;
+	return drizzleKitPath;
 }

@@ -1,27 +1,27 @@
 {
-  "compilerOptions": {
-    "target": "ES2022",
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "module": "ESNext",
-    "skipLibCheck": true,
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "isolatedModules": true,
-    "esModuleInterop": true,
-    "moduleDetection": "force",
-    "verbatimModuleSyntax": true,
-    "noEmit": true,
-    "outDir": "dist",
-    "jsx": "react-jsx",
-    "sourceMap": true,
-    "strict": true /* enable all strict type-checking options */,
-    "resolveJsonModule": true,
+	"compilerOptions": {
+		"target": "ES2022",
+		"lib": ["ES2022", "DOM", "DOM.Iterable"],
+		"module": "ESNext",
+		"skipLibCheck": true,
+		"moduleResolution": "bundler",
+		"allowImportingTsExtensions": true,
+		"isolatedModules": true,
+		"esModuleInterop": true,
+		"moduleDetection": "force",
+		"verbatimModuleSyntax": true,
+		"noEmit": true,
+		"outDir": "dist",
+		"jsx": "react-jsx",
+		"sourceMap": true,
+		"strict": true /* enable all strict type-checking options */,
+		"resolveJsonModule": true,
 
-    "baseUrl": ".",
-    "paths": {
-      "@drizzle-lab/visualizer": ["../packages/visualizer/dist"]
-    }
-  },
-  "include": ["./src", "build.ts"],
-  "exclude": ["node_modules", "dist"]
+		"baseUrl": ".",
+		"paths": {
+			"@drizzle-lab/visualizer": ["../packages/visualizer/dist"]
+		}
+	},
+	"include": ["./src", "build.ts"],
+	"exclude": ["node_modules", "dist"]
 }
