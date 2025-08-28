@@ -39,8 +39,8 @@
   },
   "dependencies": {
     "@drizzle-lab/api": "workspace:*",
-    "react": "^18.0.0 || ^19.0.0",
-    "react-dom": "^18.0.0 || ^19.0.0"
+    "react": "catalog:",
+    "react-dom": "catalog:"
   },
   "devDependencies": {
     "@dagrejs/dagre": "^1.1.4",
@@ -52,33 +52,33 @@
     "@shikijs/langs": "^3.2.1",
     "@shikijs/themes": "^3.2.1",
     "@tailwindcss/postcss": "^4.0.14",
-    "@tailwindcss/vite": "^4.0.14",
-    "@types/node": "^22.13.10",
-    "@types/react": "^18.3.18",
-    "@types/react-dom": "^18.3.5",
+    "@tailwindcss/vite": "catalog:",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
     "@vitejs/plugin-react": "^4.3.4",
     "@xyflow/react": "^12.4.2",
     "autoprefixer": "^10.4.21",
-    "class-variance-authority": "^0.7.1",
-    "clsx": "^2.1.1",
+    "class-variance-authority": "catalog:",
+    "clsx": "catalog:",
     "globals": "^15.14.0",
     "html-to-image": "1.11.11",
     "lucide-react": "^0.475.0",
     "patch-package": "^8.0.0",
     "postcss-import": "^16.1.0",
     "shiki": "^2.5.0",
-    "tailwind-merge": "^3.0.2",
-    "tailwindcss": "^4.0.14",
-    "tailwindcss-animate": "^1.0.7",
-    "typescript": "^5.8.2",
-    "vite": "^6.2.2",
+    "tailwind-merge": "catalog:",
+    "tailwindcss": "^4.1.12",
+    "tailwindcss-animate": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
     "vite-plugin-dts": "^4.5.3",
-    "vite-tsconfig-paths": "^5.1.4"
+    "vite-tsconfig-paths": "catalog:"
   },
   "peerDependencies": {
     "drizzle-orm": ">=0.36",
-    "react": "^18.0.0 || ^19.0.0",
-    "react-dom": "^18.0.0 || ^19.0.0"
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   },
   "engines": {
     "node": ">=22.0.0"
