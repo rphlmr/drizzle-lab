@@ -1,5 +1,5 @@
 import type { PartialConfig } from "@drizzle-lab/api/config/loader.node";
-import { type Monaco, loader } from "@monaco-editor/react";
+import { loader, type Monaco } from "@monaco-editor/react";
 import { createId } from "@paralleldrive/cuid2";
 import { shikiToMonaco } from "@shikijs/monaco";
 import { createSkyInspector } from "@statelyai/inspect";
@@ -10,9 +10,9 @@ import prettierEstreePlugin from "prettier/plugins/estree";
 import * as prettier from "prettier/standalone";
 import {
   type ActorRefFrom,
+  assertEvent,
   type EventFromLogic,
   type ExtractEvent,
-  assertEvent,
   enqueueActions,
   forwardTo,
   fromCallback,
@@ -27,18 +27,18 @@ import { anonymousCreatorId } from "~/database/shared";
 import type { Playground, PlaygroundId, UserId } from "~/database/types";
 import {
   type Dialect,
-  type PlaygroundFileName,
-  type PlaygroundFileTree,
-  type TypeFile,
-  type UserPlaygroundFileName,
   getCoreFiles,
   getRegistryManifest,
+  type PlaygroundFileName,
+  type PlaygroundFileTree,
   playgroundFileNames,
+  type TypeFile,
+  type UserPlaygroundFileName,
 } from "~/registry";
 import { PlaygroundTools } from "~/registry/tools";
 import { isQueryLog } from "~/registry/utils/query-logger";
 import { assertNonNull } from "~/utils/assert";
-import { type InvokeFailure, type SenderRef, actorNotProvided, makeInvokeFailure } from "~/utils/machine";
+import { actorNotProvided, type InvokeFailure, makeInvokeFailure, type SenderRef } from "~/utils/machine";
 
 import { highlighter } from "./highlighter";
 
@@ -56,7 +56,7 @@ declare global {
 
 let _loadMonaco: Promise<Monaco> | null = null;
 
-export async function loadMonaco() {
+export function loadMonaco() {
   if (window.monacoInstance) {
     return window.monacoInstance;
   }
@@ -89,6 +89,7 @@ const initMonaco = fromPromise(async () => {
     /* Base Options: */
     esModuleInterop: true,
     skipDefaultLibCheck: true,
+    skipLibCheck: true,
     target: monaco.languages.typescript.ScriptTarget.Latest,
     allowJs: true,
     isolatedModules: true,
@@ -270,7 +271,7 @@ export const EditorMachine = setup({
 
       editorAsset.types = manifest.types;
     }),
-    setTypes: fromPromise(async () => {
+    setTypes: fromPromise(() => {
       assertNonNull(editorAsset.types);
 
       const monaco = getMonacoInstance();
@@ -280,6 +281,8 @@ export const EditorMachine = setup({
       }));
 
       monaco.languages.typescript.typescriptDefaults.setExtraLibs(types);
+
+      return Promise.resolve();
     }),
     fetchCoreFiles: fromPromise(async ({ input }: { input: { dialect: Dialect } }) => {
       const { dialect } = input;
@@ -683,6 +686,23 @@ async function fetchNodeModules(nodeModulesImports: string[], dialect = autoDete
       imports.set("drizzle-valibot", import("drizzle-valibot"));
       imports.set("valibot", import("valibot"));
     }
+
+    if (module === "drizzle-typebox" || module.startsWith("@sinclair/typebox")) {
+      imports.set("drizzle-typebox", import("drizzle-typebox"));
+      imports.set("@sinclair/typebox", import("@sinclair/typebox"));
+      imports.set("@sinclair/typebox/compiler", import("@sinclair/typebox/compiler"));
+      imports.set("@sinclair/typebox/errors", import("@sinclair/typebox/errors"));
+      imports.set("@sinclair/typebox/parser", import("@sinclair/typebox/parser"));
+      imports.set("@sinclair/typebox/syntax", import("@sinclair/typebox/syntax"));
+      imports.set("@sinclair/typebox/system", import("@sinclair/typebox/system"));
+      imports.set("@sinclair/typebox/type", import("@sinclair/typebox/type"));
+      imports.set("@sinclair/typebox/value", import("@sinclair/typebox/value"));
+    }
+
+    if (module === "drizzle-arktype" || module === "arktype") {
+      imports.set("drizzle-arktype", import("drizzle-arktype"));
+      imports.set("arktype", import("arktype"));
+    }
   }
 
   switch (dialect) {
@@ -784,7 +804,7 @@ declare global {
   }
 }
 
-async function createModuleSystem<T extends JsFileSystem, K extends string = FileToImport<string & keyof T>>(
+function createModuleSystem<T extends JsFileSystem, K extends string = FileToImport<string & keyof T>>(
   files: T,
   nodeModules: NodeModules
 ) {
@@ -835,7 +855,7 @@ async function createModuleSystem<T extends JsFileSystem, K extends string = Fil
     return exports;
   }
 
-  async function importModule(fileName: K, args: Record<string, unknown> = {}) {
+  function importModule(fileName: K, args: Record<string, unknown> = {}) {
     // Clear the module stack before each run
     window.moduleStack = [];
 
@@ -879,7 +899,7 @@ function parseOutputs(fileName: BaseFileName<UserPlaygroundFileName> | undefined
   return outputs
     .map((output) => {
       if (!output) {
-        return;
+        return null;
       }
 
       let lang = "typescript";
@@ -1444,31 +1464,25 @@ const PlaygroundMachine = setup({
       const { content, ...metadata } = playground;
       return { content, metadata };
     }),
-    savePlayground: fromPromise(
-      async ({
-        input,
-      }: {
-        input: { playground: Playground; overwrite?: boolean };
-      }) => {
-        const { playground, overwrite } = input;
+    savePlayground: fromPromise(async ({ input }: { input: { playground: Playground; overwrite?: boolean } }) => {
+      const { playground, overwrite } = input;
 
-        const results = await localDb
-          .insert(localDb.schema.playground)
-          .values(playground)
-          .onConflictDoUpdate({
-            target: localDb.schema.playground.id,
-            set: {
-              ...playground,
-              updatedAt: overwrite ? playground.updatedAt : undefined,
-            },
-          })
-          .returning();
+      const results = await localDb
+        .insert(localDb.schema.playground)
+        .values(playground)
+        .onConflictDoUpdate({
+          target: localDb.schema.playground.id,
+          set: {
+            ...playground,
+            updatedAt: overwrite ? playground.updatedAt : undefined,
+          },
+        })
+        .returning();
 
-        const result = results.at(0)!;
+      const result = results.at(0)!;
 
-        return result;
-      }
-    ),
+      return result;
+    }),
   },
   actions: {
     setError: enqueueActions(({ enqueue, event }) => {
