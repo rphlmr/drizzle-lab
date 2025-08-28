@@ -2,6 +2,8 @@
 @import "tw-animate-css";
 @import "@drizzle-lab/visualizer/style.css";
 
+@plugin 'tailwind-scrollbar';
+
 @custom-variant dark (&:is(.dark *));
 
 :root {

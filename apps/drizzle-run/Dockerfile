@@ -1,55 +1,87 @@
-FROM node:22.18-alpine AS base
-WORKDIR /work
+ARG APP_NAME=drizzle-run
 
-# Enable pnpm
-RUN corepack enable && corepack prepare pnpm@10.14.0 --activate
-
-# -------------------------
-# Build packages standalone
-# -------------------------
-
-FROM base AS build-api
-WORKDIR /build/api
-ENV NODE_ENV=development
-COPY packages/api ./
-RUN pnpm install && pnpm run build
-
-FROM base AS build-visualizer
-WORKDIR /build/visualizer
-ENV NODE_ENV=development
-COPY packages/visualizer ./
-RUN pnpm install && pnpm run build
-
-# -------------------------
-# Build the app consuming built packages
-# -------------------------
-FROM base AS build-app
-WORKDIR /build/app
-ENV NODE_ENV=development
-
-# Set these ARGs to the exact "name" fields from each package's package.json
-ARG API_PKG_NAME=api
-ARG VIS_PKG_NAME=visualizer
-
-COPY apps/drizzle-run ./
-
-# inject built packages into node_modules so app installs see them as local packages
-RUN mkdir -p node_modules/$API_PKG_NAME node_modules/$VIS_PKG_NAME
-COPY --from=build-api /build/api ./node_modules/$API_PKG_NAME
-COPY --from=build-visualizer /build/visualizer ./node_modules/$VIS_PKG_NAME
-
-# install app deps (no workspace lock checks) and build
-RUN pnpm install && pnpm run build
-
-# -------------------------
-# Production image
-# -------------------------
-FROM node:22.18-alpine AS prod
-WORKDIR /app
+# Base image
+FROM node:22.18-alpine@sha256:1b2479dd35a99687d6638f5976fd235e26c5b37e8122f786fcd5fe231d63de5b AS base
+ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
 ENV NODE_ENV=production
+ENV NODE_OPTIONS="--max_old_space_size=4096"
+RUN addgroup --system --gid 1001 rr && \
+	adduser --system --uid 1001 --ingroup rr rr && \
+	apk add --no-cache gcompat && \
+	corepack enable && \
+	pnpm install turbo --global
 
-COPY --from=build-app /build/app/package.json ./
-COPY --from=build-app /build/app/node_modules ./node_modules
-COPY --from=build-app /build/app/build ./build
+# Build base (adds git only for build stages)
+FROM base AS build-base
+RUN apk add --no-cache git
 
-CMD ["node", "./build/server/index.js"]
+# Pruner
+FROM build-base AS pruner
+ARG APP_NAME
+WORKDIR /app
+COPY --chown=rr:rr . .
+RUN turbo prune $APP_NAME --docker
+
+# Prefetch deps - refreshed only if pnpm workspace is updated
+FROM build-base AS prefetch-deps
+WORKDIR /.temp
+COPY --chown=rr:rr pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY --chown=rr:rr patches/ ./patches/
+RUN --mount=type=cache,target=/pnpm/.pnpm-store,uid=1001,gid=1001 \
+	pnpm fetch
+
+# Dev and Build deps
+FROM prefetch-deps AS dev-deps
+ARG APP_NAME
+WORKDIR /app
+COPY --from=pruner --chown=rr:rr /app/out/json/ .
+RUN --mount=type=cache,target=/pnpm/.pnpm-store,uid=1001,gid=1001 \
+	pnpm --frozen-lockfile --offline install
+
+# Production deps
+FROM prefetch-deps AS production-deps
+ARG APP_NAME
+WORKDIR /app
+COPY --from=pruner --chown=rr:rr /app/out/json/ .
+RUN --mount=type=cache,target=/pnpm/.pnpm-store,uid=1001,gid=1001 \
+	pnpm --filter=$APP_NAME --frozen-lockfile --offline install --prod
+
+# Builder
+FROM dev-deps AS builder
+ARG APP_NAME
+ENV NODE_ENV=production
+WORKDIR /app
+# Copy source code AFTER dependencies are installed
+COPY --from=pruner --chown=rr:rr /app/out/full/ .
+COPY --chown=rr:rr turbo.json turbo.json
+# COPY --chown=rr:rr .changeset/ ./.changeset/
+# Run changeset version before build
+# RUN pnpm changeset version
+RUN turbo build --filter=$APP_NAME
+
+# Final image
+FROM base AS runner
+ARG APP_NAME
+ENV PORT=3000
+ENV TZ=UTC
+ENV NODE_ENV=production
+ENV START=${APP_NAME}:start
+
+WORKDIR /app
+
+COPY --from=production-deps --chown=rr:rr /app/ .
+COPY --from=builder --chown=rr:rr /app/package.json ./package.json
+COPY --from=builder --chown=rr:rr /app/apps/$APP_NAME/package.json ./apps/$APP_NAME/package.json
+COPY --from=builder --chown=rr:rr /app/apps/$APP_NAME/build ./apps/$APP_NAME/build
+
+WORKDIR /app/apps/$APP_NAME
+
+EXPOSE 3000
+
+USER rr
+
+SHELL ["/bin/ash", "-c"]
+
+CMD node build/server/index.js

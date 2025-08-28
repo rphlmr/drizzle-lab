@@ -32,8 +32,7 @@
       "~/*": ["./app/*"],
       "registry/*": ["./registry/*"],
       "@drizzle-lab/api/*/node": ["../../packages/api/src/*/index.node"],
-      "@drizzle-lab/api/*": ["../../packages/api/src/*"],
-      "@drizzle-lab/visualizer/*": ["../../packages/visualizer/src/*"]
+      "@drizzle-lab/api/*": ["../../packages/api/src/*"]
     }
   }
 }

@@ -1,6 +1,5 @@
-import fs from "fs/promises";
-
-import { defineConfig, Options } from "tsup";
+import fs from "node:fs/promises";
+import { defineConfig, type Options } from "tsup";
 
 await fs.rm("dist", { recursive: true }).catch(() => {});
 

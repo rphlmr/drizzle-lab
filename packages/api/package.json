@@ -17,6 +17,7 @@
     "dist"
   ],
   "scripts": {
+    "dev:watch": "tsup --config tsup.config.ts --watch",
     "build": "tsup --config tsup.config.ts",
     "postbuild": "pnpm run check-exports",
     "check-exports": "attw --pack .",

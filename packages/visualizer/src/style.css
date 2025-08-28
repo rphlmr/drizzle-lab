@@ -1,8 +1,7 @@
 @import "@xyflow/react/dist/style.css";
 @import "tailwindcss/utilities.css" prefix(dv);
 @import "tailwindcss/theme.css" prefix(dv);
-
-@plugin "tailwindcss-animate";
+@import "tw-animate-css";
 
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 

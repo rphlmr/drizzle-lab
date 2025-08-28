@@ -21,3 +21,4 @@ supabase
 *.vsix
 vscode-extension
 drizzle-lab.tgz
+!.changeset/

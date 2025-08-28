@@ -22,41 +22,41 @@ export function DrizzleVisualizerLegend({
       data-app="drizzle-visualizer"
       data-theme={theme}
       className={cn(
-        "dv:flex dv:w-full dv:flex-wrap dv:items-center dv:justify-center dv:gap-2 dv:dark:bg-[#0f0f14] dv:px-2 dv:py-1",
+        "dv:flex dv:flex-wrap dv:justify-center dv:items-center dv:gap-2 dv:dark:bg-[#0f0f14] dv:px-2 dv:py-1 dv:w-full",
         className
       )}
     >
       <span className="dv:flex dv:items-center dv:gap-1">
-        <KeyRoundIcon className="dv:text-green dv:size-4" />
-        <span className="dv:shrink-0 dv:text-xs dv:text-muted-foreground">Primary key</span>
+        <KeyRoundIcon className="dv:size-4 dv:text-green" />
+        <span className="dv:text-muted-foreground dv:text-xs dv:shrink-0">Primary key</span>
       </span>
       <span className="dv:flex dv:items-center dv:gap-1">
-        <LinkIcon className="dv:text-green dv:size-4" />
-        <span className="dv:shrink-0 dv:text-xs dv:text-muted-foreground">Foreign key</span>
+        <LinkIcon className="dv:size-4 dv:text-green" />
+        <span className="dv:text-muted-foreground dv:text-xs dv:shrink-0">Foreign key</span>
       </span>
       <span className="dv:flex dv:items-center dv:gap-1">
-        <ShieldCheckIcon className="dv:text-green dv:size-4" />
-        <span className="dv:shrink-0 dv:text-xs dv:text-muted-foreground">Check</span>
+        <ShieldCheckIcon className="dv:size-4 dv:text-green" />
+        <span className="dv:text-muted-foreground dv:text-xs dv:shrink-0">Check</span>
       </span>
       <span className="dv:flex dv:items-center dv:gap-1">
-        <LockIcon className="dv:text-green dv:size-4" />
-        <span className="dv:shrink-0 dv:text-xs dv:text-muted-foreground">RLS Policy</span>
+        <LockIcon className="dv:size-4 dv:text-green" />
+        <span className="dv:text-muted-foreground dv:text-xs dv:shrink-0">RLS Policy</span>
       </span>
       <span className="dv:flex dv:items-center dv:gap-1">
-        <CableIcon className="dv:text-green dv:size-4" />
-        <span className="dv:shrink-0 dv:text-xs dv:text-muted-foreground">Drizzle relation</span>
+        <CableIcon className="dv:size-4 dv:text-green" />
+        <span className="dv:text-muted-foreground dv:text-xs dv:shrink-0">Drizzle relation</span>
       </span>
       <span className="dv:flex dv:items-center dv:gap-1">
-        <BadgeCheckIcon className="dv:text-green dv:size-4" />
-        <span className="dv:shrink-0 dv:text-xs dv:text-muted-foreground">Unique</span>
+        <BadgeCheckIcon className="dv:size-4 dv:text-green" />
+        <span className="dv:text-muted-foreground dv:text-xs dv:shrink-0">Unique</span>
       </span>
       <span className="dv:flex dv:items-center dv:gap-1">
-        <DiamondIcon className="dv:fill-secondary-foreground dv:text-secondary-foreground dv:size-4" />
-        <span className="dv:shrink-0 dv:text-xs dv:text-muted-foreground">Non-null</span>
+        <DiamondIcon className="dv:fill-secondary-foreground dv:size-4 dv:text-secondary-foreground" />
+        <span className="dv:text-muted-foreground dv:text-xs dv:shrink-0">Non-null</span>
       </span>
       <span className="dv:flex dv:items-center dv:gap-1">
-        <DiamondIcon className="dv:text-secondary-foreground dv:size-4" />
-        <span className="dv:shrink-0 dv:text-xs dv:text-muted-foreground">Nullable</span>
+        <DiamondIcon className="dv:size-4 dv:text-secondary-foreground" />
+        <span className="dv:text-muted-foreground dv:text-xs dv:shrink-0">Nullable</span>
       </span>
     </div>
   );

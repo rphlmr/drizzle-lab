@@ -33,16 +33,16 @@ import {
   type DeletePlaygroundActor,
   type DisableRemoteSyncActor,
   type EnableRemoteSyncActor,
+  extractSchema,
   type ForkPlaygroundActor,
+  inspector,
   PlaygroundMachine,
   type PushRemoteChangesActor,
   type RemoteSyncState,
   type SnapshotOutput,
-  extractSchema,
-  inspector,
 } from "~/modules/playground/machine.client";
 import { useEditorOptions } from "~/modules/playground/options.client";
-import { type UserPlaygroundFileName, asFileName } from "~/registry";
+import { asFileName, type UserPlaygroundFileName } from "~/registry";
 import { cn } from "~/utils/cn";
 import { env } from "~/utils/env";
 import { AppError, handleError } from "~/utils/error";
@@ -886,7 +886,7 @@ function Play() {
             </TabsContent>
             <TabsContent value="visualizer" asChild className="mt-0">
               {snapshot && (
-                <div className="flex flex-col bg-muted/50 rounded-xl h-full">
+                <div className="flex flex-col bg-muted/50 rounded-xl h-full overflow-hidden">
                   <DrizzleVisualizer snapshot={snapshot} loading={!isReady} showMiniMap={false} theme="dark" />
                   <DrizzleVisualizerLegend theme="dark" />
                 </div>
@@ -1037,7 +1037,7 @@ function Output({ output }: { output: SnapshotOutput }) {
       key={id}
       className={cn(
         "flex flex-col gap-2 bg-accent/70 hover:bg-accent p-4 pb-0 rounded-lg transition-colors",
-        type === "error" && "border border-red"
+        type === "error" && "border border-destructive"
       )}
     >
       <div className="flex items-center gap-2">

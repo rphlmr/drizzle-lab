@@ -2,36 +2,26 @@
 
 import "@xyflow/react/dist/style.css";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-
 import { schemaToSnapshot as mysqlSchemaToSnapshot } from "@drizzle-lab/api/mysql/web";
 import { schemaToSnapshot as pgSchemaToSnapshot } from "@drizzle-lab/api/pg/web";
 import { schemaToSnapshot as sqliteSchemaToSnapshot } from "@drizzle-lab/api/sqlite/web";
 import type { Edge, NodeChange, NodePositionChange, NodeProps } from "@xyflow/react";
 import {
-  Background,
-  Handle,
-  MiniMap,
-  PanOnScrollMode,
-  Panel,
-  Position,
-  ReactFlow,
   applyNodeChanges,
+  Background,
   getNodesBounds,
   getViewportForBounds,
+  Handle,
+  MiniMap,
+  Panel,
+  PanOnScrollMode,
+  Position,
+  ReactFlow,
   useEdgesState,
   useKeyPress,
   useReactFlow,
 } from "@xyflow/react";
 import { toPng } from "html-to-image";
-import { Badge } from "~/components/ui/badge";
-import { Button } from "~/components/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover";
-import { Separator } from "~/components/ui/separator";
-import { Toggle } from "~/components/ui/toggle";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "~/components/ui/tooltip";
-import { cn } from "~/lib/utils";
-
 import {
   BadgeCheckIcon,
   BookTextIcon,
@@ -51,9 +41,17 @@ import {
   ShrinkIcon,
   TriangleAlertIcon,
 } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover";
+import { Separator } from "~/components/ui/separator";
+import { Toggle } from "~/components/ui/toggle";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "~/components/ui/tooltip";
+import { cn } from "~/lib/utils";
 import { ThemeProvider, useTheme } from "./components/theme";
-import { compute } from "./compute";
 import type { Snapshot, TableNodeDefinition, ViewNodeDefinition } from "./compute";
+import { compute } from "./compute";
 import { useHighlighter } from "./highlighter";
 
 function storageKey(key: string) {
@@ -347,12 +345,15 @@ function TableNode({ data }: NodeProps<TableNodeDefinition>) {
                   <DiamondIcon className={cn("dv:size-4", column.isNotNull && "dv:fill-secondary-foreground")} />
                   {column.name}
                 </div>
-                <span className="dv:px-2 dv:py-1 dv:text-muted-foreground dv:text-xs">
+                <span
+                  className="dv:px-2 dv:py-1 dv:text-muted-foreground dv:text-xs"
+                  data-no-print={column.default || column.defaultFn || column.jsonShape}
+                >
                   {column.enumValues ? column.enumValues.join(" | ") : column.dataType}
                   {!column.isNotNull && " | null"}
                 </span>
                 {(column.default || column.defaultFn || column.jsonShape) && (
-                  <Popover data-no-print>
+                  <Popover>
                     <PopoverTrigger asChild>
                       <Button variant="outline" size="custom" className="dv:right-1 dv:absolute dv:px-2 dv:py-1">
                         <span className="dv:text-muted-foreground dv:text-xs">
