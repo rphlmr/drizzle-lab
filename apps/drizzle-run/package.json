@@ -1,6 +1,6 @@
 {
   "name": "drizzle-run",
-  "version": "0.17.0",
+  "version": "0.18.0",
   "private": true,
   "type": "module",
   "license": "AGPL-3.0-only",
@@ -44,7 +44,6 @@
     "@drizzle-lab/api": "workspace:*",
     "@drizzle-lab/visualizer": "workspace:*",
     "@electric-sql/pglite": "^0.3.7",
-    "@electric-sql/pglite-v1": "npm:@electric-sql/pglite@0.1.5",
     "@epic-web/cachified": "^5.6.0",
     "@libsql/client": "^0.15.10",
     "@libsql/client-wasm": "^0.15.10",

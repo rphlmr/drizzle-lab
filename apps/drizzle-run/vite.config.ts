@@ -14,21 +14,11 @@ export default defineConfig({
     port: 3000,
   },
   optimizeDeps: {
-    exclude: ["@electric-sql/pglite", "@electric-sql/pglite-v1", "@libsql/client-wasm"],
+    exclude: ["@electric-sql/pglite", "@libsql/client-wasm"],
   },
   build: {
     target: "esnext",
     assetsInlineLimit: 0,
-    rollupOptions: {
-      output: {
-        // required to be able to async import ... (vite issue?)
-        manualChunks: (id) => {
-          if (id.includes("@electric-sql/pglite-v1")) {
-            return "@electric-sql/pglite-v1";
-          }
-        },
-      },
-    },
   },
   plugins: [reactRouterHonoServer(), tailwindcss(), reactRouter(), tsconfigPaths()],
 });
