@@ -1,6 +1,6 @@
 import { useForm as useFormBase } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod";
-import type { ZodTypeAny, z } from "zod";
+import type { ZodTypeAny, z } from "zod/v3";
 
 import type { LoaderOrActionResponse } from "~/utils/http";
 

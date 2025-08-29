@@ -1,9 +1,9 @@
-import { type SQL, and, desc, eq, sql } from "drizzle-orm";
+import { and, desc, eq, type SQL, sql } from "drizzle-orm";
 import type React from "react";
 import { Suspense } from "react";
 import { Await, Link, type MetaFunction, useFetcher } from "react-router";
 import { useDebounceSubmit } from "remix-utils/use-debounce-submit";
-import { z } from "zod";
+import { z } from "zod/v3";
 import { CatchError } from "~/components/catch-error";
 import { RainLogo } from "~/components/logo";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
@@ -74,7 +74,7 @@ export function ErrorBoundary() {
 
 const dialectOptions = ["all", "postgresql", "sqlite"] as const;
 
-export const loader = async ({ request }: Route.LoaderArgs) => {
+export const loader = ({ request }: Route.LoaderArgs) => {
   try {
     const searchParams = parseParams(
       Object.fromEntries([...getSearchParams(request).entries()].map(([key, value]) => [key, value || undefined])),

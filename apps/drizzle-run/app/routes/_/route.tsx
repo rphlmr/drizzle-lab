@@ -1,6 +1,5 @@
-import { Suspense, useEffect, useState } from "react";
-
 import { sql } from "drizzle-orm";
+import { Suspense, useEffect, useState } from "react";
 import {
   Await,
   Form,
@@ -9,10 +8,13 @@ import {
   useLoaderData,
   useLocation,
   useNavigate,
+  useParams,
   useRevalidator,
   useRouteLoaderData,
 } from "react-router";
-import { useParams } from "react-router";
+import { AnonymousCTA } from "~/components/anonymous-cta";
+import { DrizzleLogo, RainLogo } from "~/components/logo";
+import { ToolbarOutlet } from "~/components/toolbar";
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import {
   AlertDialog,
@@ -48,17 +50,13 @@ import { Icon, type IconName } from "~/components/ui/icon";
 import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover";
 import { Skeleton } from "~/components/ui/skeleton";
 import { Typography } from "~/components/ui/typography";
-import { cn } from "~/utils/cn";
-
-import { AnonymousCTA } from "~/components/anonymous-cta";
-import { DrizzleLogo, RainLogo } from "~/components/logo";
-import { ToolbarOutlet } from "~/components/toolbar";
 import { localDb } from "~/database/.client/db";
 import { serverDb } from "~/database/.server/db";
 import type { User } from "~/database/types";
 import { EditorOptionsDialog } from "~/modules/playground/options.client";
 import { getDrizzleVersion } from "~/registry";
 import { NewPlaygroundWizard } from "~/routes/api.playground/route";
+import { cn } from "~/utils/cn";
 import { handleError } from "~/utils/error";
 import { failure, success } from "~/utils/http";
 import type { Closable } from "~/utils/use-dialog";
@@ -142,6 +140,10 @@ export function HydrateFallback() {
       <RainLogo className="h-10 animate-pulse" />
       <Typography variant="mutedText" className="animate-pulse">
         Drizzle Run is loading several binaries to work locally first
+      </Typography>
+      <Typography variant="mutedText">
+        If you are stuck here, I am sorry but you may need to clear your cache (including deleting the local database
+        🙁)
       </Typography>
     </div>
   );

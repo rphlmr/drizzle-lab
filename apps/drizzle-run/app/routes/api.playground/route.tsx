@@ -2,7 +2,7 @@ import { getInputProps } from "@conform-to/react";
 import type React from "react";
 import { useMemo, useState } from "react";
 import { useFetcher } from "react-router";
-import { z } from "zod";
+import { z } from "zod/v3";
 import { Form, useForm } from "~/components/form";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
@@ -12,12 +12,12 @@ import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group";
 import { Typography } from "~/components/ui/typography";
 import { localDb } from "~/database/.client/db";
 import {
+  asDialect,
   type Dialect,
   DialectSchema,
-  type PresetManifest,
-  asDialect,
   getPresetFiles,
   getPresetsManifest,
+  type PresetManifest,
 } from "~/registry";
 import { cn } from "~/utils/cn";
 import { AppError, handleError } from "~/utils/error";
@@ -190,12 +190,6 @@ function NoPresetSelected() {
   );
 }
 
-function WizardContent({
-  children,
-  className,
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) {
+function WizardContent({ children, className }: { children: React.ReactNode; className?: string }) {
   return <div className={cn("flex flex-col flex-1 gap-4 px-4 w-full overflow-hidden", className)}>{children}</div>;
 }

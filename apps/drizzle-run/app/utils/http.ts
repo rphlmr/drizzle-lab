@@ -1,6 +1,6 @@
 import { parseWithZod } from "@conform-to/zod";
 import { type Params, redirect } from "react-router";
-import type { ZodTypeAny } from "zod";
+import type { ZodTypeAny } from "zod/v3";
 
 import { AppError } from "~/utils/error";
 

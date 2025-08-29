@@ -2,7 +2,7 @@ import { type FieldMetadata, FormProvider, useField, useForm as useFormBase } fr
 import { parseWithZod } from "@conform-to/zod";
 import type React from "react";
 import { type FetcherWithComponents, Form as RRForm, type FormProps as RRFormProps } from "react-router";
-import type { ZodTypeAny, z } from "zod";
+import type { ZodTypeAny, z } from "zod/v3";
 import { cn } from "~/utils/cn";
 import type { LoaderOrActionResponse } from "~/utils/http";
 import { Typography } from "./ui/typography";

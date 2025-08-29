@@ -7,7 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import type { ImperativePanelHandle } from "react-resizable-panels";
 import { type MetaArgs, redirect, useLoaderData, useNavigate, useRevalidator } from "react-router";
 import { fromPromise } from "xstate";
-import { z } from "zod";
+import { z } from "zod/v3";
 import { AnonymousCTA } from "~/components/anonymous-cta";
 import { RainLogo } from "~/components/logo";
 import { Toolbar } from "~/components/toolbar";
