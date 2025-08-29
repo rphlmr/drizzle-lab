@@ -49,6 +49,7 @@ import { AppError, handleError } from "~/utils/error";
 import { assertActionType, clientRedirect, failure, parseParams, success } from "~/utils/http";
 import { robot } from "~/utils/robot";
 import { useAsyncFetcher } from "~/utils/use-async-fetcher";
+import PackageJSON from "../../../package.json";
 import type { Route } from "./+types/route";
 import { PlaygroundSelector } from "./components";
 
@@ -119,6 +120,17 @@ export const loader = async ({ context, params }: Route.LoaderArgs) => {
     remoteSyncEnabled: Boolean(
       context.isAuthenticated && playground && playground.creatorId === context.getAuthSessionOrThrow().userId
     ),
+    includedLibraries: {
+      "drizzle-typebox": PackageJSON.dependencies["drizzle-typebox"],
+      "@sinclair/typebox": PackageJSON.dependencies["@sinclair/typebox"],
+      "drizzle-arktype": PackageJSON.dependencies["drizzle-arktype"],
+      arktype: PackageJSON.dependencies.arktype,
+      "drizzle-valibot": PackageJSON.dependencies["drizzle-valibot"],
+      valibot: PackageJSON.dependencies.valibot,
+      "drizzle-zod": PackageJSON.dependencies["drizzle-zod"],
+      zod: PackageJSON.dependencies.zod,
+      "drizzle-seed": PackageJSON.dependencies["drizzle-seed"],
+    },
   });
 };
 
@@ -171,6 +183,7 @@ export async function clientLoader({ serverLoader, params }: Route.ClientLoaderA
       isMacOs,
       isCurrentUserPlayground,
       readOnly,
+      includedLibraries: serverData.includedLibraries,
     });
   } catch (cause) {
     const reason = handleError(cause);
@@ -327,6 +340,7 @@ function Play() {
       isCurrentUserPlayground,
       readOnly,
       serverPlayground,
+      includedLibraries,
     },
   } = useLoaderData<typeof clientLoader>();
   const { revalidate } = useRevalidator();
@@ -628,25 +642,46 @@ function Play() {
                   </PopoverTrigger>
                   <TooltipContent>Guide</TooltipContent>
                 </Tooltip>
-                <PopoverContent className="w-fit">
-                  <Typography variant="largeText">Guide</Typography>
-                  <Separator />
-                  <Typography>
-                    You have access to a magic global variable <Typography variant="inlineCode">$</Typography>
-                  </Typography>
-                  <Typography>
-                    It includes a <Typography variant="inlineCode">random</Typography> generator you can use in any tabs
-                  </Typography>
-                  <div className="flex flex-col gap-2">
-                    <Typography variant="mutedText">Example: </Typography>
-                    <Typography variant="inlineCode" className="w-fit">
-                      {/* biome-ignore lint/suspicious/noCommentText: <explanation> */}
-                      $.random.uuid() // → a random uuid
+                <PopoverContent className="space-y-4 w-fit">
+                  <div className="flex flex-col">
+                    <Typography variant="largeText">Guide</Typography>
+                    <Separator />
+                    <Typography>
+                      You have access to a magic global variable <Typography variant="inlineCode">$</Typography>
                     </Typography>
-                    <Typography variant="inlineCode" className="w-fit">
-                      {/* biome-ignore lint/suspicious/noCommentText: <explanation> */}
-                      $.random.array(5,$.random.uuid) // → a random array of 5 uuids
+                    <Typography>
+                      It includes a <Typography variant="inlineCode">random</Typography> generator you can use in any
+                      tabs
                     </Typography>
+                    <div className="flex flex-col gap-2">
+                      <Typography variant="mutedText">Example: </Typography>
+                      <Typography variant="inlineCode" className="w-fit">
+                        {/* biome-ignore lint/suspicious/noCommentText: ... */}
+                        $.random.uuid() // → a random uuid
+                      </Typography>
+                      <Typography variant="inlineCode" className="w-fit">
+                        {/* biome-ignore lint/suspicious/noCommentText: ... */}
+                        $.random.array(5,$.random.uuid) // → a random array of 5 uuids
+                      </Typography>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col">
+                    <Typography variant="largeText">Included libraries</Typography>
+                    <Separator />
+                    <Typography>You can use the following libraries in your playground:</Typography>
+                    <div className="flex flex-col gap-2">
+                      {Object.entries(includedLibraries).map(([lib, version]) => (
+                        <span key={lib} className="flex items-center gap-2">
+                          <Typography variant="inlineCode" className="w-fit">
+                            {lib}
+                          </Typography>
+                          <Typography variant="mutedText" className="w-fit">
+                            {version}
+                          </Typography>
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 </PopoverContent>
               </Popover>
