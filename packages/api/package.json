@@ -1,6 +1,6 @@
 {
   "name": "@drizzle-lab/api",
-  "version": "0.29.0",
+  "version": "0.30.2",
   "description": "Drizzle Lab API - Fork of Drizzle Kit API",
   "type": "module",
   "license": "MIT",
@@ -17,14 +17,16 @@
     "dist"
   ],
   "scripts": {
+    "dev:watch": "tsup --config tsup.config.ts --watch",
     "build": "tsup --config tsup.config.ts",
-    "postbuild": "npm run check:exports",
-    "check:exports": "attw --pack .",
-    "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
+    "postbuild": "pnpm run check-exports",
+    "check-exports": "attw --pack .",
     "typecheck": "tsc --noEmit",
-    "prerelease:publish": "npm version prerelease && npm publish --access=public --tag next",
-    "patch:publish": "npm version patch && npm publish --access=public",
-    "minor:publish": "npm version minor && npm publish --access=public"
+    "prerelease:publish": "pnpm version prerelease && pnpm publish --access=public --tag next",
+    "patch:publish": "pnpm version patch && pnpm publish --access=public",
+    "minor:publish": "pnpm version minor && pnpm publish --access=public",
+    "check": "biome check .",
+    "check:fix": "biome check --fix ."
   },
   "engines": {
     "node": ">=20.0.0"
@@ -79,6 +81,18 @@
         "require": "./dist/pg/index.node.cjs"
       }
     },
+    "./pg/web": {
+      "import": {
+        "types": "./dist/pg/index.web.d.ts",
+        "import": "./dist/pg/index.web.js",
+        "default": "./dist/pg/index.web.js"
+      },
+      "require": {
+        "types": "./dist/pg/index.web.d.cts",
+        "import": "./dist/pg/index.web.cjs",
+        "require": "./dist/pg/index.web.cjs"
+      }
+    },
     "./sqlite": {
       "import": {
         "types": "./dist/sqlite/index.d.ts",
@@ -103,6 +117,18 @@
         "require": "./dist/sqlite/index.node.cjs"
       }
     },
+    "./sqlite/web": {
+      "import": {
+        "types": "./dist/sqlite/index.web.d.ts",
+        "import": "./dist/sqlite/index.web.js",
+        "default": "./dist/sqlite/index.web.js"
+      },
+      "require": {
+        "types": "./dist/sqlite/index.web.d.cts",
+        "import": "./dist/sqlite/index.web.cjs",
+        "require": "./dist/sqlite/index.web.cjs"
+      }
+    },
     "./mysql": {
       "import": {
         "types": "./dist/mysql/index.d.ts",
@@ -125,6 +151,18 @@
         "types": "./dist/mysql/index.node.d.cts",
         "import": "./dist/mysql/index.node.cjs",
         "require": "./dist/mysql/index.node.cjs"
+      }
+    },
+    "./mysql/web": {
+      "import": {
+        "types": "./dist/mysql/index.web.d.ts",
+        "import": "./dist/mysql/index.web.js",
+        "default": "./dist/mysql/index.web.js"
+      },
+      "require": {
+        "types": "./dist/mysql/index.web.d.cts",
+        "import": "./dist/mysql/index.web.cjs",
+        "require": "./dist/mysql/index.web.cjs"
       }
     },
     "./relations": {
@@ -170,6 +208,10 @@
         "./dist/pg/index.node.d.ts",
         "./dist/pg/index.node.d.cts"
       ],
+      "pg/web": [
+        "./dist/pg/index.web.d.ts",
+        "./dist/pg/index.web.d.cts"
+      ],
       "sqlite": [
         "./dist/sqlite/index.d.ts",
         "./dist/sqlite/index.d.cts"
@@ -178,6 +220,10 @@
         "./dist/sqlite/index.node.d.ts",
         "./dist/sqlite/index.node.d.cts"
       ],
+      "sqlite/web": [
+        "./dist/sqlite/index.web.d.ts",
+        "./dist/sqlite/index.web.d.cts"
+      ],
       "mysql": [
         "./dist/mysql/index.d.ts",
         "./dist/mysql/index.d.cts"
@@ -185,6 +231,10 @@
       "mysql/node": [
         "./dist/mysql/index.node.d.ts",
         "./dist/mysql/index.node.d.cts"
+      ],
+      "mysql/web": [
+        "./dist/mysql/index.web.d.ts",
+        "./dist/mysql/index.web.d.cts"
       ],
       "relations": [
         "./dist/relations/index.d.ts",
@@ -204,21 +254,17 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@repo/eslint-config": "*",
-    "@repo/typescript-config": "*",
+    "@arethetypeswrong/cli": "^0.18.2",
+    "@types/node": "catalog:",
     "eslint": "^8.56.0",
     "tsup": "^8.3.5",
-    "typescript": "^5.3.3"
+    "typescript": "catalog:"
   },
   "peerDependencies": {
     "@electric-sql/pglite": ">=0.2.0",
     "@libsql/client-wasm": ">=0.9.0",
-    "drizzle-kit": ">=0.26.0",
-    "drizzle-orm": ">=0.36.0",
+    "drizzle-kit": ">=0.26",
+    "drizzle-orm": ">=0.36",
     "mysql2": ">=3.0.0"
-  },
-  "optionalDependencies": {
-    "@rollup/rollup-linux-x64-musl": "^4.25.0"
-  },
-  "prettier": {}
+  }
 }

@@ -1,17 +1,34 @@
 {
-  "extends": "@repo/typescript-config/react-library.json",
   "compilerOptions": {
-    "outDir": "dist",
-    "jsx": "react-jsx",
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "types": ["vite/client"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+    "noImplicitAny": false,
+
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "allowImportingTsExtensions": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "moduleDetection": "force",
     "noEmit": true,
+    "jsx": "react-jsx",
+
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true,
+    "verbatimModuleSyntax": true,
+
+    "baseUrl": ".",
     "paths": {
-      "@drizzle-lab/api/*": ["../api/src/*"]
+      "~/*": ["./src/*"],
+      "@drizzle-lab/api/*/web": ["../api/src/*/index.web"]
     }
   },
-  "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    "../../shared/typescript-config/reset.d.ts"
-  ],
-  "exclude": ["node_modules", "dist"]
+  "include": ["demo", "src"],
+  "exclude": ["node_modules"]
 }

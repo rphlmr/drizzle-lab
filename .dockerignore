@@ -1,6 +1,5 @@
 node_modules
 
-
 .git
 .idea
 .turbo
@@ -22,3 +21,4 @@ supabase
 *.vsix
 vscode-extension
 drizzle-lab.tgz
+!.changeset/

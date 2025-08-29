@@ -1,10 +1,10 @@
-import { Link, useRouteError } from "@remix-run/react";
-import { buttonVariants } from "@repo/ui/components/button";
-import { Icon } from "@repo/ui/components/icon";
-import { Typography } from "@repo/ui/components/typography";
+import { Link, useRouteError } from "react-router";
 
 import type { AdditionalData } from "~/utils/error";
-import { isErrorResponse } from "~/utils/http";
+import { isFailureResponse } from "~/utils/http";
+import { buttonVariants } from "./ui/button";
+import { Icon } from "./ui/icon";
+import { Typography } from "./ui/typography";
 
 interface CatchErrorProps {
   redirectTo?: string;
@@ -16,10 +16,10 @@ export function CatchError({ redirectTo = "/" }: CatchErrorProps) {
   let reason = "";
   let paramsError: AdditionalData["paramsErrors"];
 
-  if (isErrorResponse(error)) {
-    message = error.error.message;
-    reason = error.error.additionalData?.reason || "";
-    paramsError = error.error.additionalData?.paramsErrors;
+  if (isFailureResponse(error)) {
+    message = error.failure.message;
+    reason = error.failure.additionalData?.reason || "";
+    paramsError = error.failure.additionalData?.paramsErrors;
   }
 
   if (error instanceof Error) {
@@ -27,7 +27,7 @@ export function CatchError({ redirectTo = "/" }: CatchErrorProps) {
   }
 
   return (
-    <div className="flex max-w-60 flex-col items-center gap-4">
+    <div className="flex flex-col items-center gap-4 max-w-60">
       <Icon name="ghost" className="size-20 text-red" />
       <Typography variant="largeText" className="mt-2 text-center">
         {message}
@@ -42,11 +42,7 @@ export function CatchError({ redirectTo = "/" }: CatchErrorProps) {
           <pre className="text-xs">{JSON.stringify(paramsError, null, 2)}</pre>
         </Typography>
       ) : null}
-      <Link
-        to={redirectTo}
-        className={buttonVariants({ variant: "secondary" })}
-        reloadDocument
-      >
+      <Link to={redirectTo} className={buttonVariants({ variant: "secondary" })} reloadDocument>
         Reload
       </Link>
     </div>

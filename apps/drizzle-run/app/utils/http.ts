@@ -1,17 +1,17 @@
 import { parseWithZod } from "@conform-to/zod";
-import { type Params, redirect } from "@remix-run/react";
-import type { ZodTypeAny } from "zod";
+import { type Params, redirect } from "react-router";
+import type { ZodTypeAny } from "zod/v3";
 
 import { AppError } from "~/utils/error";
 
 export { redirect as clientRedirect };
 
-export function error(cause: AppError) {
+export function failure(cause: AppError) {
   console.error(JSON.stringify(cause, null, 2));
 
   return {
-    data: null,
-    error: {
+    success: null,
+    failure: {
       message: cause.message,
       label: cause.label,
       ...(cause.additionalData && {
@@ -22,19 +22,17 @@ export function error(cause: AppError) {
   };
 }
 
-export type ErrorResponse = ReturnType<typeof error>;
+export type FailureResponse = ReturnType<typeof failure>;
 
-export type ResponsePayload = Record<string, unknown> | null;
-
-export function data<T>(data: T) {
-  return { data, error: null };
+export function success<T>(success: T) {
+  return { success, failure: null };
 }
 
-export type DataResponse<T> = ReturnType<typeof data<T>>;
+export type SuccessResponse<T> = ReturnType<typeof success<T>>;
 
-export type LoaderOrActionResponse<T> = DataResponse<T> | ErrorResponse;
+export type LoaderOrActionResponse<T> = SuccessResponse<T> | FailureResponse;
 
-export function isErrorResponse(response: unknown): response is ErrorResponse {
+export function isFailureResponse(response: unknown): response is FailureResponse {
   return (
     typeof response === "object" &&
     response !== null &&
@@ -56,9 +54,7 @@ export const QUERY_KEY = {
 
 export function path(
   path: string,
-  searchParams?:
-    | Record<string, string | number | boolean | null | undefined>
-    | undefined,
+  searchParams?: Record<string, string | number | boolean | null | undefined> | undefined
 ) {
   const init = Object.entries(searchParams || {})
     .map(([key, value]) => {
@@ -82,26 +78,15 @@ export function path(
  * @param {string} to The redirect destination
  * @param {string} defaultRedirect The redirect to use if the to is unsafe.
  */
-export function safeRedirect(
-  to: FormDataEntryValue | string | null | undefined,
-  defaultRedirect = "/",
-) {
-  if (
-    !to ||
-    typeof to !== "string" ||
-    !to.startsWith("/") ||
-    to.startsWith("//")
-  ) {
+export function safeRedirect(to: FormDataEntryValue | string | null | undefined, defaultRedirect = "/") {
+  if (!to || typeof to !== "string" || !to.startsWith("/") || to.startsWith("//")) {
     return defaultRedirect;
   }
 
   return to;
 }
 
-export function parsePayload<Schema extends ZodTypeAny>(
-  payload: FormData | URLSearchParams,
-  schema: Schema,
-) {
+export function parsePayload<Schema extends ZodTypeAny>(payload: FormData | URLSearchParams, schema: Schema) {
   const submission = parseWithZod(payload, { schema });
 
   if (submission.status !== "success") {
@@ -123,10 +108,7 @@ export function getSearchParams(request: Request) {
   return new URL(request.url).searchParams;
 }
 
-export function parseParams<Schema extends ZodTypeAny>(
-  params: Params<string>,
-  schema: Schema,
-) {
+export function parseParams<Schema extends ZodTypeAny>(params: Params<string>, schema: Schema) {
   const values = schema.safeParse(params);
 
   if (!values.success) {
@@ -147,7 +129,7 @@ export function parseParams<Schema extends ZodTypeAny>(
 
 export function assertActionType<ActionType, ExpectedType extends ActionType>(
   actionType: ActionType,
-  expectedType: ExpectedType,
+  expectedType: ExpectedType
 ): asserts actionType is ExpectedType {
   if (actionType !== expectedType) {
     throw new Error("Unexpected action type");

@@ -1,0 +1,56 @@
+diff --git a/dist/v3/coercion.d.ts b/dist/v3/coercion.d.ts
+index 6a8ca89d9e8db62ef4be551f41d3e5ba0132777e..d12b5f34815606bb1a19d2cd10079dcbf3a3d466 100644
+--- a/dist/v3/coercion.d.ts
++++ b/dist/v3/coercion.d.ts
+@@ -1,4 +1,4 @@
+-import type { ZodTypeAny } from 'zod';
++import type { ZodTypeAny } from 'zod/v3';
+ /**
+  * @deprecated Conform strip empty string to undefined by default
+  */
+diff --git a/dist/v3/coercion.js b/dist/v3/coercion.js
+index 9463b38ab3c78edd935fb133a1be5207aef8364b..c8cd91297def19cad6d022d40f78d1174c7d9ef4 100644
+--- a/dist/v3/coercion.js
++++ b/dist/v3/coercion.js
+@@ -3,7 +3,7 @@
+ Object.defineProperty(exports, '__esModule', { value: true });
+ 
+ var _rollupPluginBabelHelpers = require('../_virtual/_rollupPluginBabelHelpers.js');
+-var zod = require('zod');
++var zod = require('zod/v3');
+ 
+ /**
+  * Helpers for coercing string value
+diff --git a/dist/v3/coercion.mjs b/dist/v3/coercion.mjs
+index ed16a961f9ba40bb6c13f0cff199303e862a2e47..8d27e790d04f4fca8e58bfaeb2d0838b6c47177c 100644
+--- a/dist/v3/coercion.mjs
++++ b/dist/v3/coercion.mjs
+@@ -1,5 +1,5 @@
+ import { objectSpread2 as _objectSpread2 } from '../_virtual/_rollupPluginBabelHelpers.mjs';
+-import { any, ZodArray, ZodObject, ZodEffects, ZodOptional, ZodCatch, ZodIntersection, ZodUnion, ZodDiscriminatedUnion, ZodBranded, ZodTuple, ZodNullable, ZodPipeline, lazy } from 'zod';
++import { any, ZodArray, ZodObject, ZodEffects, ZodOptional, ZodCatch, ZodIntersection, ZodUnion, ZodDiscriminatedUnion, ZodBranded, ZodTuple, ZodNullable, ZodPipeline, lazy } from 'zod/v3';
+ 
+ /**
+  * Helpers for coercing string value
+diff --git a/dist/v3/constraint.d.ts b/dist/v3/constraint.d.ts
+index 3fde02d7fb61ceb8c077d29c6955f3c82bf802ba..2522b6b457c3de3a47369f82c7c0081a3f85c567 100644
+--- a/dist/v3/constraint.d.ts
++++ b/dist/v3/constraint.d.ts
+@@ -1,4 +1,4 @@
+ import type { Constraint } from '@conform-to/dom';
+-import type { ZodTypeAny } from 'zod';
++import type { ZodTypeAny } from 'zod/v3';
+ export declare function getZodConstraint(schema: ZodTypeAny): Record<string, Constraint>;
+ //# sourceMappingURL=constraint.d.ts.map
+\ No newline at end of file
+diff --git a/dist/v3/parse.d.ts b/dist/v3/parse.d.ts
+index 6c811c1f38e64e80e328fdc0cb027096f7883db0..b3509ddf017407c2e9e830a6e771ca4fcd5bda22 100644
+--- a/dist/v3/parse.d.ts
++++ b/dist/v3/parse.d.ts
+@@ -1,5 +1,5 @@
+ import { type Intent, type Submission } from '@conform-to/dom';
+-import { type ZodTypeAny, type ZodErrorMap, type input, type output, type ZodIssue } from 'zod';
++import { type ZodTypeAny, type ZodErrorMap, type input, type output, type ZodIssue } from 'zod/v3';
+ export declare function parseWithZod<Schema extends ZodTypeAny>(payload: FormData | URLSearchParams, options: {
+     schema: Schema | ((intent: Intent | null) => Schema);
+     async?: false;

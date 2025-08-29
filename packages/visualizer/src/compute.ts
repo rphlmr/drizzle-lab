@@ -1,14 +1,14 @@
 import "@xyflow/react/dist/style.css";
 
 import dagre from "@dagrejs/dagre";
-import type { Snapshot as MySqlSnapshot } from "@drizzle-lab/api/mysql";
-import type { Snapshot as PgSnapshot } from "@drizzle-lab/api/pg";
-import type { Snapshot as SQLiteSnapshot } from "@drizzle-lab/api/sqlite";
-import type { Node, Edge } from "@xyflow/react";
+import type { Snapshot as MySqlSnapshot } from "@drizzle-lab/api/mysql/web";
+import type { Snapshot as PgSnapshot } from "@drizzle-lab/api/pg/web";
+import type { Snapshot as SQLiteSnapshot } from "@drizzle-lab/api/sqlite/web";
+import type { Edge, Node } from "@xyflow/react";
 import { Position } from "@xyflow/react";
 
 /*
- * Work in progress
+ * Work in progress TODO: refactor and test
  */
 
 export type Snapshot = PgSnapshot | SQLiteSnapshot | MySqlSnapshot;
@@ -111,9 +111,7 @@ const NODE_ROW_HEIGHT = 100;
 
 // Calculate the maximum width needed for a node based on its column names
 const getNodeWidth = (node: TableNodeDefinition | ViewNodeDefinition) => {
-  const columnWidths = node.data.columns.map(
-    (col) => (col.name.length + col.dataType.length) * 8,
-  );
+  const columnWidths = node.data.columns.map((col) => (col.name.length + col.dataType.length) * 8);
   const headerWidth = node.data.name.length * 8;
   return Math.max(NODE_WIDTH, Math.max(...columnWidths, headerWidth) + 40); // Add padding just in case
 };
@@ -127,10 +125,7 @@ const getNodeHeight = (node: TableNodeDefinition | ViewNodeDefinition) => {
 
   if (node.type === "view") {
     // Views, only have columns
-    const columnsHeight = Math.max(
-      node.data.columns.length * ITEM_HEIGHT,
-      NODE_ROW_HEIGHT,
-    );
+    const columnsHeight = Math.max(node.data.columns.length * ITEM_HEIGHT, NODE_ROW_HEIGHT);
     return baseHeight + columnsHeight;
   }
 
@@ -143,10 +138,8 @@ const getNodeHeight = (node: TableNodeDefinition | ViewNodeDefinition) => {
   const checksHeight = tableNode.data.checks.length * ITEM_HEIGHT;
   const indexesHeight = tableNode.data.indexes.length * ITEM_HEIGHT;
   const foreignKeysHeight = tableNode.data.foreignKeys.length * ITEM_HEIGHT;
-  const uniqueConstraintsHeight =
-    tableNode.data.uniqueConstraints.length * ITEM_HEIGHT;
-  const compositePrimaryKeysHeight =
-    tableNode.data.compositePrimaryKeys.length * ITEM_HEIGHT;
+  const uniqueConstraintsHeight = tableNode.data.uniqueConstraints.length * ITEM_HEIGHT;
+  const compositePrimaryKeysHeight = tableNode.data.compositePrimaryKeys.length * ITEM_HEIGHT;
 
   // Sum up all components
   const totalComponentsHeight =
@@ -163,11 +156,7 @@ const getNodeHeight = (node: TableNodeDefinition | ViewNodeDefinition) => {
 };
 
 // Determine optimal edge positions based on node connections
-const getNodeEdgePositions = (
-  nodeId: string,
-  edges: Edge[],
-  dagreGraph: dagre.graphlib.Graph,
-) => {
+const getNodeEdgePositions = (nodeId: string, edges: Edge[], dagreGraph: dagre.graphlib.Graph) => {
   const currentNode = dagreGraph.node(nodeId);
   const currentX = currentNode.x;
 
@@ -192,8 +181,7 @@ const getNodeEdgePositions = (
 
   // If there's only one connection, align both positions to that side
   if (connectedNodes.length === 1) {
-    const position =
-      connectedNodes[0].x > currentX ? Position.Right : Position.Left;
+    const position = connectedNodes[0].x > currentX ? Position.Right : Position.Left;
     return { sourcePos: position, targetPos: position };
   }
 
@@ -214,10 +202,7 @@ const getNodeEdgePositions = (
 };
 
 // Supabase, thanks!
-const getLayoutedElements = (
-  nodes: (TableNodeDefinition | ViewNodeDefinition)[],
-  edges: Edge[],
-) => {
+const getLayoutedElements = (nodes: (TableNodeDefinition | ViewNodeDefinition)[], edges: Edge[]) => {
   const dagreGraph = new dagre.graphlib.Graph();
   dagreGraph.setDefaultEdgeLabel(() => ({}));
 
@@ -234,34 +219,30 @@ const getLayoutedElements = (
   });
 
   // First, add all nodes to the graph
-  nodes.forEach((node) => {
+  for (const node of nodes) {
     const width = getNodeWidth(node);
     const height = getNodeHeight(node);
     dagreGraph.setNode(node.id, {
       width: width / 2.5,
       height: height / 2.5,
     });
-  });
+  }
 
   // Add edges to the graph
-  edges.forEach((edge) => {
+  for (const edge of edges) {
     dagreGraph.setEdge(edge.source, edge.target);
-  });
+  }
 
   // Find nodes with no relations
   const connectedNodes = new Set<string>();
-  edges.forEach((edge) => {
+  for (const edge of edges) {
     connectedNodes.add(edge.source);
     connectedNodes.add(edge.target);
-  });
+  }
 
   // Group nodes into ranks to create a more horizontal layout
-  const connectedNodesList = nodes.filter((node) =>
-    connectedNodes.has(node.id),
-  );
-  const unconnectedNodesList = nodes.filter(
-    (node) => !connectedNodes.has(node.id),
-  );
+  const connectedNodesList = nodes.filter((node) => connectedNodes.has(node.id));
+  const unconnectedNodesList = nodes.filter((node) => !connectedNodes.has(node.id));
 
   // Assign ranks to connected nodes to spread them horizontally
   connectedNodesList.forEach((node, index) => {
@@ -273,24 +254,20 @@ const getLayoutedElements = (
   });
 
   // Place unconnected nodes on the far right
-  unconnectedNodesList.forEach((node) => {
+  for (const node of unconnectedNodesList) {
     dagreGraph.setNode(node.id, {
       ...dagreGraph.node(node.id),
       rank: 1000,
     });
-  });
+  }
 
   // Layout the graph
   dagre.layout(dagreGraph);
 
   // Apply the layout positions to the nodes
-  nodes.forEach((node) => {
+  for (const node of nodes) {
     const nodeWithPosition = dagreGraph.node(node.id);
-    const { sourcePos, targetPos } = getNodeEdgePositions(
-      node.id,
-      edges,
-      dagreGraph,
-    );
+    const { sourcePos, targetPos } = getNodeEdgePositions(node.id, edges, dagreGraph);
 
     node.targetPosition = targetPos;
     node.sourcePosition = sourcePos;
@@ -299,12 +276,12 @@ const getLayoutedElements = (
       x: nodeWithPosition.x - nodeWithPosition.width / 2,
       y: nodeWithPosition.y - nodeWithPosition.height / 2,
     };
-  });
+  }
 
   return { nodes, edges };
 };
 
-export async function compute(snapshot: Snapshot) {
+export function compute(snapshot: Snapshot) {
   if (!snapshot) {
     return { nodes: [], edges: [] };
   }
@@ -315,7 +292,7 @@ export async function compute(snapshot: Snapshot) {
   switch (snapshot.dialect) {
     case "postgresql": {
       /* Tables */
-      Object.values(snapshot.tables).forEach((table) => {
+      for (const table of Object.values(snapshot.tables)) {
         /* Foreign Keys */
         const foreignKeys = Object.values(table.foreignKeys).flatMap((fk) => {
           const fkName = fk.name;
@@ -340,7 +317,7 @@ export async function compute(snapshot: Snapshot) {
           });
         });
 
-        foreignKeys.forEach((foreignKey) => {
+        for (const foreignKey of foreignKeys) {
           edges.push({
             id: foreignKey.id,
             source: foreignKey.tableTo,
@@ -348,9 +325,10 @@ export async function compute(snapshot: Snapshot) {
             target: foreignKey.tableFrom,
             targetHandle: `${foreignKey.columnFrom}-left`,
             style: { strokeWidth: 2 },
+            className: "edge-plain",
             type: "smoothstep",
           });
-        });
+        }
 
         /* Composite Primary Keys */
         const compositePrimaryKeys = Object.values(table.compositePrimaryKeys);
@@ -358,7 +336,7 @@ export async function compute(snapshot: Snapshot) {
         /* Relations */
         const relations = table.relations;
 
-        relations.forEach((relation) => {
+        for (const relation of relations) {
           edges.push({
             id: crypto.randomUUID(),
             source: relation.referencedTableName,
@@ -366,9 +344,10 @@ export async function compute(snapshot: Snapshot) {
             target: table.name,
             targetHandle: relation.fieldName,
             style: { strokeWidth: 2, strokeDasharray: "5" },
+            className: "edge-dashed",
             type: "smoothstep",
           });
-        });
+        }
 
         /* Checks */
         const checks = Object.values(table.checkConstraints);
@@ -390,19 +369,14 @@ export async function compute(snapshot: Snapshot) {
             description: table.description,
             schema: table.schema,
             columns: Object.values(table.columns).map((column) => {
-              const foreignKey = foreignKeys.find(
-                (fk) => fk.columnFrom === column.name,
-              );
+              const foreignKey = foreignKeys.find((fk) => fk.columnFrom === column.name);
 
               return {
                 name: column.name,
                 dataType: column.type,
                 description: column.description,
                 isPrimaryKey:
-                  column.primaryKey ||
-                  compositePrimaryKeys.some((cpk) =>
-                    cpk.columns.includes(column.name),
-                  ),
+                  column.primaryKey || compositePrimaryKeys.some((cpk) => cpk.columns.includes(column.name)),
                 isForeignKey: Boolean(foreignKey),
                 isNotNull: column.notNull,
                 isUnique: column.isUnique,
@@ -427,10 +401,10 @@ export async function compute(snapshot: Snapshot) {
           position: { x: 0, y: 0 },
           type: "table",
         });
-      });
+      }
 
       /* Views */
-      Object.values(snapshot.views).forEach((view) => {
+      for (const view of Object.values(snapshot.views)) {
         nodes.push({
           id: view.name,
           data: {
@@ -459,12 +433,13 @@ export async function compute(snapshot: Snapshot) {
           position: { x: 0, y: 0 },
           type: "view",
         });
-      });
+      }
+
       break;
     }
     case "sqlite": {
       /* Tables */
-      Object.values(snapshot.tables).forEach((table) => {
+      for (const table of Object.values(snapshot.tables)) {
         /* Foreign Keys */
         const foreignKeys = Object.values(table.foreignKeys).flatMap((fk) => {
           const fkName = fk.name;
@@ -489,7 +464,7 @@ export async function compute(snapshot: Snapshot) {
           });
         });
 
-        foreignKeys.forEach((foreignKey) => {
+        for (const foreignKey of foreignKeys) {
           edges.push({
             id: foreignKey.id,
             source: foreignKey.tableTo,
@@ -497,9 +472,10 @@ export async function compute(snapshot: Snapshot) {
             target: foreignKey.tableFrom,
             targetHandle: `${foreignKey.columnFrom}-left`,
             style: { strokeWidth: 2 },
+            className: "edge-plain",
             type: "smoothstep",
           });
-        });
+        }
 
         /* Composite Primary Keys */
         const compositePrimaryKeys = Object.values(table.compositePrimaryKeys);
@@ -507,7 +483,7 @@ export async function compute(snapshot: Snapshot) {
         /* Relations */
         const relations = table.relations;
 
-        relations.forEach((relation) => {
+        for (const relation of relations) {
           edges.push({
             id: crypto.randomUUID(),
             source: relation.referencedTableName,
@@ -515,9 +491,10 @@ export async function compute(snapshot: Snapshot) {
             target: table.name,
             targetHandle: relation.fieldName,
             style: { strokeWidth: 2, strokeDasharray: "5" },
+            className: "edge-dashed",
             type: "smoothstep",
           });
-        });
+        }
 
         /* Checks */
         const checks = Object.values(table.checkConstraints);
@@ -535,19 +512,14 @@ export async function compute(snapshot: Snapshot) {
             name: table.name,
             description: table.description,
             columns: Object.values(table.columns).map((column) => {
-              const foreignKey = foreignKeys.find(
-                (fk) => fk.columnFrom === column.name,
-              );
+              const foreignKey = foreignKeys.find((fk) => fk.columnFrom === column.name);
 
               return {
                 name: column.name,
                 dataType: column.type,
                 description: column.description,
                 isPrimaryKey:
-                  column.primaryKey ||
-                  compositePrimaryKeys.some((cpk) =>
-                    cpk.columns.includes(column.name),
-                  ),
+                  column.primaryKey || compositePrimaryKeys.some((cpk) => cpk.columns.includes(column.name)),
                 isForeignKey: Boolean(foreignKey),
                 isNotNull: column.notNull,
                 isUnique: false,
@@ -572,10 +544,10 @@ export async function compute(snapshot: Snapshot) {
           position: { x: 0, y: 0 },
           type: "table",
         });
-      });
+      }
 
       /* Views */
-      Object.values(snapshot.views).forEach((view) => {
+      for (const view of Object.values(snapshot.views)) {
         nodes.push({
           id: view.name,
           data: {
@@ -604,13 +576,13 @@ export async function compute(snapshot: Snapshot) {
           position: { x: 0, y: 0 },
           type: "view",
         });
-      });
+      }
 
       break;
     }
     case "mysql": {
       /* Tables */
-      Object.values(snapshot.tables).forEach((table) => {
+      for (const table of Object.values(snapshot.tables)) {
         /* Foreign Keys */
         const foreignKeys = Object.values(table.foreignKeys).flatMap((fk) => {
           const fkName = fk.name;
@@ -635,7 +607,7 @@ export async function compute(snapshot: Snapshot) {
           });
         });
 
-        foreignKeys.forEach((foreignKey) => {
+        for (const foreignKey of foreignKeys) {
           edges.push({
             id: foreignKey.id,
             source: foreignKey.tableTo,
@@ -643,9 +615,10 @@ export async function compute(snapshot: Snapshot) {
             target: foreignKey.tableFrom,
             targetHandle: `${foreignKey.columnFrom}-left`,
             style: { strokeWidth: 2 },
+            className: "edge-plain",
             type: "smoothstep",
           });
-        });
+        }
 
         /* Composite Primary Keys */
         const compositePrimaryKeys = Object.values(table.compositePrimaryKeys);
@@ -653,7 +626,7 @@ export async function compute(snapshot: Snapshot) {
         /* Relations */
         const relations = table.relations;
 
-        relations.forEach((relation) => {
+        for (const relation of relations) {
           edges.push({
             id: crypto.randomUUID(),
             source: relation.referencedTableName,
@@ -661,9 +634,10 @@ export async function compute(snapshot: Snapshot) {
             target: table.name,
             targetHandle: relation.fieldName,
             style: { strokeWidth: 2, strokeDasharray: "5" },
+            className: "edge-dashed",
             type: "smoothstep",
           });
-        });
+        }
 
         /* Checks */
         const checks = Object.values(table.checkConstraints);
@@ -682,19 +656,14 @@ export async function compute(snapshot: Snapshot) {
             description: table.description,
             schema: table.schema,
             columns: Object.values(table.columns).map((column) => {
-              const foreignKey = foreignKeys.find(
-                (fk) => fk.columnFrom === column.name,
-              );
+              const foreignKey = foreignKeys.find((fk) => fk.columnFrom === column.name);
 
               return {
                 name: column.name,
                 dataType: column.type,
                 description: column.description,
                 isPrimaryKey:
-                  column.primaryKey ||
-                  compositePrimaryKeys.some((cpk) =>
-                    cpk.columns.includes(column.name),
-                  ),
+                  column.primaryKey || compositePrimaryKeys.some((cpk) => cpk.columns.includes(column.name)),
                 isForeignKey: Boolean(foreignKey),
                 isNotNull: column.notNull,
                 isUnique: false,
@@ -719,10 +688,10 @@ export async function compute(snapshot: Snapshot) {
           position: { x: 0, y: 0 },
           type: "table",
         });
-      });
+      }
 
       /* Views */
-      Object.values(snapshot.views).forEach((view) => {
+      for (const view of Object.values(snapshot.views)) {
         nodes.push({
           id: view.name,
           data: {
@@ -751,7 +720,8 @@ export async function compute(snapshot: Snapshot) {
           position: { x: 0, y: 0 },
           type: "view",
         });
-      });
+      }
+
       break;
     }
   }

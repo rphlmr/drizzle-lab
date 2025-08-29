@@ -1,5 +1,5 @@
+import { sql } from "drizzle-orm";
 import { Suspense, useEffect, useState } from "react";
-
 import {
   Await,
   Form,
@@ -8,10 +8,14 @@ import {
   useLoaderData,
   useLocation,
   useNavigate,
+  useParams,
   useRevalidator,
   useRouteLoaderData,
-} from "@remix-run/react";
-import { Alert, AlertDescription, AlertTitle } from "@repo/ui/components/alert";
+} from "react-router";
+import { AnonymousCTA } from "~/components/anonymous-cta";
+import { DrizzleLogo, RainLogo } from "~/components/logo";
+import { ToolbarOutlet } from "~/components/toolbar";
+import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -20,14 +24,10 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@repo/ui/components/alert-dialog";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@repo/ui/components/avatar";
-import { Badge } from "@repo/ui/components/badge";
-import { Button, buttonVariants } from "@repo/ui/components/button";
+} from "~/components/ui/alert-dialog";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
+import { Badge } from "~/components/ui/badge";
+import { Button, buttonVariants } from "~/components/ui/button";
 import {
   Command,
   CommandEmpty,
@@ -37,56 +37,46 @@ import {
   CommandList,
   CommandSeparator,
   CommandShortcut,
-} from "@repo/ui/components/command";
-import { Dialog, DialogContent } from "@repo/ui/components/dialog";
+} from "~/components/ui/command";
+import { Dialog, DialogContent } from "~/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@repo/ui/components/dropdown-menu";
-import { Icon, type IconName } from "@repo/ui/components/icon";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@repo/ui/components/popover";
-import { Skeleton } from "@repo/ui/components/skeleton";
-import { Typography } from "@repo/ui/components/typography";
-import { cn } from "@repo/ui/utils/cn";
-import { sql } from "drizzle-orm";
-import { useParams } from "react-router";
-
-import { AnonymousCTA } from "~/components/anonymous-cta";
-import { DrizzleLogo, RainLogo } from "~/components/logo";
-import { ToolbarOutlet } from "~/components/toolbar";
+} from "~/components/ui/dropdown-menu";
+import { Icon, type IconName } from "~/components/ui/icon";
+import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover";
+import { Skeleton } from "~/components/ui/skeleton";
+import { Typography } from "~/components/ui/typography";
 import { localDb } from "~/database/.client/db";
 import { serverDb } from "~/database/.server/db";
 import type { User } from "~/database/types";
 import { EditorOptionsDialog } from "~/modules/playground/options.client";
 import { getDrizzleVersion } from "~/registry";
 import { NewPlaygroundWizard } from "~/routes/api.playground/route";
+import { cn } from "~/utils/cn";
 import { handleError } from "~/utils/error";
-import { data, error } from "~/utils/http";
+import { failure, success } from "~/utils/http";
 import type { Closable } from "~/utils/use-dialog";
 import { useDialog } from "~/utils/use-dialog";
 import { useIsMobileAppLayout } from "~/utils/use-is-mobile-app-layout";
+import type { Route } from "./+types/route";
 
-export const loader = async ({ context }: LoaderFunctionArgs) => {
+export const loader = async ({ context }: Route.LoaderArgs) => {
   try {
     let user: Promise<User | undefined> | undefined;
 
     if (context.isAuthenticated) {
       user = serverDb.query.user
         .findFirst({
-          where: (User, { eq }) =>
-            eq(User.id, context.getAuthSessionOrThrow().userId),
+          where: (User, { eq }) => eq(User.id, context.getAuthSessionOrThrow().userId),
         })
         .execute();
     }
 
-    return data({
+    return success({
       user,
       version: await getDrizzleVersion(),
       isAuthenticated: context.isAuthenticated,
@@ -95,59 +85,50 @@ export const loader = async ({ context }: LoaderFunctionArgs) => {
             extras: {
               isShared: sql<boolean>`true`.as("is_shared"),
             },
-            where: (Playground, { eq }) =>
-              eq(Playground.creatorId, context.getAuthSessionOrThrow().userId),
+            where: (Playground, { eq }) => eq(Playground.creatorId, context.getAuthSessionOrThrow().userId),
             orderBy: (Playground, { desc }) => [desc(Playground.updatedAt)],
           })
         : [],
     });
   } catch (cause) {
     const reason = handleError(cause);
-    throw error(reason);
+    throw failure(reason);
   }
 };
 
-export const clientLoader = async ({
-  serverLoader,
-}: ClientLoaderFunctionArgs) => {
+export const clientLoader = async ({ serverLoader }: Route.ClientLoaderArgs) => {
   try {
-    const serverResponse = await serverLoader<typeof loader>();
-    const serverPlaygrounds = serverResponse.data.playgrounds;
-    const serverPlaygroundIds = serverPlaygrounds.map(
-      (playground) => playground.id,
-    );
+    const serverResponse = await serverLoader();
+    const serverPlaygrounds = serverResponse.success.playgrounds;
+    const serverPlaygroundIds = serverPlaygrounds.map((playground) => playground.id);
     const localPlaygrounds = await localDb.query.playground.findMany({
       extras: {
         isShared: sql<boolean>`false`.as("is_shared"),
       },
       where:
         serverPlaygroundIds.length > 0
-          ? (Playground, { notInArray }) =>
-              notInArray(Playground.id, serverPlaygroundIds)
+          ? (Playground, { notInArray }) => notInArray(Playground.id, serverPlaygroundIds)
           : undefined,
       orderBy: (Playground, { desc }) => [desc(Playground.updatedAt)],
     });
 
     const playgrounds = [...serverPlaygrounds, ...localPlaygrounds].sort(
-      (a, b) =>
-        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+      (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
     );
 
     const hasReadBanner = localStorage.getItem("hasReadBanner") === "true";
 
-    const isMacOs =
-      navigator.userAgent.includes("Macintosh") ||
-      navigator.userAgent.includes("Mac OS");
+    const isMacOs = navigator.userAgent.includes("Macintosh") || navigator.userAgent.includes("Mac OS");
 
-    return data({
-      ...serverResponse.data,
+    return success({
+      ...serverResponse.success,
       playgrounds,
       hasReadBanner,
       isMacOs,
     });
   } catch (cause) {
     const reason = handleError(cause);
-    throw error(reason);
+    throw failure(reason);
   }
 };
 
@@ -155,58 +136,61 @@ clientLoader.hydrate = true;
 
 export function HydrateFallback() {
   return (
-    <div className="flex size-full flex-col items-center justify-center gap-4">
+    <div className="flex flex-col justify-center items-center gap-4 size-full">
       <RainLogo className="h-10 animate-pulse" />
       <Typography variant="mutedText" className="animate-pulse">
         Drizzle Run is loading several binaries to work locally first
+      </Typography>
+      <Typography variant="mutedText">
+        If you are stuck here, I am sorry but you may need to clear your cache (including deleting the local database
+        🙁)
       </Typography>
     </div>
   );
 }
 
-const apps: Array<{ id: string; path: string; icon: IconName; label: string }> =
-  [
-    {
-      path: "/",
-      label: "Command",
-      icon: "chevron-right",
-      id: "index",
-    },
-    {
-      path: "/",
-      label: "Playground",
-      icon: "box",
-      id: "playground",
-    },
-    {
-      path: "/explore",
-      label: "Explore",
-      icon: "telescope",
-      id: "explore",
-    },
-    {
-      path: "/visualizer",
-      label: "Schema visualizer",
-      icon: "camera",
-      id: "visualizer",
-    },
-    {
-      path: "/converter",
-      label: "Convert Drizzle to SQL",
-      icon: "arrow-right-left",
-      id: "converter",
-    },
-    {
-      path: "/converter/sql",
-      label: "Convert SQL to Drizzle",
-      icon: "arrow-right-left",
-      id: "converter",
-    },
-  ] as const;
+const apps: Array<{ id: string; path: string; icon: IconName; label: string }> = [
+  {
+    path: "/",
+    label: "Command",
+    icon: "chevron-right",
+    id: "index",
+  },
+  {
+    path: "/",
+    label: "Playground",
+    icon: "box",
+    id: "playground",
+  },
+  {
+    path: "/explore",
+    label: "Explore",
+    icon: "telescope",
+    id: "explore",
+  },
+  {
+    path: "/visualizer",
+    label: "Schema visualizer",
+    icon: "camera",
+    id: "visualizer",
+  },
+  {
+    path: "/converter",
+    label: "Convert Drizzle to SQL",
+    icon: "arrow-right-left",
+    id: "converter",
+  },
+  {
+    path: "/converter/sql",
+    label: "Convert SQL to Drizzle",
+    icon: "arrow-right-left",
+    id: "converter",
+  },
+] as const;
 
 export default function MainLayout() {
   const {
-    data: { user, version, playgrounds, hasReadBanner, isMacOs },
+    success: { user, version, playgrounds, hasReadBanner, isMacOs },
   } = useLoaderData<typeof clientLoader>();
   const location = useLocation();
   const navigate = useNavigate();
@@ -242,12 +226,12 @@ export default function MainLayout() {
 
   return (
     <>
-      <div className="grid size-full grid-rows-[auto_1fr]">
-        <header className="grid h-14 grid-cols-3 items-center justify-between gap-1 border-b px-4">
+      <div className="grid grid-rows-[auto_1fr] size-full">
+        <header className="justify-between items-center gap-1 grid grid-cols-3 px-4 border-b h-14">
           <div className="flex items-center gap-2">
             <NavLink to="/" className="flex items-center gap-1">
               <DrizzleLogo className="h-10" />
-              <Typography as="span" className="pt-0.5 text-base text-green">
+              <Typography as="span" className="pt-0.5 text-green text-base">
                 Run
               </Typography>
             </NavLink>
@@ -257,16 +241,12 @@ export default function MainLayout() {
             <Badge variant="outline">Drizzle {version}</Badge>
           </div>
 
-          <div className="flex w-full items-center justify-center">
+          <div className="flex justify-center items-center w-full">
             <Popover open={open} onOpenChange={setOpen}>
               <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="max-w-60 gap-1"
-                  role="combobox"
-                >
-                  <Icon name={currentApp.icon} size="md" />
-                  <span className="truncate">{currentApp.label}</span>
+                <Button variant="outline" className="gap-1 max-w-60">
+                  <Icon name={currentApp?.icon} size="md" />
+                  <span className="truncate">{currentApp?.label}</span>
                   <CommandShortcut>{`${meta}K`}</CommandShortcut>
                 </Button>
               </PopoverTrigger>
@@ -278,7 +258,7 @@ export default function MainLayout() {
                     <CommandGroup heading="Playground">
                       <CommandItem onSelect={() => setOpenList(!openList)}>
                         <Popover open={openList} onOpenChange={setOpenList}>
-                          <PopoverTrigger className="flex w-full items-center justify-between gap-1 outline-none">
+                          <PopoverTrigger className="flex justify-between items-center gap-1 outline-none w-full">
                             <div className="flex items-center gap-1">
                               <Icon name="folder-open" size="md" />
                               <span className="truncate">Open</span>
@@ -286,7 +266,7 @@ export default function MainLayout() {
                             <Icon name="chevron-right" size="md" />
                           </PopoverTrigger>
                           <PopoverContent
-                            className="w-96 p-0"
+                            className="p-0 w-96"
                             side="right"
                             align="start"
                             alignOffset={-11}
@@ -307,21 +287,13 @@ export default function MainLayout() {
                                       }}
                                       className="gap-2"
                                     >
-                                      <Badge variant="outline">
-                                        {playground.dialect}
-                                      </Badge>
+                                      <Badge variant="outline">{playground.dialect}</Badge>
 
-                                      {playground.isShared && (
-                                        <Badge variant="outline">shared</Badge>
-                                      )}
+                                      {playground.isShared && <Badge variant="outline">shared</Badge>}
 
-                                      <span className="truncate">
-                                        {playground.name}
-                                      </span>
+                                      <span className="truncate">{playground.name}</span>
 
-                                      <span className="hidden">
-                                        {playground.id}
-                                      </span>
+                                      <span className="hidden">{playground.id}</span>
                                     </CommandItem>
                                   );
                                 })}
@@ -330,10 +302,7 @@ export default function MainLayout() {
                           </PopoverContent>
                         </Popover>
                       </CommandItem>
-                      <CommandItem
-                        className="gap-1"
-                        onSelect={() => dialog.open("new_playground")}
-                      >
+                      <CommandItem className="gap-1" onSelect={() => dialog.open("new_playground")}>
                         <Icon name="box-plus" size="md" />
                         <span className="truncate">New playground</span>
                       </CommandItem>
@@ -349,7 +318,7 @@ export default function MainLayout() {
                             onSelect={() => {
                               let goTo = app.path;
 
-                              if (app.path === currentApp.path) {
+                              if (app.path === currentApp?.path) {
                                 goTo = location.pathname;
                               }
 
@@ -381,10 +350,7 @@ export default function MainLayout() {
                       <CommandItem
                         className="gap-1"
                         onSelect={() => {
-                          window.open(
-                            "https://orm.drizzle.team/docs/overview",
-                            "_blank",
-                          );
+                          window.open("https://orm.drizzle.team/docs/overview", "_blank");
                           setOpen(false);
                         }}
                       >
@@ -394,10 +360,7 @@ export default function MainLayout() {
                       <CommandItem
                         className="gap-1"
                         onSelect={() => {
-                          window.open(
-                            "https://github.com/rphlmr/drizzle-run",
-                            "_blank",
-                          );
+                          window.open("https://github.com/rphlmr/drizzle-run", "_blank");
                           setOpen(false);
                         }}
                       >
@@ -411,13 +374,9 @@ export default function MainLayout() {
             </Popover>
           </div>
 
-          <div className="flex items-center justify-end gap-1">
+          <div className="flex justify-end items-center gap-1">
             <ToolbarOutlet className="flex items-center gap-1" />
-            <Suspense
-              fallback={
-                <Skeleton className="size-5 cursor-pointer rounded-full" />
-              }
-            >
+            <Suspense fallback={<Skeleton className="rounded-full size-5 cursor-pointer" />}>
               <Await resolve={user}>
                 {(user) => (
                   <DropdownMenu>
@@ -427,18 +386,13 @@ export default function MainLayout() {
                           variant: "outline",
                           size: "icon",
                         }),
-                        "rounded-full",
+                        "rounded-full"
                       )}
                     >
                       {user ? (
                         <Avatar className="size-5">
-                          <AvatarImage
-                            src={user.avatarUrl || ""}
-                            alt={user.username}
-                          />
-                          <AvatarFallback>
-                            {user.username.substring(0, 2).toUpperCase()}
-                          </AvatarFallback>
+                          <AvatarImage src={user.avatarUrl || ""} alt={user.username} />
+                          <AvatarFallback>{user.username.substring(0, 2).toUpperCase()}</AvatarFallback>
                         </Avatar>
                       ) : (
                         <Icon name="circle-user-round" size="md" />
@@ -449,21 +403,12 @@ export default function MainLayout() {
                         {user ? (
                           <>
                             <Avatar className="size-14">
-                              <AvatarImage
-                                src={user.avatarUrl || ""}
-                                alt={user.username}
-                              />
-                              <AvatarFallback>
-                                {user.username.substring(0, 2).toUpperCase()}
-                              </AvatarFallback>
+                              <AvatarImage src={user.avatarUrl || ""} alt={user.username} />
+                              <AvatarFallback>{user.username.substring(0, 2).toUpperCase()}</AvatarFallback>
                             </Avatar>
                             <div className="flex flex-col items-center gap-1">
-                              <Typography variant="largeText">
-                                {user.fullName}
-                              </Typography>
-                              <Typography variant="smallText">
-                                {user.username}
-                              </Typography>
+                              <Typography variant="largeText">{user.fullName}</Typography>
+                              <Typography variant="smallText">{user.username}</Typography>
                             </div>
                           </>
                         ) : (
@@ -479,11 +424,7 @@ export default function MainLayout() {
                               dialog.open("log_out");
                             }}
                           >
-                            <Icon
-                              name="log-out"
-                              size="md"
-                              className="text-center"
-                            >
+                            <Icon name="log-out" size="md" className="text-center">
                               Use Prisma
                             </Icon>
                           </DropdownMenuItem>
@@ -496,7 +437,7 @@ export default function MainLayout() {
             </Suspense>
           </div>
         </header>
-        <div className="grid size-full grid-cols-1 overflow-hidden">
+        <div className="grid grid-cols-1 size-full overflow-hidden">
           <Outlet />
         </div>
         {!hasReadBanner && !isMobileAppLayout && <WelcomeBanner />}
@@ -505,14 +446,12 @@ export default function MainLayout() {
         <>
           {dialog.type === "new_playground" && (
             <Dialog open onOpenChange={dialog.toggle}>
-              <DialogContent className="h-96 md:max-w-[80%]">
+              <DialogContent className="md:max-w-[80%] h-96">
                 <NewPlaygroundWizard />
               </DialogContent>
             </Dialog>
           )}
-          {dialog.type === "editor_settings" && (
-            <EditorOptionsDialog close={dialog.close} />
-          )}
+          {dialog.type === "editor_settings" && <EditorOptionsDialog close={dialog.close} />}
           {dialog.type === "log_out" && <LogOutDialog close={dialog.close} />}
         </>
       )}
@@ -548,10 +487,11 @@ function LogOutDialog({ close }: Closable) {
 }
 
 export function usePlaygrounds() {
-  const { data } = useRouteLoaderData<typeof clientLoader>("routes/_") || {};
+  const { success } =
+    useRouteLoaderData<typeof clientLoader>("routes/_" satisfies RouteIdMatch<Route.ComponentProps>) || {};
   return {
-    playgrounds: data?.playgrounds || [],
-    isAuthenticated: data?.isAuthenticated || false,
+    playgrounds: success?.playgrounds || [],
+    isAuthenticated: success?.isAuthenticated || false,
   };
 }
 
@@ -559,22 +499,14 @@ function WelcomeBanner() {
   const { revalidate } = useRevalidator();
 
   return (
-    <Alert className="absolute bottom-4 left-4 w-fit">
+    <Alert className="bottom-4 left-4 absolute w-fit">
       <AlertTitle className="text-lg">👋 Welcome to Drizzle Run!</AlertTitle>
       <AlertDescription className="flex flex-col gap-2">
         <div className="flex flex-col">
-          <p>
-            You can use this tool to learn how to use Drizzle and share your
-            playgrounds
-          </p>
+          <p>You can use this tool to learn how to use Drizzle and share your playgrounds</p>
           <p>
             This is a work in progress, so do not hesitate to give a feedback on{" "}
-            <a
-              target="_blank"
-              rel="noreferrer"
-              href="https://github.com/rphlmr/drizzle-run"
-              className="text-blue"
-            >
+            <a target="_blank" rel="noreferrer" href="https://github.com/rphlmr/drizzle-run" className="text-blue">
               GitHub
             </a>
           </p>
@@ -582,12 +514,7 @@ function WelcomeBanner() {
 
         <p>
           This software is given for free by{" "}
-          <a
-            target="_blank"
-            rel="noreferrer"
-            href="https://x.com/rphlmr"
-            className="text-green"
-          >
+          <a target="_blank" rel="noreferrer" href="https://x.com/rphlmr" className="text-green">
             @rphlmr
           </a>{" "}
           and will be open sourced later
@@ -595,45 +522,20 @@ function WelcomeBanner() {
 
         <p>
           Made with{" "}
-          <a
-            target="_blank"
-            rel="noreferrer"
-            href="https://x.com/DrizzleORM"
-            className="text-green"
-          >
+          <a target="_blank" rel="noreferrer" href="https://x.com/DrizzleORM" className="text-green">
             @DrizzleORM
           </a>{" "}
-          <a
-            target="_blank"
-            rel="noreferrer"
-            href="https://x.com/ElectricSQL"
-            className="text-green"
-          >
+          <a target="_blank" rel="noreferrer" href="https://x.com/ElectricSQL" className="text-green">
             @ElectricSQL
           </a>{" "}
-          <a
-            target="_blank"
-            rel="noreferrer"
-            href="https://turso.tech/libsql"
-            className="text-green"
-          >
+          <a target="_blank" rel="noreferrer" href="https://turso.tech/libsql" className="text-green">
             @tursodatabase
           </a>{" "}
-          <a
-            target="_blank"
-            rel="noreferrer"
-            href="https://x.com/statelyai"
-            className="text-green"
-          >
+          <a target="_blank" rel="noreferrer" href="https://x.com/statelyai" className="text-green">
             @statelyai
           </a>{" "}
           and{" "}
-          <a
-            target="_blank"
-            rel="noreferrer"
-            href="https://x.com/supabase"
-            className="text-green"
-          >
+          <a target="_blank" rel="noreferrer" href="https://x.com/supabase" className="text-green">
             @supabase
           </a>
         </p>

@@ -1,0 +1,20 @@
+import { DrizzleVisualizer, DrizzleVisualizerLegend } from "../src";
+import * as schema from "./schema";
+
+import "../src/style.css";
+
+export default function App() {
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        width: "100%",
+        height: "100%",
+      }}
+    >
+      <DrizzleVisualizer dialect="postgresql" schema={schema} theme="dark" />
+      <DrizzleVisualizerLegend theme="dark" />
+    </div>
+  );
+}

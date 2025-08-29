@@ -6,12 +6,10 @@ import type { Logger } from "drizzle-orm/logger";
 
 import type { QueryLog } from "~/registry/utils/query-logger";
 
-// eslint-disable-next-line import/namespace
 import * as $schema from "./schema";
 
 class QueryLogger implements Logger {
   logQuery(sql: string, params: unknown[]): void {
-    // eslint-disable-next-line no-console
     console.log({
       type: "query-log",
       sql,

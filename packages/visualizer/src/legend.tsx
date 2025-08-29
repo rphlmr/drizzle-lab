@@ -1,50 +1,63 @@
-import { Icon } from "@repo/ui/components/icon";
-import { cn } from "@repo/ui/utils/cn";
+import {
+  BadgeCheckIcon,
+  CableIcon,
+  DiamondIcon,
+  KeyRoundIcon,
+  LinkIcon,
+  LockIcon,
+  ShieldCheckIcon,
+} from "lucide-react";
 
-export function DrizzleVisualizerLegend({ className }: { className?: string }) {
+import { cn } from "~/lib/utils";
+
+export function DrizzleVisualizerLegend({
+  className,
+  theme = "dark",
+}: {
+  className?: string;
+  theme?: "dark" | "light";
+}) {
   return (
     <div
+      data-app="drizzle-visualizer"
+      data-theme={theme}
       className={cn(
-        "flex w-full flex-wrap items-center justify-center gap-2 bg-[#0f0f14] px-2 py-1",
-        className,
+        "dv:flex dv:flex-wrap dv:justify-center dv:items-center dv:gap-2 dv:dark:bg-[#0f0f14] dv:px-2 dv:py-1 dv:w-full",
+        className
       )}
     >
-      <Icon name="key-round" size="xs" className="text-green">
-        <span className="shrink-0 text-xs text-muted-foreground">
-          Primary key
-        </span>
-      </Icon>
-      <Icon name="link" size="xs" className="text-green">
-        <span className="shrink-0 text-xs text-muted-foreground">
-          Foreign key
-        </span>
-      </Icon>
-      <Icon name="shield-check" size="xs" className="text-green">
-        <span className="shrink-0 text-xs text-muted-foreground">Check</span>
-      </Icon>
-      <Icon name="lock" size="xs" className="text-green">
-        <span className="shrink-0 text-xs text-muted-foreground">
-          RLS Policy
-        </span>
-      </Icon>
-      <Icon name="cable" size="xs" className="text-green">
-        <span className="shrink-0 text-xs text-muted-foreground">
-          Drizzle relation
-        </span>
-      </Icon>
-      <Icon name="badge-check" size="xs" className="text-secondary-foreground">
-        <span className="shrink-0 text-xs text-muted-foreground">Unique</span>
-      </Icon>
-      <Icon
-        name="diamond"
-        size="xs"
-        className="fill-secondary-foreground text-secondary-foreground"
-      >
-        <span className="shrink-0 text-xs text-muted-foreground">Non-null</span>
-      </Icon>
-      <Icon name="diamond" size="xs" className="text-secondary-foreground">
-        <span className="shrink-0 text-xs text-muted-foreground">Nullable</span>
-      </Icon>
+      <span className="dv:flex dv:items-center dv:gap-1">
+        <KeyRoundIcon className="dv:size-4 dv:text-green" />
+        <span className="dv:text-muted-foreground dv:text-xs dv:shrink-0">Primary key</span>
+      </span>
+      <span className="dv:flex dv:items-center dv:gap-1">
+        <LinkIcon className="dv:size-4 dv:text-green" />
+        <span className="dv:text-muted-foreground dv:text-xs dv:shrink-0">Foreign key</span>
+      </span>
+      <span className="dv:flex dv:items-center dv:gap-1">
+        <ShieldCheckIcon className="dv:size-4 dv:text-green" />
+        <span className="dv:text-muted-foreground dv:text-xs dv:shrink-0">Check</span>
+      </span>
+      <span className="dv:flex dv:items-center dv:gap-1">
+        <LockIcon className="dv:size-4 dv:text-green" />
+        <span className="dv:text-muted-foreground dv:text-xs dv:shrink-0">RLS Policy</span>
+      </span>
+      <span className="dv:flex dv:items-center dv:gap-1">
+        <CableIcon className="dv:size-4 dv:text-green" />
+        <span className="dv:text-muted-foreground dv:text-xs dv:shrink-0">Drizzle relation</span>
+      </span>
+      <span className="dv:flex dv:items-center dv:gap-1">
+        <BadgeCheckIcon className="dv:size-4 dv:text-green" />
+        <span className="dv:text-muted-foreground dv:text-xs dv:shrink-0">Unique</span>
+      </span>
+      <span className="dv:flex dv:items-center dv:gap-1">
+        <DiamondIcon className="dv:fill-secondary-foreground dv:size-4 dv:text-secondary-foreground" />
+        <span className="dv:text-muted-foreground dv:text-xs dv:shrink-0">Non-null</span>
+      </span>
+      <span className="dv:flex dv:items-center dv:gap-1">
+        <DiamondIcon className="dv:size-4 dv:text-secondary-foreground" />
+        <span className="dv:text-muted-foreground dv:text-xs dv:shrink-0">Nullable</span>
+      </span>
     </div>
   );
 }

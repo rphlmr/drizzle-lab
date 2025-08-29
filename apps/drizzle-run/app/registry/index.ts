@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v3";
 
 export const DialectSchema = z.enum(["postgresql", "sqlite"], {
   required_error: "Dialect is required",
@@ -94,7 +94,7 @@ export async function getCoreFiles(dialect: Dialect): Promise<PlaygroundFileTree
     import(`./dialects/${dialect}/core/utils.ts?raw`),
     import(`./dialects/${dialect}/core/seed.ts?raw`),
     import(`./dialects/${dialect}/core/db.ts?raw`),
-    import(`./tools/index.ts?raw`),
+    import("./tools/index.ts?raw"),
   ]);
 
   return {
@@ -112,7 +112,7 @@ export type TypeFile = {
   content: string;
 };
 
-export async function getRegistryManifest() {
+export function getRegistryManifest() {
   return import("~/registry/dist/manifest.json");
 }
 

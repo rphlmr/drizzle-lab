@@ -1,5 +1,3 @@
-import * as vscode from "vscode";
-
 import { getConfiguration } from "../../../context";
 import { outputChannel, render, toastError } from "../../../utils";
 import { createDrizzleStudioPanel } from "../panel";
@@ -21,8 +19,7 @@ export async function OpenStudio(...args: any[]) {
     await startStudio(configPath, envFile);
     const panel = createDrizzleStudioPanel();
 
-    const studioUrl =
-      getConfiguration<string>("studio.url") || "https://local.drizzle.studio";
+    const studioUrl = getConfiguration<string>("studio.url") || "https://local.drizzle.studio";
 
     outputChannel.appendLine(`${OutputKey} using Studio URL: ${studioUrl}`);
 
@@ -39,9 +36,7 @@ export async function OpenStudio(...args: any[]) {
     panel.reveal();
   } catch (error) {
     toastError(
-      `${OutputKey} Failed to start Drizzle Studio: ${
-        error instanceof Error ? error.message : String(error)
-      }`,
+      `${OutputKey} Failed to start Drizzle Studio: ${error instanceof Error ? error.message : String(error)}`
     );
     return;
   }

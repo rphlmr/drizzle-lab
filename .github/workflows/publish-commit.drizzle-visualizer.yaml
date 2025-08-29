@@ -1,0 +1,83 @@
+name: "[Drizzle Visualizer] 🚀 pkg-pr-new"
+
+concurrency:
+  group: ${{ github.repository }}-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  pull_request:
+    paths:
+      - "packages/visualizer/**"
+
+defaults:
+  run:
+    working-directory: packages/visualizer
+
+jobs:
+  lint:
+    name: ⬣ Linting
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: biomejs/setup-biome@v2
+      - run: biome ci . --reporter=github
+
+  typecheck:
+    name: 🔎 Type check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: ⬇️ Checkout repo
+        uses: actions/checkout@v4
+
+      - name: 👷 Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: ⎔ Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: "package.json"
+          cache: "pnpm"
+          cache-dependency-path: |
+            packages/visualizer/pnpm-lock.yaml
+            packages/cli/pnpm-lock.yaml
+
+      - name: 📥 Install dependencies
+        run: pnpm install
+
+      - name: 🔎 Type check
+        run: pnpm typecheck
+
+  build:
+    name: 🏗️ Build
+    runs-on: ubuntu-latest
+    needs: [lint, typecheck]
+
+    steps:
+      - name: ⬇️ Checkout repo
+        uses: actions/checkout@v4
+
+      - name: 👷 Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: ⎔ Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: "package.json"
+          cache: "pnpm"
+          cache-dependency-path: |
+            packages/visualizer/pnpm-lock.yaml
+            packages/cli/pnpm-lock.yaml
+
+      - name: 📥 Install dependencies
+        run: pnpm install
+
+      - name: 🏗️ Build
+        run: pnpm build
+
+      - name: 📦 Prepare package
+        run: pnpm prepublishOnly
+
+      - name: 📦 Publish
+        run: pnpm dlx pkg-pr-new publish --packageManager=pnpm

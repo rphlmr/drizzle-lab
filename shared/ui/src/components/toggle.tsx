@@ -6,20 +6,20 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "../utils/cn";
 
 const toggleVariants = cva(
-  "group inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors data-[state=on]:bg-accent data-[state=on]:text-accent-foreground hover:bg-muted hover:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
+  "dzl-group dzl-inline-flex dzl-items-center dzl-justify-center dzl-rounded-md dzl-text-sm dzl-font-medium dzl-transition-colors dzl-data-[state=on]:bg-accent dzl-data-[state=on]:text-accent-foreground dzl-hover:bg-muted dzl-hover:text-muted-foreground dzl-focus-visible:outline-none dzl-focus-visible:ring-1 dzl-focus-visible:ring-ring dzl-disabled:pointer-events-none dzl-disabled:opacity-50",
   {
     variants: {
       variant: {
-        default: "bg-transparent",
+        default: "dzl-bg-transparent",
         outline:
-          "border border-input bg-transparent shadow-sm hover:bg-accent hover:text-accent-foreground",
+          "dzl-border dzl-border-border dzl-border-input dzl-bg-transparent dzl-shadow-sm dzl-hover:bg-accent dzl-hover:text-accent-foreground",
       },
       size: {
-        default: "h-9 px-3",
-        sm: "h-8 px-2",
-        lg: "h-10 px-3",
-        icon: "size-9",
-        ["icon:sm"]: "size-8",
+        default: "dzl-h-9 dzl-px-3",
+        sm: "dzl-h-8 dzl-px-2",
+        lg: "dzl-h-10 dzl-px-3",
+        icon: "dzl-size-9",
+        ["icon:sm"]: "dzl-size-8",
       },
     },
     defaultVariants: {

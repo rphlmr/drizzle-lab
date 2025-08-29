@@ -1,4 +1,3 @@
-import chalk from "chalk";
 import { getTableName, is, Many, SQL } from "drizzle-orm";
 import {
   getTableConfig,
@@ -16,8 +15,7 @@ import type { DrizzleSchema } from "../../internal/global";
 import { getColumnCasing, sqlToStr } from "../../internal/helpers";
 import type { Relation } from "../../internal/relations";
 import { withStyle } from "../../internal/style";
-import { escapeSingleQuotes, splitSqlStatements } from "../../sql/utils";
-import { importFromDatabase } from "../loader/database";
+import { escapeSingleQuotes } from "../../sql/utils";
 import type {
   CheckConstraint,
   Column,
@@ -151,15 +149,13 @@ export function drizzleObjectsToSnapshot(
         const existingUnique = indexesObject[column.uniqueName!];
         if (typeof existingUnique !== "undefined") {
           console.log(
-            `\n${withStyle.errorWarning(`We\'ve found duplicated unique constraint names in ${chalk.underline.blue(
-              tableName,
-            )} table. 
-          The unique constraint ${chalk.underline.blue(
-            column.uniqueName,
-          )} on the ${chalk.underline.blue(
-            name,
-          )} column is conflicting with a unique constraint name already defined for ${chalk.underline.blue(
-            existingUnique.columns.join(","),
+            `\n${withStyle.errorWarning(`We\'ve found duplicated unique constraint names in ${
+              tableName
+            } table. 
+          The unique constraint ${column.uniqueName} on the ${
+            name
+          } column is conflicting with a unique constraint name already defined for ${existingUnique.columns.join(
+            ",",
           )} columns\n`)}`,
           );
           throw new Error(
@@ -276,14 +272,12 @@ export function drizzleObjectsToSnapshot(
       if (typeof existingUnique !== "undefined") {
         console.log(
           `\n${withStyle.errorWarning(
-            `We\'ve found duplicated unique constraint names in ${chalk.underline.blue(
-              tableName,
-            )} table. \nThe unique constraint ${chalk.underline.blue(
-              name,
-            )} on the ${chalk.underline.blue(
-              columnNames.join(","),
-            )} columns is confilcting with a unique constraint name already defined for ${chalk.underline.blue(
-              existingUnique.columns.join(","),
+            `We\'ve found duplicated unique constraint names in ${
+              tableName
+            } table. \nThe unique constraint ${name} on the ${columnNames.join(
+              ",",
+            )} columns is confilcting with a unique constraint name already defined for ${existingUnique.columns.join(
+              ",",
             )} columns\n`,
           )}`,
         );
@@ -331,11 +325,9 @@ export function drizzleObjectsToSnapshot(
         if (checksInTable[tableName].includes(check.name)) {
           console.log(
             `\n${withStyle.errorWarning(
-              `We\'ve found duplicated check constraint name in ${chalk.underline.blue(
-                tableName,
-              )}. Please rename your check constraint in the ${chalk.underline.blue(
-                tableName,
-              )} table`,
+              `We\'ve found duplicated check constraint name in ${
+                tableName
+              }. Please rename your check constraint in the ${tableName} table`,
             )}`,
           );
           throw new Error(
@@ -391,9 +383,9 @@ export function drizzleObjectsToSnapshot(
     if (typeof existingView !== "undefined") {
       console.log(
         `\n${withStyle.errorWarning(
-          `We\'ve found duplicated view name across ${chalk.underline.blue(
-            schema ?? "public",
-          )} schema. Please rename your view`,
+          `We\'ve found duplicated view name across ${
+            schema ?? "public"
+          } schema. Please rename your view`,
         )}`,
       );
       throw new Error(
@@ -483,32 +475,4 @@ export function drizzleObjectsToSnapshot(
     /* lab extension */
     projectId,
   };
-}
-
-/**
- * Convert the schema SQL dump to a Drizzle snapshot
- *
- * **It requires `@libsql/client-wasm` to be installed**
- *
- * @param sqlDump - SQL dump
- * @returns Drizzle snapshot
- */
-export async function sqlToSnapshot(sqlDump: string) {
-  const { createClient } = await import("@libsql/client-wasm").catch(() => {
-    throw new Error("Please install @libsql/client-wasm to use this feature");
-  });
-
-  const client = createClient({ url: ":memory:" });
-
-  const statements = splitSqlStatements(sqlDump);
-  for (const statement of statements) {
-    await client.execute(statement);
-  }
-
-  return importFromDatabase({
-    query: async (sql, args = []) => {
-      const res = await client.execute({ sql, args });
-      return res.rows as any;
-    },
-  });
 }

@@ -5,7 +5,7 @@ import { getLoadContext } from "./context";
 import { refreshSession } from "./middleware";
 import { createSessionStorage } from "./session";
 
-export const server = await createHonoServer({
+export default createHonoServer({
   getLoadContext,
   configure(server) {
     server.use(
@@ -17,14 +17,14 @@ export const server = await createHonoServer({
           return {
             ...sessionStorage,
             // If a user doesn't come back to the app within 30 days, their session will be deleted.
-            async commitSession(session) {
+            commitSession(session) {
               return sessionStorage.commitSession(session, {
                 maxAge: 60 * 60 * 24 * 365, // 1 year
               });
             },
           };
         },
-      }),
+      })
     );
 
     server.use(refreshSession());

@@ -8,26 +8,18 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@repo/ui/components/alert-dialog";
-import { Button } from "@repo/ui/components/button";
+} from "~/components/ui/alert-dialog";
+import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@repo/ui/components/dropdown-menu";
-import { Icon } from "@repo/ui/components/icon";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@repo/ui/components/popover";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@repo/ui/components/tooltip";
+} from "~/components/ui/dropdown-menu";
+import { Icon } from "~/components/ui/icon";
+import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover";
+import { Tooltip, TooltipContent, TooltipTrigger } from "~/components/ui/tooltip";
 
 import { AnonymousCTA } from "~/components/anonymous-cta";
 import type { Playground } from "~/database/types";
@@ -71,8 +63,8 @@ export function PlaygroundSelector({
             </Icon>
           </AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This playground will no longer be
-            accessible by you or others you have shared it with.
+            This action cannot be undone. This playground will no longer be accessible by you or others you have shared
+            it with.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

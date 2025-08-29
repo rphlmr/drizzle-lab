@@ -1,22 +1,11 @@
-import type React from "react";
-
-import {
-  type FieldMetadata,
-  FormProvider,
-  useField,
-  useForm as useFormBase,
-} from "@conform-to/react";
+import { type FieldMetadata, FormProvider, useField, useForm as useFormBase } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod";
-import {
-  type FormProps as RemixFormProps,
-  Form as RemixForm,
-} from "@remix-run/react";
-import { Typography } from "@repo/ui/components/typography";
-import { cn } from "@repo/ui/utils/cn";
-import type { FetcherWithComponents } from "react-router-dom";
-import type { z, ZodTypeAny } from "zod";
-
+import type React from "react";
+import { type FetcherWithComponents, Form as RRForm, type FormProps as RRFormProps } from "react-router";
+import type { ZodTypeAny, z } from "zod/v3";
+import { cn } from "~/utils/cn";
 import type { LoaderOrActionResponse } from "~/utils/http";
+import { Typography } from "./ui/typography";
 
 interface FieldErrorProps extends React.HTMLAttributes<HTMLParagraphElement> {
   field: FieldMetadata<unknown>;
@@ -45,13 +34,13 @@ export function FieldError({ field, className, ...props }: FieldErrorProps) {
   );
 }
 
-interface FormProps extends RemixFormProps {
+interface FormProps extends RRFormProps {
   context?: React.ComponentPropsWithoutRef<typeof FormProvider>["context"];
   fetcher?: FetcherWithComponents<unknown>;
 }
 
 export function Form({ context, fetcher, ...props }: FormProps) {
-  const FormComponent = fetcher?.Form || RemixForm;
+  const FormComponent = fetcher?.Form || RRForm;
 
   return context ? (
     <FormProvider context={context}>
@@ -71,13 +60,9 @@ type FormOption<Schema extends ZodTypeAny> = Omit<
   defaultValue?: Partial<Schema["_input"]>;
 };
 
-export function useForm<Schema extends ZodTypeAny>({
-  schema,
-  lastResult,
-  ...options
-}: FormOption<Schema>) {
+export function useForm<Schema extends ZodTypeAny>({ schema, lastResult, ...options }: FormOption<Schema>) {
   return useFormBase({
-    lastResult: lastResult?.error?.additionalData?.submissionResult,
+    lastResult: lastResult?.failure?.additionalData?.submissionResult,
     onValidate({ formData }) {
       return parseWithZod<Schema>(formData, { schema });
     },

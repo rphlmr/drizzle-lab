@@ -1,13 +1,9 @@
-import { cn } from "@repo/ui/utils/cn";
+import { cn } from "~/utils/cn";
 
 export function DrizzleLogo({ className }: { className?: string }) {
   return (
-    <svg
-      viewBox="0 0 202 72"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className={cn(className)}
-    >
+    <svg viewBox="0 0 202 72" fill="none" xmlns="http://www.w3.org/2000/svg" className={cn(className)}>
+      <title>Drizzle Logo</title>
       <rect
         width="5.25365"
         height="22.2834"
@@ -54,6 +50,7 @@ export function RainLogo({ className }: { className?: string }) {
       xmlns="http://www.w3.org/2000/svg"
       className={cn("w-fit text-green", className)}
     >
+      <title>Rain Logo</title>
       <path
         d="M37.058 78.7296C38.9195 75.4813 37.7789 71.368 34.5104 69.5422C31.2419 67.7164 27.0832 68.8696 25.2218 72.1179L3.37059 110.248C1.50909 113.496 2.64969 117.61 5.91818 119.435C9.18668 121.261 13.3454 120.108 15.2068 116.86L37.058 78.7296Z"
         fill="currentColor"

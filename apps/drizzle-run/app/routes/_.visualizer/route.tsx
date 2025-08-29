@@ -1,5 +1,5 @@
-import { Link, type MetaFunction } from "@remix-run/react";
-import { Typography } from "@repo/ui/components/typography";
+import { Link, type MetaFunction } from "react-router";
+import { Typography } from "~/components/ui/typography";
 
 import { CatchError } from "~/components/catch-error";
 import { env } from "~/utils/env";
@@ -54,20 +54,12 @@ export function ErrorBoundary() {
   return <CatchError redirectTo="/" />;
 }
 
-export default function Route() {
+export default function View() {
   return (
-    <div className="flex size-full flex-col items-center justify-center gap-12">
-      <Typography variant="largeText">
-        Drizzle Visualizer is now available as a standalone app.
-      </Typography>
-      <code className="text-muted-foreground">
-        npx drizzle-lab@latest visualizer
-      </code>
-      <Link
-        to="https://www.npmjs.com/package/drizzle-lab?activeTab=readme"
-        target="_blank"
-        rel="noreferrer"
-      >
+    <div className="flex flex-col justify-center items-center gap-12 size-full">
+      <Typography variant="largeText">Drizzle Visualizer is now available as a standalone app.</Typography>
+      <code className="text-muted-foreground">npx drizzle-lab@latest visualizer</code>
+      <Link to="https://www.npmjs.com/package/drizzle-lab?activeTab=readme" target="_blank" rel="noreferrer">
         View on npm
       </Link>
     </div>

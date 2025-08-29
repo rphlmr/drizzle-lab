@@ -1,24 +1,17 @@
 import { useEffect, useRef, useState } from "react";
 
 import { Editor } from "@monaco-editor/react";
-import { Badge } from "@repo/ui/components/badge";
-import { Button } from "@repo/ui/components/button";
-import { Icon } from "@repo/ui/components/icon";
-import {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from "@repo/ui/components/resizable";
-import { Typography } from "@repo/ui/components/typography";
-import { cn } from "@repo/ui/utils/cn";
 import { useActor } from "@xstate/react";
 import type { ImperativePanelHandle } from "react-resizable-panels";
+import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
+import { Icon } from "~/components/ui/icon";
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "~/components/ui/resizable";
+import { Typography } from "~/components/ui/typography";
+import { cn } from "~/utils/cn";
 
 import { RainLogo } from "~/components/logo";
-import {
-  EditorMachine,
-  schemaToSql,
-} from "~/modules/playground/machine.client";
+import { EditorMachine, schemaToSql } from "~/modules/playground/machine.client";
 import { useEditorOptions } from "~/modules/playground/options.client";
 import { asFileName } from "~/registry";
 
@@ -71,11 +64,11 @@ export const commentsRelations = relations(comments, ({ one }) => ({
 }));
 `;
 
-export default function Route() {
+export default function View() {
   const editorPanelRef = useRef<ImperativePanelHandle>(null);
   const editorOptions = useEditorOptions();
   const [rawSchema, setRawSchema] = useState<string>(
-    () => sessionStorage.getItem("converter.schema.ts") || schemaExample,
+    () => sessionStorage.getItem("converter.schema.ts") || schemaExample
   );
   const [sql, setSql] = useState<string>("");
   const [editor] = useActor(EditorMachine, {
@@ -114,30 +107,19 @@ export default function Route() {
         setSql(sql);
       })
       .catch((cause) => {
-        setSql(cause.message);
+        setSql((cause as Error).message);
       });
   }, [isReady, rawSchema]);
 
   return (
-    <ResizablePanelGroup
-      autoSaveId="converter"
-      direction="horizontal"
-      className="relative size-full"
-    >
-      <ResizablePanel
-        ref={editorPanelRef}
-        defaultSize={50}
-        className="relative p-4 pl-0"
-      >
-        <Badge
-          variant="secondary"
-          className="absolute right-4 top-4 z-10 w-fit"
-        >
+    <ResizablePanelGroup autoSaveId="converter" direction="horizontal" className="relative size-full">
+      <ResizablePanel ref={editorPanelRef} defaultSize={50} className="relative p-4 pl-0">
+        <Badge variant="secondary" className="top-4 right-4 z-10 absolute w-fit">
           Drizzle Schema
         </Badge>
 
         {editor.hasTag("setup") && (
-          <div className="flex h-full flex-col items-center justify-center gap-4 p-4">
+          <div className="flex flex-col justify-center items-center gap-4 p-4 h-full">
             {editor.hasTag("starting") && (
               <>
                 <RainLogo className="h-10 animate-pulse" />
@@ -152,9 +134,7 @@ export default function Route() {
               <>
                 <RainLogo className="h-10 text-red" />
                 <p>{editorSetupError.message}</p>
-                {editorSetupError.cause ? (
-                  <p>{editorSetupError.cause}</p>
-                ) : null}
+                {editorSetupError.cause ? <p>{editorSetupError.cause}</p> : null}
               </>
             )}
           </div>
@@ -165,7 +145,7 @@ export default function Route() {
             defaultPath={asFileName("schema.ts")}
             theme="tokyo-night"
             options={editorOptions}
-            onChange={async (rawSchema) => {
+            onChange={(rawSchema) => {
               if (!rawSchema) {
                 setRawSchema("");
                 return;
@@ -183,14 +163,11 @@ export default function Route() {
         }}
       />
       <ResizablePanel defaultSize={50} className="relative p-4 pl-0">
-        <Badge
-          variant="secondary"
-          className="absolute right-4 top-4 z-10 flex w-fit items-center gap-1"
-        >
+        <Badge variant="secondary" className="top-4 right-4 z-10 absolute flex items-center gap-1 w-fit">
           Generated SQL
           <Button
             size="icon"
-            className="size-fit rounded-none"
+            className="rounded-none size-fit"
             variant="ghost"
             onClick={() => {
               if (!sql) {
@@ -201,15 +178,12 @@ export default function Route() {
               setCopied(true);
             }}
           >
-            <Icon
-              name={copied ? "clipboard-check" : "clipboard"}
-              className={cn(copied && "text-green")}
-            />
+            <Icon name={copied ? "clipboard-check" : "clipboard"} className={cn(copied && "text-green")} />
           </Button>
         </Badge>
 
         {editor.hasTag("setup") && (
-          <div className="flex h-full flex-col items-center justify-center gap-4 p-4">
+          <div className="flex flex-col justify-center items-center gap-4 p-4 h-full">
             {editor.hasTag("starting") && (
               <>
                 <RainLogo className="h-10 animate-pulse" />
@@ -224,22 +198,14 @@ export default function Route() {
               <>
                 <RainLogo className="h-10 text-red" />
                 <p>{editorSetupError.message}</p>
-                {editorSetupError.cause ? (
-                  <p>{editorSetupError.cause}</p>
-                ) : null}
+                {editorSetupError.cause ? <p>{editorSetupError.cause}</p> : null}
               </>
             )}
           </div>
         )}
 
         {editor.hasTag("started") && (
-          <Editor
-            value={sql}
-            language="sql"
-            path="schema.sql"
-            theme="tokyo-night"
-            options={editorOptions}
-          />
+          <Editor value={sql} language="sql" path="schema.sql" theme="tokyo-night" options={editorOptions} />
         )}
       </ResizablePanel>
     </ResizablePanelGroup>

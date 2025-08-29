@@ -1,34 +1,19 @@
-import { useEffect, useRef, useState } from "react";
-
 import { Editor } from "@monaco-editor/react";
-import { Badge } from "@repo/ui/components/badge";
-import { Button, buttonVariants } from "@repo/ui/components/button";
-import { Icon } from "@repo/ui/components/icon";
-import {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from "@repo/ui/components/resizable";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@repo/ui/components/select";
-import { Typography } from "@repo/ui/components/typography";
-import { cn } from "@repo/ui/utils/cn";
 import { useActor } from "@xstate/react";
+import { useEffect, useRef, useState } from "react";
 import type { ImperativePanelHandle } from "react-resizable-panels";
 import { useDebounce } from "use-debounce";
-
 import { RainLogo } from "~/components/logo";
-import {
-  EditorMachine,
-  sqlToSchema,
-} from "~/modules/playground/machine.client";
+import { Badge } from "~/components/ui/badge";
+import { Button, buttonVariants } from "~/components/ui/button";
+import { Icon } from "~/components/ui/icon";
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "~/components/ui/resizable";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
+import { Typography } from "~/components/ui/typography";
+import { EditorMachine, sqlToSchema } from "~/modules/playground/machine.client";
 import { useEditorOptions } from "~/modules/playground/options.client";
-import { asFileName, dialects, type Dialect } from "~/registry";
+import { type Dialect, asFileName, dialects } from "~/registry";
+import { cn } from "~/utils/cn";
 
 const sqlExample = `CREATE TABLE IF NOT EXISTS "users" (
 	"id" serial PRIMARY KEY NOT NULL,
@@ -67,12 +52,10 @@ EXCEPTION
 END $$;
 `;
 
-export default function Route() {
+export default function View() {
   const editorPanelRef = useRef<ImperativePanelHandle>(null);
   const editorOptions = useEditorOptions();
-  const [rawSql, setRawSql] = useState<string>(
-    () => sessionStorage.getItem("converter.schema.sql") || sqlExample,
-  );
+  const [rawSql, setRawSql] = useState<string>(() => sessionStorage.getItem("converter.schema.sql") || sqlExample);
   const [debouncedSql] = useDebounce(rawSql, 500);
   const [schema, setSchema] = useState<string>("");
   const [dialect, setDialect] = useState<Dialect>("postgresql");
@@ -112,26 +95,15 @@ export default function Route() {
         setSchema(schema);
       })
       .catch((cause) => {
-        setSchema(cause.message);
+        setSchema((cause instanceof Error ? cause.message : JSON.stringify(cause)) || "An unknown error occurred");
       });
   }, [isReady, debouncedSql, dialect]);
 
   return (
-    <ResizablePanelGroup
-      autoSaveId="converter"
-      direction="horizontal"
-      className="relative size-full"
-    >
-      <ResizablePanel
-        ref={editorPanelRef}
-        defaultSize={50}
-        className="relative p-4 pl-0"
-      >
-        <div className="absolute right-4 top-4 z-10 flex items-center gap-1">
-          <Select
-            value={dialect}
-            onValueChange={(value) => setDialect(value as Dialect)}
-          >
+    <ResizablePanelGroup autoSaveId="converter" direction="horizontal" className="relative size-full">
+      <ResizablePanel ref={editorPanelRef} defaultSize={50} className="relative p-4 pl-0">
+        <div className="top-4 right-4 z-10 absolute flex items-center gap-1">
+          <Select value={dialect} onValueChange={(value) => setDialect(value as Dialect)}>
             <SelectTrigger
               className={buttonVariants({
                 variant: "secondary",
@@ -155,7 +127,7 @@ export default function Route() {
         </div>
 
         {editor.hasTag("setup") && (
-          <div className="flex h-full flex-col items-center justify-center gap-4 p-4">
+          <div className="flex flex-col justify-center items-center gap-4 p-4 h-full">
             {editor.hasTag("starting") && (
               <>
                 <RainLogo className="h-10 animate-pulse" />
@@ -170,9 +142,7 @@ export default function Route() {
               <>
                 <RainLogo className="h-10 text-red" />
                 <p>{editorSetupError.message}</p>
-                {editorSetupError.cause ? (
-                  <p>{editorSetupError.cause}</p>
-                ) : null}
+                {editorSetupError.cause ? <p>{editorSetupError.cause}</p> : null}
               </>
             )}
           </div>
@@ -185,7 +155,7 @@ export default function Route() {
             path="schema.sql"
             theme="tokyo-night"
             options={editorOptions}
-            onChange={async (rawSql) => {
+            onChange={(rawSql) => {
               if (!rawSql) {
                 setRawSql("");
                 return;
@@ -203,14 +173,11 @@ export default function Route() {
         }}
       />
       <ResizablePanel defaultSize={50} className="relative p-4 pl-0">
-        <Badge
-          variant="secondary"
-          className="absolute right-4 top-4 z-10 flex w-fit items-center gap-1"
-        >
+        <Badge variant="secondary" className="top-4 right-4 z-10 absolute flex items-center gap-1 w-fit">
           Generated Drizzle schema
           <Button
             size="icon"
-            className="size-fit rounded-none"
+            className="rounded-none size-fit"
             variant="ghost"
             onClick={() => {
               if (!schema) {
@@ -221,15 +188,12 @@ export default function Route() {
               setCopied(true);
             }}
           >
-            <Icon
-              name={copied ? "clipboard-check" : "clipboard"}
-              className={cn(copied && "text-green")}
-            />
+            <Icon name={copied ? "clipboard-check" : "clipboard"} className={cn(copied && "text-green")} />
           </Button>
         </Badge>
 
         {editor.hasTag("setup") && (
-          <div className="flex h-full flex-col items-center justify-center gap-4 p-4">
+          <div className="flex flex-col justify-center items-center gap-4 p-4 h-full">
             {editor.hasTag("starting") && (
               <>
                 <RainLogo className="h-10 animate-pulse" />
@@ -244,21 +208,14 @@ export default function Route() {
               <>
                 <RainLogo className="h-10 text-red" />
                 <p>{editorSetupError.message}</p>
-                {editorSetupError.cause ? (
-                  <p>{editorSetupError.cause}</p>
-                ) : null}
+                {editorSetupError.cause ? <p>{editorSetupError.cause}</p> : null}
               </>
             )}
           </div>
         )}
 
         {editor.hasTag("started") && (
-          <Editor
-            value={schema}
-            defaultPath={asFileName("schema.ts")}
-            theme="tokyo-night"
-            options={editorOptions}
-          />
+          <Editor value={schema} defaultPath={asFileName("schema.ts")} theme="tokyo-night" options={editorOptions} />
         )}
       </ResizablePanel>
     </ResizablePanelGroup>

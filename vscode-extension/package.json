@@ -2,8 +2,7 @@
   "name": "vscode-drizzle-orm",
   "displayName": "Drizzle ORM",
   "description": "Adds schema visualizer for Drizzle ORM",
-  "preview": true,
-  "version": "0.9.0",
+  "version": "0.12.0",
   "private": true,
   "icon": "icon.png",
   "license": "MIT",
@@ -17,7 +16,7 @@
   },
   "engines": {
     "vscode": "^1.93.0",
-    "node": ">=20.0.0"
+    "node": ">=22.0.0"
   },
   "categories": [
     "Programming Languages"
@@ -65,32 +64,35 @@
     }
   },
   "scripts": {
-    "package": "vsce package",
-    "vscode:prepublish": "npm run check-types && npm run lint && npm run build",
-    "compile": "npm run check-types && npm run lint && tsx build.ts",
+    "package": "vsce package --no-dependencies",
+    "vscode:prepublish": "pnpm check && pnpm run build",
+    "compile": "pnpm check && tsx build.ts",
     "watch": "npm-run-all -p watch:*",
     "watch:esbuild": "tsx build.ts --watch",
     "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
     "build": "tsx build.ts --production",
-    "check-types": "tsc --noEmit",
-    "lint": "eslint src",
+    "check": "biome check .",
+    "check:fix": "biome check --fix .",
+    "typecheck": "tsc --noEmit",
     "publish": "vsce publish",
     "patch:publish": "vsce publish patch",
     "minor:publish": "vsce publish minor"
   },
   "devDependencies": {
+    "@drizzle-lab/visualizer": "workspace:*",
     "@types/mocha": "^10.0.9",
-    "@types/node": "20.x",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
     "@types/vscode": "^1.93.0",
-    "@typescript-eslint/eslint-plugin": "^8.10.0",
-    "@typescript-eslint/parser": "^8.7.0",
     "@vscode/test-cli": "^0.0.10",
     "@vscode/test-electron": "^2.4.1",
+    "@vscode/vsce": "^3.6.0",
+    "drizzle-kit": "^0.30.5",
     "esbuild": "^0.24.0",
-    "eslint": "^9.13.0",
     "npm-run-all": "^4.1.5",
     "tsx": "^4.19.2",
-    "typescript": "^5.6.3"
+    "typescript": "catalog:"
   },
   "keywords": [
     "drizzle db",
@@ -109,5 +111,12 @@
     "sql",
     "visualizer",
     "love"
-  ]
+  ],
+  "dependencies": {
+    "@drizzle-lab/visualizer": "workspace:*",
+    "dotenv": "^16.4.7",
+    "jiti": "^2.4.2",
+    "react": "catalog:",
+    "react-dom": "catalog:"
+  }
 }

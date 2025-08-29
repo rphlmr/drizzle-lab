@@ -1,23 +1,13 @@
-import type { LinksFunction } from "@remix-run/node";
-import {
-  Links,
-  Meta,
-  Outlet,
-  Scripts,
-  ScrollRestoration,
-  useRouteLoaderData,
-} from "@remix-run/react";
-import { Toaster } from "@repo/ui/components/sonner";
-import { TooltipProvider } from "@repo/ui/components/tooltip";
-import stylesheet from "@repo/ui/css/base.css?url";
-
+import { Links, type LinksFunction, Meta, Outlet, Scripts, ScrollRestoration, useRouteLoaderData } from "react-router";
+import { Toaster } from "~/components/ui/sonner";
+import { TooltipProvider } from "~/components/ui/tooltip";
+import "./app.css";
 import { CatchError } from "~/components/catch-error";
-import { data } from "~/utils/http";
-
+import { success } from "~/utils/http";
+import type { Route } from "./+types/root";
 import { env, getBrowserEnv } from "./utils/env";
 
 export const links: LinksFunction = () => [
-  { rel: "stylesheet", href: stylesheet },
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
   {
     rel: "preconnect",
@@ -31,13 +21,14 @@ export const links: LinksFunction = () => [
 ];
 
 export function loader() {
-  return data({
+  return success({
     env: getBrowserEnv(),
   });
 }
 
 export function Layout({ children }: { children: React.ReactNode }) {
-  const { data } = useRouteLoaderData<typeof loader>("root") || {};
+  const { success } =
+    useRouteLoaderData<Route.ComponentProps["loaderData"]>("root" satisfies RouteIdMatch<Route.ComponentProps>) || {};
 
   return (
     <html lang="en">
@@ -47,21 +38,17 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Meta />
         <Links />
       </head>
-      <body className="dark h-dvh w-screen overscroll-none">
+      <body className="w-screen h-dvh overscroll-none dark">
         <TooltipProvider>{children}</TooltipProvider>
         <Toaster />
         <ScrollRestoration />
         <script
           dangerouslySetInnerHTML={{
-            __html: `window.env = ${JSON.stringify(data?.env)}`,
+            __html: `window.env = ${JSON.stringify(success?.env)}`,
           }}
         />
         {env.NODE_ENV === "production" && (
-          <script
-            defer
-            data-site-id="drizzle.run"
-            src="https://assets.onedollarstats.com/tracker.js"
-          ></script>
+          <script defer data-site-id="drizzle.run" src="https://assets.onedollarstats.com/tracker.js" />
         )}
         <Scripts />
       </body>
@@ -75,7 +62,7 @@ export default function App() {
 
 export function ErrorBoundary() {
   return (
-    <div className="flex h-screen items-center justify-center">
+    <div className="flex justify-center items-center h-screen">
       <CatchError redirectTo="/" />
     </div>
   );

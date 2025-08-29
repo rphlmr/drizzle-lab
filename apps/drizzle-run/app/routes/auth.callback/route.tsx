@@ -1,19 +1,18 @@
-import { redirect } from "@remix-run/node";
-import { type MetaFunction, useLoaderData } from "@remix-run/react";
-
+import { type MetaFunction, redirect } from "react-router";
 import { serverDb } from "~/database/.server/db";
 import type { UserId } from "~/database/types";
 import { getSupabaseServerClient } from "~/integrations/supabase/client.server";
 import { makeAuthSession } from "~/modules/auth/service.server";
 import { AppError, handleError } from "~/utils/error";
-import { QUERY_KEY, error, getSearchParams, safeRedirect } from "~/utils/http";
+import { QUERY_KEY, failure, getSearchParams, safeRedirect } from "~/utils/http";
 import { robot } from "~/utils/robot";
+import type { Route } from "./+types/route";
 
 export const meta: MetaFunction = () => {
   return robot.private;
 };
 
-export async function loader({ request, context }: LoaderFunctionArgs) {
+export async function loader({ request, context }: Route.LoaderArgs) {
   if (context.isAuthenticated) {
     throw redirect("/");
   }
@@ -31,8 +30,7 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
       });
     }
 
-    const { error, data } =
-      await getSupabaseServerClient(context).auth.exchangeCodeForSession(code);
+    const { error, data } = await getSupabaseServerClient(context).auth.exchangeCodeForSession(code);
 
     if (error) {
       throw error;
@@ -42,9 +40,7 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
       .insert(serverDb.schema.user)
       .values({
         id: data.user.id as UserId,
-        username:
-          data.user.user_metadata["preferred_username"] ||
-          data.user.user_metadata["username"],
+        username: data.user.user_metadata["preferred_username"] || data.user.user_metadata["username"],
         fullName: data.user.user_metadata["full_name"],
         avatarUrl: data.user.user_metadata["avatar_url"],
       })
@@ -55,12 +51,12 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
     throw redirect(safeRedirect(searchParams.get(QUERY_KEY.redirectTo)));
   } catch (cause) {
     const reason = handleError(cause);
-    return error(reason);
+    return failure(reason);
   }
 }
 
-export default function AuthCallback() {
-  const { error } = useLoaderData<typeof loader>();
+export default function View({ loaderData }: Route.ComponentProps) {
+  const { failure } = loaderData;
 
-  return <div>{JSON.stringify(error, null, 2)}</div>;
+  return <div>{JSON.stringify(failure, null, 2)}</div>;
 }

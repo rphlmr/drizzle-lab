@@ -3,7 +3,7 @@ import type { WebviewPanel } from "vscode";
 import { createPanel, render } from "../../utils";
 
 /* Local state */
-let $panel: WebviewPanel | undefined = undefined;
+let $panel: WebviewPanel | undefined;
 
 export function createDrizzleStudioPanel() {
   if ($panel) {

@@ -1,38 +1,14 @@
 import { useEffect, useRef } from "react";
+import { type FetcherSubmitOptions, type SubmitTarget, useFetcher } from "react-router";
+import type { LoaderOrActionResponse, SuccessResponse } from "./http";
 
-import { useFetcher } from "@remix-run/react";
+type Deferred<T> = ReturnType<typeof newDeferred<T>>;
 
-import type { LoaderOrActionResponse, DataResponse } from "./http";
-
-type ActionFunction = (
-  args: ActionFunctionArgs,
-) => Promise<LoaderOrActionResponse<unknown>>;
-type ClientActionFunction = (
-  args: ClientActionFunctionArgs,
-) => Promise<LoaderOrActionResponse<unknown>>;
-type LoaderFunction = (
-  args: LoaderFunctionArgs,
-) => Promise<LoaderOrActionResponse<unknown>>;
-type ClientLoaderFunction = (
-  args: ClientLoaderFunctionArgs,
-) => Promise<LoaderOrActionResponse<unknown>>;
-type LoaderOrActionFunction =
-  | LoaderFunction
-  | ClientLoaderFunction
-  | ActionFunction
-  | ClientActionFunction;
-
-type Deferred<T extends LoaderOrActionFunction> = ReturnType<
-  typeof newDeferred<T>
->;
-
-function newDeferred<T extends LoaderOrActionFunction>() {
-  let resolve: (data: unknown) => void = () => void 0;
+function newDeferred<T>() {
+  let resolve: (data: T) => void = () => void 0;
   let reject: (error: unknown) => void = () => void 0;
 
-  const promise = new Promise<
-    Extract<Awaited<ReturnType<T>>, DataResponse<unknown>>["data"]
-  >((_resolve, _reject) => {
+  const promise = new Promise<T>((_resolve, _reject) => {
     resolve = _resolve;
     reject = _reject;
   });
@@ -40,9 +16,12 @@ function newDeferred<T extends LoaderOrActionFunction>() {
   return { resolve, reject, promise };
 }
 
-function useAsyncFetcher<T extends LoaderOrActionFunction>() {
+export function useAsyncFetcher<
+  T extends (...args: any) => Promise<LoaderOrActionResponse<any>>,
+  Output = Extract<Awaited<ReturnType<T>>, SuccessResponse<unknown>>["success"],
+>() {
   const fetcher = useFetcher<T>();
-  const deferred = useRef<Deferred<T> | null>(null);
+  const deferred = useRef<Deferred<Output> | null>(null);
 
   useEffect(() => {
     if (fetcher.state !== "idle" || !fetcher.data || !deferred.current) {
@@ -51,20 +30,23 @@ function useAsyncFetcher<T extends LoaderOrActionFunction>() {
 
     const response = fetcher.data;
 
-    if (response.error) {
-      return deferred.current.reject(response.error);
+    if (response.failure) {
+      return deferred.current.reject(response.failure);
     }
 
-    return deferred.current.resolve(response.data);
+    return deferred.current.resolve(response.success as Output);
   }, [fetcher.data, fetcher.state]);
 
   return {
-    submit: (...args: Parameters<typeof fetcher.submit>) => {
-      fetcher.submit(...args);
-      deferred.current = newDeferred();
+    submit: (
+      target: SubmitTarget,
+      options?: FetcherSubmitOptions & {
+        action?: RoutePath;
+      }
+    ): Promise<Output> => {
+      fetcher.submit(target, options);
+      deferred.current = newDeferred<Output>();
       return deferred.current.promise;
     },
   };
 }
-
-export { useAsyncFetcher };

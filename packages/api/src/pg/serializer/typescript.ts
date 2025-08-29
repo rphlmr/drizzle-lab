@@ -13,7 +13,7 @@ import type {
   Snapshot,
 } from "../schema";
 import { vectorOps } from "../utils";
-import { sqlToSnapshot } from "./snapshot";
+import { sqlToSnapshot } from "./sql-to-snapshot";
 
 const pgImportsList = new Set([
   "pgTable",

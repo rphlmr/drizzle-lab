@@ -4,8 +4,8 @@ export { schemaToDrizzleObjects } from "./serializer/drizzle-objects";
 export {
   drizzleObjectsToSnapshot,
   schemaToSnapshot,
-  sqlToSnapshot,
 } from "./serializer/snapshot";
+export { sqlToSnapshot } from "./serializer/sql-to-snapshot";
 export {
   drizzleObjectsToSql,
   schemaToSql,
