@@ -32,9 +32,17 @@ import * as schema from "../database/schema";
 export function Visualizer() {
   return (
     <div className="size-full flex flex-col">
-      <DrizzleVisualizer schema={schema} dialect="postgresql" />
-      <DrizzleVisualizerLegend />
+      <DrizzleVisualizer schema={schema} dialect="postgresql" theme="dark" />
+      <DrizzleVisualizerLegend theme="dark"/>
     </div>
   );
 }
+```
+
+### Theme
+
+The Drizzle Visualizer supports two themes: `dark` and `light`. You can specify the theme using the `theme` prop.
+
+```tsx
+<DrizzleVisualizer schema={schema} dialect="postgresql" theme="dark" />
 ```
