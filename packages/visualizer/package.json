@@ -34,9 +34,9 @@
     "check:fix": "biome check --fix .",
     "typecheck": "tsc --noEmit",
     "preview": "vite preview",
-    "prerelease:publish": "npm version prerelease && npm publish --access=public --tag next",
-    "patch:publish": "npm version patch && npm publish --access=public",
-    "minor:publish": "npm version minor && npm publish --access=public"
+    "prerelease:publish": "pnpm version prerelease && pnpm publish --access=public --tag next",
+    "patch:publish": "pnpm version patch && pnpm publish --access=public",
+    "minor:publish": "pnpm version minor && pnpm publish --access=public"
   },
   "dependencies": {
     "@drizzle-lab/api": "workspace:*",
