@@ -1,122 +1,122 @@
 {
-	"name": "vscode-drizzle-orm",
-	"displayName": "Drizzle ORM",
-	"description": "Adds schema visualizer for Drizzle ORM",
-	"version": "0.12.0",
-	"private": true,
-	"icon": "icon.png",
-	"license": "MIT",
-	"publisher": "rphlmr",
-	"author": {
-		"name": "Raphaël Moreau",
-		"url": "https://github.com/rphlmr"
-	},
-	"sponsor": {
-		"url": "https://github.com/sponsors/rphlmr"
-	},
-	"engines": {
-		"vscode": "^1.93.0",
-		"node": ">=22.0.0"
-	},
-	"categories": [
-		"Programming Languages"
-	],
-	"homepage": "https://github.com/rphlmr/drizzle-lab",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/rphlmr/drizzle-lab"
-	},
-	"bugs": {
-		"url": "https://github.com/rphlmr/drizzle-lab/issues"
-	},
-	"activationEvents": [
-		"workspaceContains:**/*drizzle.config.ts",
-		"onLanguage:typescript"
-	],
-	"main": "./dist/extension.js",
-	"contributes": {
-		"commands": [
-			{
-				"command": "drizzle.visualizer:stop",
-				"title": "🌧️ Stop Drizzle Visualizer server"
-			},
-			{
-				"command": "drizzle.studio:stop",
-				"title": "🌧️ Stop Drizzle Studio server"
-			}
-		],
-		"codeLens": [
-			{
-				"languages": [
-					"typescript"
-				]
-			}
-		],
-		"configuration": {
-			"title": "Drizzle",
-			"properties": {
-				"drizzle.studio.url": {
-					"type": "string",
-					"default": "https://local.drizzle.studio",
-					"description": "Drizzle Studio URL"
-				}
-			}
-		}
-	},
-	"scripts": {
-		"package": "vsce package --no-dependencies",
-		"vscode:prepublish": "pnpm check && pnpm run build",
-		"compile": "pnpm check && tsx build.ts",
-		"watch": "npm-run-all -p watch:*",
-		"watch:esbuild": "tsx build.ts --watch",
-		"watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
-		"build": "tsx build.ts --production",
-		"check": "biome check .",
-		"check:fix": "biome check --fix .",
-		"typecheck": "tsc --noEmit",
-		"publish": "vsce publish",
-		"patch:publish": "vsce publish patch",
-		"minor:publish": "vsce publish minor"
-	},
-	"devDependencies": {
-		"@drizzle-lab/visualizer": "workspace:*",
-		"@types/mocha": "^10.0.9",
-		"@types/node": "catalog:",
-		"@types/react": "catalog:",
-		"@types/react-dom": "catalog:",
-		"@types/vscode": "^1.93.0",
-		"@vscode/test-cli": "^0.0.10",
-		"@vscode/test-electron": "^2.4.1",
-		"@vscode/vsce": "^3.6.0",
-		"drizzle-kit": "^0.30.5",
-		"esbuild": "^0.24.0",
-		"npm-run-all": "^4.1.5",
-		"tsx": "^4.19.2",
-		"typescript": "catalog:"
-	},
-	"keywords": [
-		"drizzle db",
-		"drizzle orm",
-		"drizzle-orm",
-		"drizzle",
-		"orm drizzle-db",
-		"orm drizzle-orm",
-		"orm drizzle",
-		"orm",
-		"node orm",
-		"typescript",
-		"postgres",
-		"mysql",
-		"sqlite",
-		"sql",
-		"visualizer",
-		"love"
-	],
-	"dependencies": {
-		"@drizzle-lab/visualizer": "workspace:*",
-		"dotenv": "^16.4.7",
-		"jiti": "^2.4.2",
-		"react": "catalog:",
-		"react-dom": "catalog:"
-	}
+  "name": "vscode-drizzle-orm",
+  "displayName": "Drizzle ORM",
+  "description": "Adds schema visualizer for Drizzle ORM",
+  "version": "0.12.0",
+  "private": true,
+  "icon": "icon.png",
+  "license": "MIT",
+  "publisher": "rphlmr",
+  "author": {
+    "name": "Raphaël Moreau",
+    "url": "https://github.com/rphlmr"
+  },
+  "sponsor": {
+    "url": "https://github.com/sponsors/rphlmr"
+  },
+  "engines": {
+    "vscode": "^1.93.0",
+    "node": ">=22.0.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "homepage": "https://github.com/rphlmr/drizzle-lab",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rphlmr/drizzle-lab"
+  },
+  "bugs": {
+    "url": "https://github.com/rphlmr/drizzle-lab/issues"
+  },
+  "activationEvents": [
+    "workspaceContains:**/*drizzle.config.ts",
+    "onLanguage:typescript"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "drizzle.visualizer:stop",
+        "title": "🌧️ Stop Drizzle Visualizer server"
+      },
+      {
+        "command": "drizzle.studio:stop",
+        "title": "🌧️ Stop Drizzle Studio server"
+      }
+    ],
+    "codeLens": [
+      {
+        "languages": [
+          "typescript"
+        ]
+      }
+    ],
+    "configuration": {
+      "title": "Drizzle",
+      "properties": {
+        "drizzle.studio.url": {
+          "type": "string",
+          "default": "https://local.drizzle.studio",
+          "description": "Drizzle Studio URL"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "package": "vsce package --no-dependencies",
+    "vscode:prepublish": "pnpm check && pnpm run build",
+    "compile": "pnpm check && tsx build.ts",
+    "watch": "npm-run-all -p watch:*",
+    "watch:esbuild": "tsx build.ts --watch",
+    "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
+    "build": "tsx build.ts --production",
+    "check": "biome check .",
+    "check:fix": "biome check --fix .",
+    "typecheck": "tsc --noEmit",
+    "publish": "vsce publish",
+    "patch:publish": "vsce publish patch",
+    "minor:publish": "vsce publish minor"
+  },
+  "devDependencies": {
+    "@drizzle-lab/visualizer": "workspace:*",
+    "@types/mocha": "^10.0.9",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "@types/vscode": "^1.93.0",
+    "@vscode/test-cli": "^0.0.10",
+    "@vscode/test-electron": "^2.4.1",
+    "@vscode/vsce": "^3.6.0",
+    "drizzle-kit": "^0.30.5",
+    "esbuild": "^0.24.0",
+    "npm-run-all": "^4.1.5",
+    "tsx": "^4.19.2",
+    "typescript": "catalog:"
+  },
+  "keywords": [
+    "drizzle db",
+    "drizzle orm",
+    "drizzle-orm",
+    "drizzle",
+    "orm drizzle-db",
+    "orm drizzle-orm",
+    "orm drizzle",
+    "orm",
+    "node orm",
+    "typescript",
+    "postgres",
+    "mysql",
+    "sqlite",
+    "sql",
+    "visualizer",
+    "love"
+  ],
+  "dependencies": {
+    "@drizzle-lab/visualizer": "workspace:*",
+    "dotenv": "^16.4.7",
+    "jiti": "^2.4.2",
+    "react": "catalog:",
+    "react-dom": "catalog:"
+  }
 }

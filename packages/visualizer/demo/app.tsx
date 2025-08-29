@@ -1,7 +1,7 @@
 import { DrizzleVisualizer, DrizzleVisualizerLegend } from "../src";
 import * as schema from "./schema";
 
-import "../src/styles.css";
+import "../src/style.css";
 
 export default function App() {
   return (

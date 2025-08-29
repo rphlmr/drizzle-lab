@@ -1,12 +1,11 @@
 import "@xyflow/react/dist/style.css";
 
 import dagre from "@dagrejs/dagre";
-import type { Edge, Node } from "@xyflow/react";
-import { Position } from "@xyflow/react";
-
 import type { Snapshot as MySqlSnapshot } from "@drizzle-lab/api/mysql/web";
 import type { Snapshot as PgSnapshot } from "@drizzle-lab/api/pg/web";
 import type { Snapshot as SQLiteSnapshot } from "@drizzle-lab/api/sqlite/web";
+import type { Edge, Node } from "@xyflow/react";
+import { Position } from "@xyflow/react";
 
 /*
  * Work in progress TODO: refactor and test
@@ -282,7 +281,7 @@ const getLayoutedElements = (nodes: (TableNodeDefinition | ViewNodeDefinition)[]
   return { nodes, edges };
 };
 
-export async function compute(snapshot: Snapshot) {
+export function compute(snapshot: Snapshot) {
   if (!snapshot) {
     return { nodes: [], edges: [] };
   }
@@ -326,6 +325,7 @@ export async function compute(snapshot: Snapshot) {
             target: foreignKey.tableFrom,
             targetHandle: `${foreignKey.columnFrom}-left`,
             style: { strokeWidth: 2 },
+            className: "edge-plain",
             type: "smoothstep",
           });
         }
@@ -344,6 +344,7 @@ export async function compute(snapshot: Snapshot) {
             target: table.name,
             targetHandle: relation.fieldName,
             style: { strokeWidth: 2, strokeDasharray: "5" },
+            className: "edge-dashed",
             type: "smoothstep",
           });
         }
@@ -471,6 +472,7 @@ export async function compute(snapshot: Snapshot) {
             target: foreignKey.tableFrom,
             targetHandle: `${foreignKey.columnFrom}-left`,
             style: { strokeWidth: 2 },
+            className: "edge-plain",
             type: "smoothstep",
           });
         }
@@ -489,6 +491,7 @@ export async function compute(snapshot: Snapshot) {
             target: table.name,
             targetHandle: relation.fieldName,
             style: { strokeWidth: 2, strokeDasharray: "5" },
+            className: "edge-dashed",
             type: "smoothstep",
           });
         }
@@ -612,6 +615,7 @@ export async function compute(snapshot: Snapshot) {
             target: foreignKey.tableFrom,
             targetHandle: `${foreignKey.columnFrom}-left`,
             style: { strokeWidth: 2 },
+            className: "edge-plain",
             type: "smoothstep",
           });
         }
@@ -630,6 +634,7 @@ export async function compute(snapshot: Snapshot) {
             target: table.name,
             targetHandle: relation.fieldName,
             style: { strokeWidth: 2, strokeDasharray: "5" },
+            className: "edge-dashed",
             type: "smoothstep",
           });
         }

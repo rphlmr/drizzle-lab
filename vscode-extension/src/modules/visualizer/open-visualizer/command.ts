@@ -42,7 +42,7 @@ export async function OpenVisualizer(...args: any[]) {
   logger.info(`Env file path: ${envFilePath || "not provided"}`);
 
   try {
-    const { tsSchema, dialect, schemaFilePaths } = await loadDrizzleTsSchema(drizzleConfigPath, envFilePath);
+    const { tsSchema, schemaFilePaths, config } = await loadDrizzleTsSchema(drizzleConfigPath, envFilePath);
 
     console.debug("tsSchema   ", tsSchema);
     console.debug("schemaFilePaths", schemaFilePaths);
@@ -54,10 +54,10 @@ export async function OpenVisualizer(...args: any[]) {
         const watcher = vscode.workspace.createFileSystemWatcher(filePath);
 
         watcher.onDidChange(async () => {
-          const { tsSchema, dialect } = await loadDrizzleTsSchema(drizzleConfigPath, envFilePath);
+          const { tsSchema, config } = await loadDrizzleTsSchema(drizzleConfigPath, envFilePath);
 
           // @ts-expect-error unhandled for now
-          const snapshot = getSnapshot(tsSchema, dialect);
+          const snapshot = getSnapshot(tsSchema, config.dialect, config);
 
           panel.webview.postMessage({
             type: "reload",
@@ -80,25 +80,59 @@ export async function OpenVisualizer(...args: any[]) {
     console.info("scriptUri", scriptUri);
 
     // @ts-expect-error unhandled for now
-    const snapshot = getSnapshot(tsSchema, dialect);
+    const snapshot = getSnapshot(tsSchema, config.dialect, config);
     console.info("snapshot", snapshot);
+
+    panel.webview.onDidReceiveMessage(async (message) => {
+      if (message.type === "save-image") {
+        const { file, fileName } = message.payload;
+        const uri = await vscode.window.showSaveDialog({
+          defaultUri: vscode.Uri.file(fileName),
+          filters: {
+            Images: ["png"],
+          },
+        });
+
+        if (uri) {
+          try {
+            // Extract base64 data from data URL and convert to binary
+            if (file.startsWith("data:image/png;base64,")) {
+              const base64Data = file.split(",")[1];
+              const binaryData = Buffer.from(base64Data, "base64");
+              await vscode.workspace.fs.writeFile(uri, binaryData);
+            } else {
+              throw new Error("Invalid PNG data format");
+            }
+
+            vscode.window.showInformationMessage(`Saved schema to ${uri.fsPath}`);
+          } catch (error) {
+            const errorMsg = error instanceof Error ? error.message : String(error);
+            vscode.window.showErrorMessage(`Failed to save image: ${errorMsg}`);
+            logger.error(`Failed to save image: ${errorMsg}`);
+          }
+        }
+      }
+    });
 
     panel.webview.html = `
 			<!DOCTYPE html>
-			<html lang="en" style="width: 100%; height: 100%; margin: 0; padding: 0;">
+			<html lang="en" style="height: 100vh; width: 100vw">
 			<head>
 					<meta charset="UTF-8">
-					<meta name="viewport" content="width=device-width, initial-scale=1.0">
+					<meta
+            name="viewport"
+            content="width=device-width, height=device-height, initial-scale=1.0"
+          />
 					<link rel="stylesheet" href="${cssUri}">
 					<title>Drizzle Visualizer</title>
 			</head>
-			<body style="width: 100%; height: 100%; margin: 0; padding: 0;">
-					<div id="root" style="width: 100%; height: 100%; margin: 0; padding: 0;"></div>
+			<body style="height: 100%; width: 100%; margin: 0; padding: 0; overflow: hidden">
+					<div id="root" style="height: 100%; width: 100%"></div>
 					<script>
 							window.vscode = acquireVsCodeApi();
 							window.initialData = ${JSON.stringify({ snapshot })};
 					</script>
-					<script src="${scriptUri}"></script>
+					<script type="module" src="${scriptUri}"></script>
 			</body>
 			</html>
 		`;
@@ -117,20 +151,18 @@ async function loadDrizzleTsSchema(drizzleConfigPath: string, envFilePath?: stri
 
   logger.info("Loading drizzle config");
 
-  const {
-    default: { schema, dialect },
-  } = await importModule<Config>({ path: drizzleConfigPath, envFilePath }, pwd);
+  const { default: config } = await importModule<Config>({ path: drizzleConfigPath, envFilePath }, pwd);
 
-  if (!schema) {
+  if (!config.schema) {
     throw new Error("Drizzle config does not have a schema");
   }
 
   const schemaPaths: Array<string> = [];
 
-  if (typeof schema === "string") {
-    schemaPaths.push(schema);
+  if (typeof config.schema === "string") {
+    schemaPaths.push(config.schema);
   } else {
-    schemaPaths.push(...schema);
+    schemaPaths.push(...config.schema);
   }
 
   logger.info(`Drizzle config loaded. Schema paths: ${schemaPaths.join(", ")}`);
@@ -171,7 +203,7 @@ async function loadDrizzleTsSchema(drizzleConfigPath: string, envFilePath?: stri
 
   return {
     tsSchema,
-    dialect,
     schemaFilePaths,
+    config,
   };
 }

@@ -10,58 +10,54 @@ const logger = createLogger("context");
 const OutputKey = "[Context]";
 
 type Configuration = typeof pkg.contributes.configuration.properties;
-type ConfigurationKey = keyof Configuration extends `${string}.${infer Rest}`
-	? Rest
-	: never;
+type ConfigurationKey = keyof Configuration extends `${string}.${infer Rest}` ? Rest : never;
 
 export function getConfiguration<Type>(key: ConfigurationKey) {
-	return vscode.workspace.getConfiguration("drizzle").get<Type>(key);
+  return vscode.workspace.getConfiguration("drizzle").get<Type>(key);
 }
 
 export function getWorkspaceRootFolder(startPath: string) {
-	const workspaceRootPath = vscode.workspace.getWorkspaceFolder(
-		vscode.Uri.file(startPath),
-	)?.uri.fsPath;
+  const workspaceRootPath = vscode.workspace.getWorkspaceFolder(vscode.Uri.file(startPath))?.uri.fsPath;
 
-	if (!workspaceRootPath) {
-		const msg = "No workspace root folder found";
-		toastError(msg);
-		logger.error(msg);
-		throw new Error(msg);
-	}
+  if (!workspaceRootPath) {
+    const msg = "No workspace root folder found";
+    toastError(msg);
+    logger.error(msg);
+    throw new Error(msg);
+  }
 
-	logger.info(`Workspace root folder: ${workspaceRootPath}`);
+  logger.info(`Workspace root folder: ${workspaceRootPath}`);
 
-	return workspaceRootPath;
+  return workspaceRootPath;
 }
 
 export async function findProjectWorkingDir(configPath: string) {
-	const pwd = path.dirname(await findNearestPackageJson(configPath));
+  const pwd = path.dirname(await findNearestPackageJson(configPath));
 
-	logger.info(`Project working directory: ${pwd}`);
+  logger.info(`Project working directory: ${pwd}`);
 
-	return pwd;
+  return pwd;
 }
 
 async function findNearestPackageJson(startPath: string) {
-	const rootPath = getWorkspaceRootFolder(startPath);
-	let currentDir = path.dirname(startPath);
+  const rootPath = getWorkspaceRootFolder(startPath);
+  let currentDir = path.dirname(startPath);
 
-	while (currentDir.startsWith(rootPath)) {
-		try {
-			const packageJsonPath = path.join(currentDir, "package.json");
-			await vscode.workspace.fs.stat(vscode.Uri.file(packageJsonPath));
+  while (currentDir.startsWith(rootPath)) {
+    try {
+      const packageJsonPath = path.join(currentDir, "package.json");
+      await vscode.workspace.fs.stat(vscode.Uri.file(packageJsonPath));
 
-			logger.info(`Found the nearest package.json: ${packageJsonPath}`);
+      logger.info(`Found the nearest package.json: ${packageJsonPath}`);
 
-			return packageJsonPath;
-		} catch {
-			currentDir = path.dirname(currentDir);
-		}
-	}
+      return packageJsonPath;
+    } catch {
+      currentDir = path.dirname(currentDir);
+    }
+  }
 
-	const msg = "No package.json found in workspace";
-	toastError(msg);
-	logger.error(msg);
-	throw new Error(msg);
+  const msg = "No package.json found in workspace";
+  toastError(msg);
+  logger.error(msg);
+  throw new Error(msg);
 }

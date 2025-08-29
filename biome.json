@@ -51,7 +51,8 @@
       "correctness": {
         "recommended": true,
         "noUnusedImports": "warn",
-        "useExhaustiveDependencies": "warn"
+        "useExhaustiveDependencies": "warn",
+        "useUniqueElementIds": "info"
       },
       "a11y": {
         "recommended": true

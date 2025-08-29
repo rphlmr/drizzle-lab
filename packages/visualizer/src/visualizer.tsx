@@ -1,7 +1,6 @@
 "use client";
 
-import "@xyflow/react/dist/style.css";
-
+import type { PartialConfig } from "@drizzle-lab/api/config/node";
 import { schemaToSnapshot as mysqlSchemaToSnapshot } from "@drizzle-lab/api/mysql/web";
 import { schemaToSnapshot as pgSchemaToSnapshot } from "@drizzle-lab/api/pg/web";
 import { schemaToSnapshot as sqliteSchemaToSnapshot } from "@drizzle-lab/api/sqlite/web";
@@ -9,8 +8,6 @@ import type { Edge, NodeChange, NodePositionChange, NodeProps } from "@xyflow/re
 import {
   applyNodeChanges,
   Background,
-  getNodesBounds,
-  getViewportForBounds,
   Handle,
   MiniMap,
   Panel,
@@ -21,7 +18,6 @@ import {
   useKeyPress,
   useReactFlow,
 } from "@xyflow/react";
-import { toPng } from "html-to-image";
 import {
   BadgeCheckIcon,
   BookTextIcon,
@@ -34,7 +30,6 @@ import {
   InfoIcon,
   KeyRoundIcon,
   LinkIcon,
-  LoaderPinwheelIcon,
   LockIcon,
   SheetIcon,
   ShieldCheckIcon,
@@ -70,19 +65,23 @@ function getSavedNodesPositions(projectId: string) {
 
 type DrizzleSchema = Record<string, unknown>;
 
-export function getSnapshot(schema: DrizzleSchema, dialect: "postgresql" | "mysql" | "sqlite" | "turso") {
+export function getSnapshot(
+  schema: DrizzleSchema,
+  dialect: "postgresql" | "mysql" | "sqlite" | "turso",
+  config?: PartialConfig
+) {
   switch (dialect) {
     case "postgresql": {
-      return pgSchemaToSnapshot(schema);
+      return pgSchemaToSnapshot(schema, config);
     }
 
     case "turso":
     case "sqlite": {
-      return sqliteSchemaToSnapshot(schema);
+      return sqliteSchemaToSnapshot(schema, config);
     }
 
     case "mysql": {
-      return mysqlSchemaToSnapshot(schema);
+      return mysqlSchemaToSnapshot(schema, config);
     }
 
     default: {
@@ -187,23 +186,26 @@ export function DrizzleVisualizer({
       return;
     }
 
-    compute(snapshot)
-      .then(({ nodes, edges }) => {
-        const defaultPositions = initialNodesPositions || getSavedNodesPositions(snapshot.projectId);
+    try {
+      const { nodes, edges } = compute(snapshot);
 
-        const updatedNodes = nodes.map((node) => {
-          const defaultPosition = defaultPositions.find((p) => p.id === node.id);
+      const defaultPositions = initialNodesPositions || getSavedNodesPositions(snapshot.projectId);
 
-          if (defaultPosition?.position) {
-            node.position = defaultPosition.position;
-          }
+      const updatedNodes = nodes.map((node) => {
+        const defaultPosition = defaultPositions.find((p) => p.id === node.id);
 
-          return node;
-        });
-        setNodes(updatedNodes);
-        setEdges(edges);
-      })
-      .catch(console.error);
+        if (defaultPosition?.position) {
+          node.position = defaultPosition.position;
+        }
+
+        return node;
+      });
+
+      setNodes(updatedNodes);
+      setEdges(edges);
+    } catch (error) {
+      console.error(error);
+    }
   }, [snapshot, setEdges, initialNodesPositions]);
 
   return (
@@ -237,15 +239,15 @@ export function DrizzleVisualizer({
                       return;
                     }
 
-                    compute(snapshot).then(({ nodes }) => {
-                      onNodesChange(
-                        nodes.map((node) => ({
-                          id: node.id,
-                          position: node.position,
-                          type: "position",
-                        }))
-                      );
-                    });
+                    const { nodes } = compute(snapshot);
+
+                    onNodesChange(
+                      nodes.map((node) => ({
+                        id: node.id,
+                        position: node.position,
+                        type: "position",
+                      }))
+                    );
                   }}
                 />
                 <FitViewButton />
@@ -296,7 +298,7 @@ function TableNode({ data }: NodeProps<TableNodeDefinition>) {
   const hiddenNodeConnector = "dv:h-px! dv:w-px! dv:min-w-0! dv:min-h-0! dv:cursor-grab! dv:border-0! dv:opacity-0!";
 
   return (
-    <div className="dv:flex dv:flex-col dv:bg-background dv:shadow-md dv:border-2 dv:border-border dv:rounded-lg dv:divide-y dv:divide-border dv:min-w-64 dv:text-foreground">
+    <div className="relative dv:flex dv:flex-col dv:bg-background dv:shadow-md dv:border-2 dv:border-border dv:rounded-lg dv:divide-y dv:divide-border dv:min-w-64 dv:text-foreground">
       <div className="dv:flex dv:p-2 dv:text-base">
         <div className="dv:flex dv:flex-col dv:gap-4">
           <div className="dv:flex dv:justify-between dv:items-center dv:gap-4 dv:text-base">
@@ -518,7 +520,7 @@ function TableNode({ data }: NodeProps<TableNodeDefinition>) {
               <Handle
                 type="target"
                 position={Position.Right}
-                id={`${relation.fieldName}`}
+                id={relation.fieldName}
                 className={cn(hiddenNodeConnector, "dv:right-0!")}
               />
             </div>
@@ -540,38 +542,85 @@ function ViewNode({ data }: NodeProps<ViewNodeDefinition>) {
   const hiddenNodeConnector = "dv:h-px! dv:w-px! dv:min-w-0! dv:min-h-0! dv:cursor-grab! dv:border-0! dv:opacity-0!";
 
   return (
-    <>
-      <div className="dv:flex dv:flex-col dv:bg-background dv:shadow-md dv:border-2 dv:border-border dv:rounded-lg dv:divide-y dv:divide-border dv:min-w-64 dv:text-foreground">
-        <div className="dv:flex dv:p-2 dv:text-base">
-          <div className="dv:flex dv:flex-col dv:gap-4 dv:w-full">
-            <div className="dv:flex dv:justify-between dv:items-center dv:gap-4 dv:text-base">
-              <div className="dv:relative dv:flex dv:items-center dv:gap-2">
-                <EyeIcon className="dv:size-5" />
-                <span>{data.schema && data.schema !== "public" ? `${data.schema}.${data.name}` : data.name}</span>
-              </div>
-              <div className="dv:flex dv:items-center dv:gap-2">
-                {data.provider && (
-                  <Badge variant="outline" className="dv:items-center dv:gap-2" data-no-print>
-                    {!data.with?.securityInvoker && <TriangleAlertIcon className="dv:size-4 dv:text-orange-400" />}
-                    RLS {data.with?.securityInvoker ? "enabled" : "disabled"}
-                  </Badge>
-                )}
-                {data.definition && (
+    <div className="dv:flex dv:flex-col dv:bg-background dv:shadow-md dv:border-2 dv:border-border dv:rounded-lg dv:divide-y dv:divide-border dv:min-w-64 dv:text-foreground">
+      <div className="dv:flex dv:p-2 dv:text-base">
+        <div className="dv:flex dv:flex-col dv:gap-4 dv:w-full">
+          <div className="dv:flex dv:justify-between dv:items-center dv:gap-4 dv:text-base">
+            <div className="dv:relative dv:flex dv:items-center dv:gap-2">
+              <EyeIcon className="dv:size-5" />
+              <span>{data.schema && data.schema !== "public" ? `${data.schema}.${data.name}` : data.name}</span>
+            </div>
+            <div className="dv:flex dv:items-center dv:gap-2">
+              {data.provider && (
+                <Badge variant="outline" className="dv:items-center dv:gap-2" data-no-print>
+                  {!data.with?.securityInvoker && <TriangleAlertIcon className="dv:size-4 dv:text-orange-400" />}
+                  RLS {data.with?.securityInvoker ? "enabled" : "disabled"}
+                </Badge>
+              )}
+              {data.definition && (
+                <Popover data-no-print>
+                  <PopoverTrigger asChild>
+                    <Button data-no-print variant="ghost" size="sm" className="dv:border-none dv:h-6">
+                      <span>Definition</span>
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="dv:w-fit dv:max-w-80">
+                    <pre
+                      className="dv:flex dv:flex-wrap dv:overflow-hidden dv:text-sm"
+                      dangerouslySetInnerHTML={{
+                        __html:
+                          highlighter?.codeToHtml(String(data.definition), {
+                            theme: "tokyo-night",
+                            lang: "sql",
+                            structure: "inline",
+                          }) || "",
+                      }}
+                    />
+                  </PopoverContent>
+                </Popover>
+              )}
+            </div>
+          </div>
+          {data.withExplain && data.description && <Description description={data.description} />}
+        </div>
+      </div>
+      <div className="dv:relative dv:divide-y dv:divide-border dv:cursor-default">
+        {data.columns.map((column) => {
+          return (
+            <div key={column.name} className="dv:relative dv:flex dv:flex-col dv:gap-4 dv:p-2 dv:text-sm">
+              <div className="dv:flex dv:justify-between dv:items-center dv:gap-2 dv:w-full">
+                <div className="dv:flex dv:items-center dv:gap-2">
+                  {column.isPrimaryKey && <KeyRoundIcon className="dv:size-4 dv:text-green" />}
+                  {/* {column.isForeignKey && (
+                      <Icon name="link" size="sm" className="text-green" />
+                    )} */}
+                  {column.isUnique && <BadgeCheckIcon className="dv:size-4 dv:text-secondary-foreground" />}
+                  <DiamondIcon className={cn("dv:size-4", column.isNotNull && "dv:fill-secondary-foreground")} />
+                  {column.name}
+                </div>
+                <span className="dv:px-2 dv:py-1 dv:text-muted-foreground dv:text-xs">
+                  {column.enumValues ? column.enumValues.join(" | ") : column.dataType}
+                  {!column.isNotNull && " | null"}
+                </span>
+                {(column.default || column.defaultFn) && (
                   <Popover data-no-print>
                     <PopoverTrigger asChild>
-                      <Button data-no-print variant="ghost" size="sm" className="dv:border-none dv:h-6">
-                        <span>Definition</span>
+                      <Button variant="outline" size="custom" className="dv:right-1 dv:absolute dv:px-2 dv:py-1">
+                        <span className="dv:text-muted-foreground dv:text-xs">
+                          {column.enumValues ? column.enumValues.join(" | ") : column.dataType}
+                          {!column.isNotNull && " | null"}
+                        </span>
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="dv:w-fit dv:max-w-80">
+                    <PopoverContent className="dv:flex dv:flex-row dv:items-center dv:gap-2 dv:w-fit">
+                      <span className="dv:text-muted-foreground dv:text-xs">default:</span>
                       <pre
-                        className="dv:flex dv:flex-wrap dv:overflow-hidden dv:text-sm"
+                        className="dv:text-sm"
                         dangerouslySetInnerHTML={{
                           __html:
-                            highlighter?.codeToHtml(String(data.definition), {
+                            highlighter?.codeToHtml(String(column.default || column.defaultFn || ""), {
                               theme: "tokyo-night",
-                              lang: "sql",
-                              structure: "inline",
+                              lang: column.default ? "sql" : "typescript",
                             }) || "",
                         }}
                       />
@@ -579,80 +628,31 @@ function ViewNode({ data }: NodeProps<ViewNodeDefinition>) {
                   </Popover>
                 )}
               </div>
-            </div>
-            {data.withExplain && data.description && <Description description={data.description} />}
-          </div>
-        </div>
-        <div className="dv:relative dv:divide-y dv:divide-border dv:cursor-default">
-          {data.columns.map((column) => {
-            return (
-              <div key={column.name} className="dv:relative dv:flex dv:flex-col dv:gap-4 dv:p-2 dv:text-sm">
-                <div className="dv:flex dv:justify-between dv:items-center dv:gap-2 dv:w-full">
-                  <div className="dv:flex dv:items-center dv:gap-2">
-                    {column.isPrimaryKey && <KeyRoundIcon className="dv:size-4 dv:text-green" />}
-                    {/* {column.isForeignKey && (
-                      <Icon name="link" size="sm" className="text-green" />
-                    )} */}
-                    {column.isUnique && <BadgeCheckIcon className="dv:size-4 dv:text-secondary-foreground" />}
-                    <DiamondIcon className={cn("dv:size-4", column.isNotNull && "dv:fill-secondary-foreground")} />
-                    {column.name}
-                  </div>
-                  <span className="dv:px-2 dv:py-1 dv:text-muted-foreground dv:text-xs">
-                    {column.enumValues ? column.enumValues.join(" | ") : column.dataType}
-                    {!column.isNotNull && " | null"}
-                  </span>
-                  {(column.default || column.defaultFn) && (
-                    <Popover data-no-print>
-                      <PopoverTrigger asChild>
-                        <Button variant="outline" size="custom" className="dv:right-1 dv:absolute dv:px-2 dv:py-1">
-                          <span className="dv:text-muted-foreground dv:text-xs">
-                            {column.enumValues ? column.enumValues.join(" | ") : column.dataType}
-                            {!column.isNotNull && " | null"}
-                          </span>
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="dv:flex dv:flex-row dv:items-center dv:gap-2 dv:w-fit">
-                        <span className="dv:text-muted-foreground dv:text-xs">default:</span>
-                        <pre
-                          className="dv:text-sm"
-                          dangerouslySetInnerHTML={{
-                            __html:
-                              highlighter?.codeToHtml(String(column.default || column.defaultFn || ""), {
-                                theme: "tokyo-night",
-                                lang: column.default ? "sql" : "typescript",
-                              }) || "",
-                          }}
-                        />
-                      </PopoverContent>
-                    </Popover>
-                  )}
-                </div>
-                {data.withExplain && column.description && <Description description={column.description} />}
-                <Handle
-                  type="target"
-                  position={Position.Left}
-                  id={`${column.name}-left`}
-                  className={cn(hiddenNodeConnector, "dv:left-0!")}
-                />
+              {data.withExplain && column.description && <Description description={column.description} />}
+              <Handle
+                type="target"
+                position={Position.Left}
+                id={`${column.name}-left`}
+                className={cn(hiddenNodeConnector, "dv:left-0!")}
+              />
 
-                <Handle
-                  type="source"
-                  position={Position.Right}
-                  id={`${column.name}-right`}
-                  className={cn(hiddenNodeConnector, "dv:right-0!")}
-                />
-              </div>
-            );
-          })}
-        </div>
-        <Handle
-          type="source"
-          position={Position.Bottom}
-          id="relation"
-          className={cn(hiddenNodeConnector, "dv:bottom-0!")}
-        />
+              <Handle
+                type="source"
+                position={Position.Right}
+                id={`${column.name}-right`}
+                className={cn(hiddenNodeConnector, "dv:right-0!")}
+              />
+            </div>
+          );
+        })}
       </div>
-    </>
+      <Handle
+        type="source"
+        position={Position.Bottom}
+        id="relation"
+        className={cn(hiddenNodeConnector, "dv:bottom-0!")}
+      />
+    </div>
   );
 }
 
@@ -761,118 +761,106 @@ function ExplainToggle(props: React.ComponentPropsWithoutRef<typeof Toggle>) {
   );
 }
 
-function downloadImage(dataUrl: string) {
-  const a = document.createElement("a");
+declare global {
+  interface Window {
+    vscode?: {
+      postMessage: (message: any) => void;
+    };
+  }
+}
 
-  a.setAttribute("download", "schema.png");
-  a.setAttribute("href", dataUrl);
+function saveAs(file: string, fileName = "schema.png") {
+  if (window.vscode) {
+    window.vscode.postMessage({
+      type: "save-image",
+      payload: {
+        file,
+        fileName,
+      },
+    });
+
+    return;
+  }
+
+  const a = document.createElement("a");
+  a.style.display = "none";
+  a.download = fileName;
+  a.href = file;
+  document.body.appendChild(a);
   a.click();
+  document.body.removeChild(a);
 }
 
 const PADDING = 100; // Add padding around the nodes
-const MIN_DIMENSION = 1024; // Minimum dimension to ensure quality
-const MAX_DIMENSION = 4096; // Maximum dimension to prevent excessive file size
 
 export function DownloadSchemaButton() {
   const theme = useTheme();
   const { getNodes } = useReactFlow();
-  const [isGenerating, setIsGenerating] = useState(false);
+  const { getNodesBounds } = useReactFlow();
 
   const onClick = async () => {
-    setIsGenerating(true);
+    const { toPng } = await import("html-to-image");
 
-    try {
-      const nodes = getNodes();
-      const nodesBounds = getNodesBounds(nodes);
+    const nodes = getNodes();
+    const nodesBounds = getNodesBounds(nodes);
 
-      // Add padding to the bounds
-      nodesBounds.x -= PADDING;
-      nodesBounds.y -= PADDING;
-      nodesBounds.width += 2 * PADDING;
-      nodesBounds.height += 2 * PADDING;
+    nodesBounds.x -= PADDING;
+    nodesBounds.y -= PADDING;
+    nodesBounds.width += 2 * PADDING;
+    nodesBounds.height += 2 * PADDING;
 
-      // Calculate dimensions while maintaining aspect ratio
-      const aspectRatio = nodesBounds.width / nodesBounds.height;
-      let imageWidth = 0;
-      let imageHeight = 0;
+    const viewport = document.querySelector(".react-flow__viewport") as HTMLElement;
 
-      if (aspectRatio > 1) {
-        // Wider than tall
-        imageWidth = Math.min(Math.max(nodesBounds.width, MIN_DIMENSION), MAX_DIMENSION);
-        imageHeight = imageWidth / aspectRatio;
-      } else {
-        // Taller than wide
-        imageHeight = Math.min(Math.max(nodesBounds.height, MIN_DIMENSION), MAX_DIMENSION);
-        imageWidth = imageHeight * aspectRatio;
-      }
-
-      // Round dimensions to integers
-      imageWidth = Math.round(imageWidth);
-      imageHeight = Math.round(imageHeight);
-
-      // Create a hidden container - Prevents UI flickering while generating
-      const hiddenContainer = document.createElement("div");
-      hiddenContainer.dataset.app = "drizzle-visualizer";
-      hiddenContainer.dataset.theme = theme;
-      hiddenContainer.classList.add("react-flow");
-      hiddenContainer.classList.add(theme);
-      hiddenContainer.style.position = "absolute";
-      hiddenContainer.style.left = "-99999px";
-      hiddenContainer.style.width = `${imageWidth}px`;
-      hiddenContainer.style.height = `${imageHeight}px`;
-      document.body.appendChild(hiddenContainer);
-
-      // Clone the viewport into the hidden container
-      const viewport = document.querySelector(".react-flow__viewport") as HTMLElement;
-
-      if (!viewport) {
-        return;
-      }
-
-      const viewportClone = viewport.cloneNode(true) as HTMLElement;
-      hiddenContainer.appendChild(viewportClone);
-
-      // Calculate and apply transform
-      const transform = getViewportForBounds(
-        nodesBounds,
-        imageWidth,
-        imageHeight,
-        0.1, // Lower minZoom to handle spread out tables better
-        1, // maxZoom
-        1.2 // Slightly increase padding factor
-      );
-
-      viewportClone.style.transform = `translate(${transform.x}px, ${transform.y}px) scale(${transform.zoom})`;
-
-      try {
-        const dataUrl = await toPng(viewportClone, {
-          width: imageWidth,
-          height: imageHeight,
-          skipFonts: true,
-          backgroundColor: theme === "dark" ? "#0f0f14" : "#fff",
-          filter: (node) => {
-            return !node.dataset?.noPrint;
-          },
-        });
-
-        downloadImage(dataUrl);
-      } finally {
-        // Clean up
-        document.body.removeChild(hiddenContainer);
-      }
-    } finally {
-      setIsGenerating(false);
+    if (!viewport) {
+      return;
     }
-  };
 
-  const Icon = isGenerating ? LoaderPinwheelIcon : ImageDownIcon;
+    // Batch DOM operations for better performance
+    const edgePaths = viewport.querySelectorAll(
+      ".edge-dashed > .react-flow__edge-path, .edge-plain > .react-flow__edge-path"
+    );
+
+    await new Promise<void>((resolve) => {
+      for (const path of edgePaths) {
+        const isDashed = path.closest(".edge-dashed");
+        path.setAttribute(
+          "style",
+          isDashed
+            ? "stroke: #3e3e3e; stroke-width: 2; stroke-dasharray: 5; fill: none;"
+            : "stroke: #3e3e3e; stroke-width: 2; fill: none;"
+        );
+      }
+      resolve();
+    });
+
+    const file = await toPng(viewport, {
+      width: nodesBounds.width,
+      height: nodesBounds.height,
+      skipFonts: true,
+      skipAutoScale: true,
+      backgroundColor: theme === "dark" ? "#0f0f14" : "#fff",
+      quality: 1,
+      cacheBust: false,
+      pixelRatio: 1,
+      style: {
+        width: `${nodesBounds.width}px`,
+        height: `${nodesBounds.height}px`,
+        transform: `translate(${-nodesBounds.x}px, ${-nodesBounds.y}px) scale(1)`,
+      },
+      filter: (node) => {
+        return !node.dataset?.noPrint;
+      },
+    });
+
+    saveAs(file);
+  };
 
   return (
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <Button variant="outline" size="icon:sm" onClick={onClick} disabled={isGenerating}>
-            <Icon className={cn("dv:size-4", isGenerating && "dv:animate-spin")} />
+          <Button variant="outline" size="icon:sm" onClick={onClick}>
+            <ImageDownIcon className={cn("dv:size-4")} />
           </Button>
         </TooltipTrigger>
         <TooltipContent>
