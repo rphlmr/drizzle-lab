@@ -17,7 +17,8 @@
     "build": "turbo build",
     "clear:all": "rm -rf node_modules pnpm-lock.yaml .turbo && find . \\( -name 'node_modules' -o -name 'pnpm-lock.yaml' -o -name '.turbo' -o -name 'build' -o -name 'dist' \\) -print0 | xargs -0 rm -rf --",
     "drizzle-run:docker:build": "docker build -f apps/drizzle-run/Dockerfile -t drizzle-run .",
-    "drizzle-run:docker:run": "docker run --rm --name drizzle-run -p 3000:3000 --env-file apps/drizzle-run/.env.production drizzle-run"
+    "drizzle-run:docker:run": "docker run --rm --name drizzle-run -p 3000:3000 --env-file apps/drizzle-run/.env.production drizzle-run",
+    "prod:drizzle-run:deploy": "fly deploy -c apps/drizzle-run/fly.toml --dockerfile apps/drizzle-run/Dockerfile --ignorefile .dockerignore --remote-only"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.2.2",
